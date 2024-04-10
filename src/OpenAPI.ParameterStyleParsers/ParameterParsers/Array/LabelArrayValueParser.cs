@@ -4,25 +4,14 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
 
-internal sealed class LabelArrayValueParser : ArrayValueParser
+internal sealed class LabelArrayValueParser(bool explode, JsonSchema schema) : ArrayValueParser(schema, explode)
 {
-    public LabelArrayValueParser(bool explode, JsonSchema schema) : base(schema, explode)
-    {
-    }
-
     public override bool TryParse(
-        IReadOnlyCollection<string> values,
-        [NotNullWhen(true)] out JsonNode? array,
+        string? value,
+        out JsonNode? array,
         [NotNullWhen(false)] out string? error)
     {
-        if (values.Count != 1)
-        {
-            error = $"Expected one value when parameter style is '{Parameter.Styles.Label}'";
-            array = null;
-            return false;
-        }
-        var arrayValues = values
-            .First()
+        var arrayValues = value?
             .Split('.')[1..];
         return TryGetArrayItems(arrayValues, out array, out error);
     }

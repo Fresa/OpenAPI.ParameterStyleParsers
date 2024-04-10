@@ -6,16 +6,11 @@ using OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
 
-internal abstract class ObjectValueParser : IValueParser
+internal abstract class ObjectValueParser(JsonSchema schema, bool explode) : IValueParser
 {
-    private readonly PropertySchemaResolver _propertySchemaResolver;
+    private readonly PropertySchemaResolver _propertySchemaResolver = new(schema);
 
-    internal bool Explode { get; }
-    protected ObjectValueParser(JsonSchema schema, bool explode)
-    {
-        _propertySchemaResolver = new PropertySchemaResolver(schema);
-        Explode = explode;
-    }
+    internal bool Explode { get; } = explode;
 
     internal static ObjectValueParser Create(Parameter parameter, JsonSchema schema) =>
         parameter.Style switch
@@ -24,21 +19,30 @@ internal abstract class ObjectValueParser : IValueParser
             Parameter.Styles.Label => new LabelObjectValueParser(parameter.Explode, schema),
             Parameter.Styles.Form => new FormObjectValueParser(parameter.Explode, schema),
             Parameter.Styles.DeepObject => new DeepObjectValueParser(parameter.Explode, schema),
+            Parameter.Styles.PipeDelimited => new PipeDelimitedObjectValueParser(parameter.Explode, schema),
+            Parameter.Styles.SpaceDelimited => new SpaceDelimitedObjectValueParser(parameter.Explode, schema),
             _ => throw new ArgumentException(nameof(parameter.Style),
                 $"Style '{parameter.Style}' not supported for object")
         };
 
     public abstract bool TryParse(
-        IReadOnlyCollection<string> values,
-        [NotNullWhen(true)] out JsonNode? array,
+        string? value,
+        out JsonNode? obj,
         [NotNullWhen(false)] out string? error);
 
 
     protected bool TryGetObjectProperties(
-        IReadOnlyList<string> keyAndValues,
-        [NotNullWhen(true)] out JsonNode? obj,
+        IReadOnlyList<string>? keyAndValues,
+        out JsonNode? obj,
         [NotNullWhen(false)] out string? error)
     {
+        if (keyAndValues == null)
+        {
+            obj = null;
+            error = null; 
+            return true;
+        }
+
         var jsonObject = new JsonObject();
         for (var i = 0; i < keyAndValues.Count; i += 2)
         {

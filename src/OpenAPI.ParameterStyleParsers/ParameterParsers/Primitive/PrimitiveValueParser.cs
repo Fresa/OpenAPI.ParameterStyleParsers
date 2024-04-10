@@ -40,21 +40,13 @@ internal abstract class PrimitiveValueParser : IValueParser
     }
 
     protected abstract bool TryParse(
-        string input,
+        string? input,
         out string? value,
         [NotNullWhen(false)] out string? error);
 
-    public bool TryParse(IReadOnlyCollection<string> values, out JsonNode? instance,
+    public bool TryParse(string? value, out JsonNode? instance,
         [NotNullWhen(false)] out string? error)
     {
-        if (values.Count > 1)
-        {
-            error = $"Expected at most one value got {values.Count}";
-            instance = null;
-            return false;
-        }
-
-        var value = values.FirstOrDefault();
         if (value == null)
         {
             instance = null;
@@ -62,9 +54,10 @@ internal abstract class PrimitiveValueParser : IValueParser
             return true;
         }
 
-        if (TryParse(value, out var parsedValue, out error))
+        if (TryParse(value, out string? parsedValue, out error))
         {
-            return PrimitiveJsonConverter.TryConvert(parsedValue, Type, out instance, out error);
+            var unescapedValue = parsedValue == null ? null : Uri.UnescapeDataString(parsedValue);
+            return PrimitiveJsonConverter.TryConvert(unescapedValue, Type, out instance, out error);
         }
 
         instance = null;

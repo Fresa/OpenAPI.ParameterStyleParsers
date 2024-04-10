@@ -3,14 +3,10 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
-internal sealed class FormPrimitiveValueParser : PrimitiveValueParser
+internal sealed class FormPrimitiveValueParser(bool explode, SchemaValueType type) : PrimitiveValueParser(explode, type)
 {
-    public FormPrimitiveValueParser(bool explode, SchemaValueType type) : base(explode, type)
-    {
-    }
-
     protected override bool TryParse(
-        string input,
+        string? input,
         out string? value,
         [NotNullWhen(false)] out string? error)
     {

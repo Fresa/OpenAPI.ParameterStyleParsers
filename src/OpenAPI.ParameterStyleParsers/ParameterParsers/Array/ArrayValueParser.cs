@@ -27,7 +27,7 @@ internal abstract class ArrayValueParser : IValueParser
 
         _jsonType = jsonType.Value;
     }
-
+    
     internal static ArrayValueParser Create(Parameter parameter, JsonSchema schema) =>
         parameter.Style switch
         {
@@ -42,15 +42,22 @@ internal abstract class ArrayValueParser : IValueParser
         };
 
     public abstract bool TryParse(
-        IReadOnlyCollection<string> values,
-        [NotNullWhen(true)] out JsonNode? array,
+        string? value,
+        out JsonNode? array,
         [NotNullWhen(false)] out string? error);
 
     protected bool TryGetArrayItems(
-        IReadOnlyList<string> values,
-        [NotNullWhen(true)] out JsonNode? array,
+        IReadOnlyList<string>? values,
+        out JsonNode? array,
         [NotNullWhen(false)] out string? error)
     {
+        if (values == null || !values.Any())
+        {
+            error = null;
+            array = null;
+            return true;
+        }
+
         var items = new JsonNode?[values.Count];
         for (var index = 0; index < values.Count; index++)
         {

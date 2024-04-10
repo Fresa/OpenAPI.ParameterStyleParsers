@@ -3,19 +3,16 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
-internal sealed class MatrixPrimitiveValueParser : PrimitiveValueParser
+internal sealed class MatrixPrimitiveValueParser(bool explode, SchemaValueType type)
+    : PrimitiveValueParser(explode, type)
 {
-    internal MatrixPrimitiveValueParser(bool explode, SchemaValueType type) : base(explode, type)
-    {
-    }
-
     protected override bool TryParse(
-        string input,
+        string? input,
         out string? value,
         [NotNullWhen(false)] out string? error)
     {
         error = null;
-        value = input.IndexOf('=') > -1 ? input[(input.IndexOf('=') + 1)..] : string.Empty;
+        value = input?.IndexOf('=') > -1 ? input[(input.IndexOf('=') + 1)..] : string.Empty;
         return true;
     }
 }

@@ -6,7 +6,7 @@ namespace OpenAPI.ParameterStyleParsers.ParameterParsers;
 internal interface IValueParser
 {
     internal bool TryParse(
-        IReadOnlyCollection<string> values,
+        string? value,
         out JsonNode? instance,
         [NotNullWhen(false)] out string? error);
 }

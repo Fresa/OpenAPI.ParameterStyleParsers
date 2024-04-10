@@ -4,32 +4,20 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
 
-internal sealed class MatrixArrayValueParser : ArrayValueParser
+internal sealed class MatrixArrayValueParser(bool explode, JsonSchema schema) : ArrayValueParser(schema, explode)
 {
-    public MatrixArrayValueParser(bool explode, JsonSchema schema) : base(schema, explode)
-    {
-    }
-
     public override bool TryParse(
-        IReadOnlyCollection<string> values,
-        [NotNullWhen(true)] out JsonNode? array,
+        string? value,
+        out JsonNode? array,
         [NotNullWhen(false)] out string? error)
     {
-        if (values.Count != 1)
-        {
-            error = $"Expected one value when parameter style is '{Parameter.Styles.Matrix}'";
-            array = null;
-            return false;
-        }
-
-        var arrayValues = values
-            .First()
+        var arrayValues = value?
             .Split(';', StringSplitOptions.RemoveEmptyEntries)
             .SelectMany(expression =>
             {
                 var valueAndKey = expression.Split('=');
                 var value = valueAndKey.Length == 1 ? string.Empty : valueAndKey.Last();
-                return Explode ? new[] { value } : value.Split(',');
+                return Explode ? [value] : value.Split(',');
             })
             .ToArray();
         return TryGetArrayItems(arrayValues, out array, out error);

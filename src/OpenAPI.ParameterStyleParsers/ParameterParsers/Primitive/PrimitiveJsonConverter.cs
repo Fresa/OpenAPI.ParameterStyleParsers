@@ -22,7 +22,7 @@ internal static class PrimitiveJsonConverter
             case SchemaValueType.Boolean:
             case SchemaValueType.Integer:
             case SchemaValueType.Null:
-                instance = value == null ? null : JsonNode.Parse(value);
+                instance = string.IsNullOrEmpty(value) ? null : JsonNode.Parse(value);
                 error = null;
                 return true;
             default:

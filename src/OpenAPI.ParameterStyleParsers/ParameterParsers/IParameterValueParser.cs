@@ -6,7 +6,7 @@ namespace OpenAPI.ParameterStyleParsers.ParameterParsers;
 public interface IParameterValueParser 
 {
     bool TryParse(
-        string[] values,
+        string value,
         out JsonNode? instance,
         [NotNullWhen(false)] out string? mappingError);
 }

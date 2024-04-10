@@ -2,47 +2,33 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using Json.Schema;
 using OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
+using OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
 using OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers;
 
 internal sealed class MissingSchemaTypeValueParser : IValueParser
 {
-    private readonly PrimitiveValueParser _primitiveValueParser;
-    private readonly ArrayValueParser _arrayValueParser;
-    
-    private MissingSchemaTypeValueParser(PrimitiveValueParser primitiveValueParser, ArrayValueParser arrayValueParser)
-    {
-        _primitiveValueParser = primitiveValueParser;
-        _arrayValueParser = arrayValueParser;
-    }
+    private readonly IValueParser _valueParser;
 
+    private MissingSchemaTypeValueParser(IValueParser valueParser)
+    {
+        _valueParser = valueParser;
+    }
 
     internal static MissingSchemaTypeValueParser Create(Parameter parameter)
     {
         var stringSchema = new JsonSchemaBuilder().Type(SchemaValueType.String);
-        var primitiveValueParser = PrimitiveValueParser.Create(parameter,
-            stringSchema);
+        if (parameter.Style == Parameter.Styles.DeepObject)
+            return new MissingSchemaTypeValueParser(new DeepObjectValueParser(parameter.Explode, stringSchema));
         var arrayValueParser = ArrayValueParser.Create(parameter,
             new JsonSchemaBuilder().Type(SchemaValueType.Array).Items(stringSchema));
-        return new MissingSchemaTypeValueParser(primitiveValueParser, arrayValueParser);
+        return new MissingSchemaTypeValueParser(arrayValueParser);
     }
 
-    public bool TryParse(IReadOnlyCollection<string> values, out JsonNode? instance, 
+    public bool TryParse(string? value, out JsonNode? instance, 
         [NotNullWhen(false)] out string? error)
     {
-        error = null;
-        return values.Count switch
-        {
-            0 => CreateNull(out instance),
-            1 => _primitiveValueParser.TryParse(values, out instance, out error),
-            _ => _arrayValueParser.TryParse(values, out instance, out error)
-        };
-    }
-
-    private static bool CreateNull(out JsonNode? instance)
-    {
-        instance = null;
-        return true;
+        return _valueParser.TryParse(value, out instance, out error);
     }
 }

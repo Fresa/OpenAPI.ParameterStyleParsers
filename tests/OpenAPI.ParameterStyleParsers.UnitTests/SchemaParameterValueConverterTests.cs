@@ -30,7 +30,7 @@ public class SchemaParameterValueConverterTests
     [MemberData(nameof(DeepObject))]
     public void Given_a_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
         string parameterJson,
-        string[] values,
+        string? value,
         bool shouldMap,
         string? jsonInstance)
     {
@@ -42,7 +42,7 @@ public class SchemaParameterValueConverterTests
                 reader.Read("style").GetValue<string>(), 
                 reader.Read("explode").GetValue<bool>());
         var parser = ParameterValueParser.Create(parameter, schema!);
-        parser.TryParse(values, out var instance, out var mappingError).Should().Be(shouldMap, mappingError);
+        parser.TryParse(value, out var instance, out var mappingError).Should().Be(shouldMap, mappingError);
         if (!shouldMap)
         {
             mappingError.Should().NotBeNullOrEmpty();
@@ -55,13 +55,13 @@ public class SchemaParameterValueConverterTests
         }
         else
         {
-            jsonInstance.Should().NotBeNullOrEmpty();
+            jsonInstance.Should().NotBeNull();
             instance.ToJsonString().Should().BeEquivalentTo(jsonInstance);
         }
     }
 
     #region Object
-    public static TheoryData<string, string[], bool, string?> DeepObject => new()
+    public static TheoryData<string, string, bool, string?> DeepObject => new()
     {
         {
             """
@@ -84,7 +84,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "color[R]=100", "color[G]=200", "color[B]=150" },
+            "color[R]=100&color[G]=200&color[B]=150",
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -101,12 +101,12 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "color[R]=100", "color[G]=200", "color[B]=" },
+            "color[R]=100&color[G]=200&color[B]=",
             true,
             """{"R":"100","G":"200","B":""}"""
         }
     };
-    public static TheoryData<string, string[], bool, string?> ObjectLabel => new()
+    public static TheoryData<string, string, bool, string?> ObjectLabel => new()
     {
         {
             """
@@ -129,7 +129,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { ".R=100.G=200.B=150" },
+            ".R=100.G=200.B=150",
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -146,7 +146,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { ".R=100.G=200.B" },
+            ".R=100.G=200.B",
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -171,7 +171,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new[] { ".R.100.G.200.B.150" },
+            ".R.100.G.200.B.150",
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -188,12 +188,12 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-        new[] { ".R.100.G.200.B." },
+        ".R.100.G.200.B.",
         true,
         """{"R":"100","G":"200","B":""}"""
         }
     };
-    public static TheoryData<string, string[], bool, string?> ObjectMatrix => new()
+    public static TheoryData<string, string, bool, string?> ObjectMatrix => new()
     {
         {
             """
@@ -216,7 +216,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { ";R=100;G=200;B=150" },
+            ";R=100;G=200;B=150",
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -233,7 +233,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            [";R=100;G=200;B"],
+            ";R=100;G=200;B",
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -258,7 +258,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            [";color=R,100,G,200,B,150"],
+            ";color=R,100,G,200,B,150",
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -283,12 +283,12 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            [";keys=comma,%2C,dot,.,semi,%3B"],
+            ";keys=comma,%2C,dot,.,semi,%3B",
             true,
             """{"comma":",","dot":".","semi":";"}"""
         }
     };
-    public static TheoryData<string, string[], bool, string?> ObjectForm => new()
+    public static TheoryData<string, string, bool, string?> ObjectForm => new()
     {
         {
             """
@@ -314,7 +314,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new[] { "R,100,G,200,B,150" },
+            "R,100,G,200,B,150",
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -339,7 +339,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new[] { "R,100,G,200,B," },
+            "R,100,G,200,B,",
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -356,7 +356,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new[] { "R,100,G,200,B," },
+            "R,100,G,200,B,",
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -381,7 +381,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new[] { "R,100,G,200,B," },
+            "R,100,G,200,B,",
             true,
             """{"R":100,"G":200,"B":""}"""
         }
@@ -389,7 +389,7 @@ public class SchemaParameterValueConverterTests
     #endregion
 
     #region Array
-    public static TheoryData<string, string[], bool, string?> ArrayLabel => new()
+    public static TheoryData<string, string?, bool, string?> ArrayLabel => new()
     {
         {
             """
@@ -404,7 +404,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { ".test.test2" },
+            ".test.test2",
             true,
             "[\"test\",\"test2\"]"
         },
@@ -421,7 +421,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new[] { ".test.test2" },
+            ".test.test2",
             true,
             "[\"test\",\"test2\"]"
         },
@@ -438,13 +438,13 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new[] { ".test." },
+            ".test.",
             true,
             "[\"test\",\"\"]"
         }
     };
 
-    public static TheoryData<string, string[], bool, string?> ArrayForm => new()
+    public static TheoryData<string, string?, bool, string?> ArrayForm => new()
     {
         {
             """
@@ -459,7 +459,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "test", "test2" },
+            "color=test&color=test2",
             true,
             "[\"test\",\"test2\"]"
         },
@@ -476,13 +476,13 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new[] { "test,test2" },
+            "color=test,test2",
             true,
             "[\"test\",\"test2\"]"
         }
     };
 
-    public static TheoryData<string, string[], bool, string?> ArrayMatrix => new()
+    public static TheoryData<string, string?, bool, string?> ArrayMatrix => new()
     {
         {
             """
@@ -497,7 +497,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { ";test=test;test=test2" },
+            ";test=test;test=test2",
             true,
             "[\"test\",\"test2\"]"
         },
@@ -514,7 +514,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { ";test=test;test" },
+            ";test=test;test",
             true,
             "[\"test\",\"\"]"
         },
@@ -531,13 +531,13 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new[] { ";test=test,test2" },
+            ";test=test,test2",
             true,
             "[\"test\",\"test2\"]"
         }
     };
 
-    public static TheoryData<string, string[], bool, string?> ArraySimple => new()
+    public static TheoryData<string, string?, bool, string?> ArraySimple => new()
     {
         {
             """
@@ -552,7 +552,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "test,test2" },
+            "test,test2",
             true,
             "[\"test\",\"test2\"]"
         },
@@ -569,7 +569,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "test," },
+            "test,",
             true,
             "[\"test\",\"\"]"
         },
@@ -586,13 +586,13 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new[] { "test,test2" },
+            "test,test2",
             true,
             "[\"test\",\"test2\"]"
         }
     };
 
-    public static TheoryData<string, string[], bool, string?> ArraySpaceDelimited => new()
+    public static TheoryData<string, string?, bool, string?> ArraySpaceDelimited => new()
     {
         {
             """
@@ -607,7 +607,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "test test2" },
+            "color=test&color=test2",
             true,
             "[\"test\",\"test2\"]"
         },
@@ -624,7 +624,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "test " },
+            "color=test&color=",
             true,
             "[\"test\",\"\"]"
         },
@@ -641,13 +641,30 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new[] { "test", "test2" },
+            "color=test%20test2",
             true,
             "[\"test\",\"test2\"]"
+        },
+        {
+            """
+            {
+                "schema": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "style": "spaceDelimited",
+                "explode": false
+            }
+            """,
+            "color=test%20",
+            true,
+            "[\"test\",\"\"]"
         }
     };
 
-    public static TheoryData<string, string[], bool, string?> ArrayPipeDelimited => new()
+    public static TheoryData<string, string?, bool, string?> ArrayPipeDelimited => new()
     {
         {
             """
@@ -662,7 +679,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "test|test2" },
+            "color=test&color=test2",
             true,
             "[\"test\",\"test2\"]"
         },
@@ -679,7 +696,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "test|" },
+            "color=test&color=",
             true,
             "[\"test\",\"\"]"
         },
@@ -696,14 +713,31 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new[] { "test", "test2" },
+            "color=test|test2",
             true,
             "[\"test\",\"test2\"]"
+        },
+        {
+            """
+            {
+                "schema": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "style": "pipeDelimited",
+                "explode": false
+            }
+            """,
+            "color=test|",
+            true,
+            "[\"test\",\"\"]"
         }
     };
     #endregion
 
-    public static TheoryData<string, string[], bool, string?> String => new()
+    public static TheoryData<string, string, bool, string?> String => new()
     {
         {
             """
@@ -715,27 +749,13 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "test" },
+            "test",
             true,
             "\"test\""
-        },
-        {
-            """
-            {
-                "schema": {
-                    "type": "string" 
-                },
-                "style": "form",
-                "explode": true
-            }
-            """,
-            new[] { "test", "test2" },
-            false,
-            null
         }
     };
 
-    public static TheoryData<string, string[], bool, string?> Number => new()
+    public static TheoryData<string, string, bool, string?> Number => new()
     {
         {
             """
@@ -747,27 +767,13 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "1.2" },
+            "1.2",
             true,
             "1.2"
-        },
-        {
-            """
-            {
-                "schema": {
-                    "type": "number" 
-                },
-                "style": "form",
-                "explode": true
-            }
-            """,
-            new[] { "1.2", "1.3" },
-            false,
-            null
         }
     };
 
-    public static TheoryData<string, string[], bool, string?> Integer => new()
+    public static TheoryData<string, string, bool, string?> Integer => new()
     {
         {
             """
@@ -779,13 +785,13 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "1" },
+            "1",
             true,
             "1"
         }
     };
 
-    public static TheoryData<string, string[], bool, string?> Boolean => new()
+    public static TheoryData<string, string, bool, string?> Boolean => new()
     {
         {
             """
@@ -796,13 +802,13 @@ public class SchemaParameterValueConverterTests
                 "style": "form",
                 "explode": true}
             """,
-            new[] { "true" },
+            "true",
             true,
             "true"
         }
     };
 
-    public static TheoryData<string, string[], bool, string?> Null => new()
+    public static TheoryData<string, string?, bool, string?> Null => new()
     {
         {
             """
@@ -814,13 +820,27 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            System.Array.Empty<string>(),
+            "",
+            true,
+            null
+        },
+        {
+            """
+            {
+                "schema": {
+                    "type": "null"
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            null,
             true,
             null
         }
     };
 
-    public static TheoryData<string, string[], bool, string?> EmptySchema => new()
+    public static TheoryData<string, string?, bool, string?> EmptySchema => new()
     {
         {
             """
@@ -831,9 +851,9 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "test" },
+            "color=test",
             true,
-            "\"test\""
+            """["test"]"""
         },
         {
             """
@@ -844,7 +864,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new[] { "test", "test2" },
+            "color=test&color=test2",
             true,
             """["test","test2"]"""
         },
@@ -857,9 +877,22 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            Array.Empty<string>(),
+            "",
             true,
-            null
+            """[""]"""
+        },
+        {
+            """
+            {
+                "schema": {
+                },
+                "style": "label",
+                "explode": false
+            }
+            """,
+            ".",
+            true,
+            """[""]"""
         }
     };
 }

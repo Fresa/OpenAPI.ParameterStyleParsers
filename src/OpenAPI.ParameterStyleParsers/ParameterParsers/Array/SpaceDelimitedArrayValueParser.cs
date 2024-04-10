@@ -4,30 +4,24 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
 
-internal sealed class SpaceDelimitedArrayValueParser : ArrayValueParser
+internal sealed class SpaceDelimitedArrayValueParser(bool explode, JsonSchema schema)
+    : ArrayValueParser(schema, explode)
 {
-    public SpaceDelimitedArrayValueParser(bool explode, JsonSchema schema) : base(schema, explode)
-    {
-    }
-
     public override bool TryParse(
-        IReadOnlyCollection<string> values,
-        [NotNullWhen(true)] out JsonNode? array,
+        string? value,
+        out JsonNode? array,
         [NotNullWhen(false)] out string? error)
     {
-        if (!Explode)
-        {
-            return TryGetArrayItems(values.ToArray(), out array, out error);
-        }
+        var arrayValues = value?
+            .Split('&', StringSplitOptions.RemoveEmptyEntries)
+            .SelectMany(expression =>
+            {
+                var valueAndKey = expression.Split('=');
+                var value = valueAndKey.Length == 1 ? string.Empty : valueAndKey.Last();
+                return Explode ? [value] : value.Split("%20");
+            })
+            .ToArray();
 
-        if (values.Count != 1)
-        {
-            error = "Expected one value when parameter doesn't specify explode";
-            array = null;
-            return false;
-        }
-
-        var arrayItems = values.First().Split(' ');
-        return TryGetArrayItems(arrayItems, out array, out error);
+        return TryGetArrayItems(arrayValues, out array, out error);
     }
 }

@@ -4,15 +4,11 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
 
-internal sealed class DeepObjectValueParser : ObjectValueParser
+internal sealed class DeepObjectValueParser(bool explode, JsonSchema schema) : ObjectValueParser(schema, explode)
 {
-    public DeepObjectValueParser(bool explode, JsonSchema schema) : base(schema, explode)
-    {
-    }
-
     public override bool TryParse(
-        IReadOnlyCollection<string> values,
-        [NotNullWhen(true)] out JsonNode? obj,
+        string? value,
+        out JsonNode? obj,
         [NotNullWhen(false)] out string? error)
     {
         if (!Explode)
@@ -22,7 +18,8 @@ internal sealed class DeepObjectValueParser : ObjectValueParser
             return false;
         }
 
-        var keyAndValues = values
+        var keyAndValues = value?
+            .Split('&')
             .SelectMany(value =>
             {
                 var keyAndValue = value

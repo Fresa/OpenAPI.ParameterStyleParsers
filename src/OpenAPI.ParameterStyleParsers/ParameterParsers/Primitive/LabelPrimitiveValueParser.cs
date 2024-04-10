@@ -3,19 +3,16 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
-internal sealed class LabelPrimitiveValueParser : PrimitiveValueParser
+internal sealed class LabelPrimitiveValueParser(bool explode, SchemaValueType type)
+    : PrimitiveValueParser(explode, type)
 {
-    public LabelPrimitiveValueParser(bool explode, SchemaValueType type) : base(explode, type)
-    {
-    }
-
     protected override bool TryParse(
-        string input,
+        string? input,
         out string? value,
         [NotNullWhen(false)] out string? error)
     {
         error = null;
-        value = input.TrimStart('.');
+        value = input?.TrimStart('.');
         return true;
     }
 }

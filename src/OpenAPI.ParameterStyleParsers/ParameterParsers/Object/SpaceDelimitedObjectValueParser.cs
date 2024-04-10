@@ -4,7 +4,8 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
 
-internal sealed class FormObjectValueParser(bool explode, JsonSchema schema) : ObjectValueParser(schema, explode)
+internal sealed class SpaceDelimitedObjectValueParser(bool explode, JsonSchema schema)
+    : ObjectValueParser(schema, explode)
 {
     public override bool TryParse(
         string? value,
@@ -13,12 +14,12 @@ internal sealed class FormObjectValueParser(bool explode, JsonSchema schema) : O
     {
         if (Explode)
         {
-            error = "form style with explode not supported for objects as the parameter name cannot be determined";
+            error = "space delimited style with explode not supported for objects as the parameter name cannot be determined";
             obj = null;
             return false;
         }
 
-        var keyAndValues = value?.Split(',');
+        var keyAndValues = value?.Split("%20");
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 }

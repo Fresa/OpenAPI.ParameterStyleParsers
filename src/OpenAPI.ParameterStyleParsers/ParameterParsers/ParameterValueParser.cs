@@ -40,7 +40,7 @@ internal sealed class ParameterValueParser : IParameterValueParser
         };
     }
 
-    public bool TryParse(string[] values, out JsonNode? instance,
+    public bool TryParse(string? value, out JsonNode? instance,
         [NotNullWhen(false)] out string? mappingError) =>
-        _valueParser.TryParse(values, out instance, out mappingError);
+        _valueParser.TryParse(value, out instance, out mappingError);
 }
