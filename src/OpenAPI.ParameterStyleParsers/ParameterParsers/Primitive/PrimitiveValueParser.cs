@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using Json.Schema;
-using OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
@@ -10,8 +9,10 @@ internal abstract class PrimitiveValueParser : IValueParser
     public SchemaValueType Type { get; }
     internal bool Explode { get; }
 
-    protected PrimitiveValueParser(bool explode, SchemaValueType type)
+    protected PrimitiveValueParser(Parameter parameter)
     {
+        var type = parameter.JsonSchema.GetJsonType() ?? SchemaValueType.String;
+
         switch (type)
         {
             case SchemaValueType.Object:
@@ -19,21 +20,18 @@ internal abstract class PrimitiveValueParser : IValueParser
                 throw new ArgumentException(nameof(type),
                     $"Type '{Enum.GetName(type)}' is not a primitive type");
         }
-        Explode = explode;
+        Explode = parameter.Explode;
         Type = type;
     }
 
-    internal static PrimitiveValueParser Create(Parameter parameter, JsonSchema jsonSchema)
+    internal static PrimitiveValueParser Create(Parameter parameter)
     {
-        var jsonType = jsonSchema.GetJsonType() ??
-                       throw new ArgumentException("Missing 'type' attribute for schema");
-
         return parameter.Style switch
         {
-            Parameter.Styles.Matrix => new MatrixPrimitiveValueParser(parameter.Explode, jsonType),
-            Parameter.Styles.Simple => new SimplePrimitiveValueParser(parameter.Explode, jsonType),
-            Parameter.Styles.Label => new LabelPrimitiveValueParser(parameter.Explode, jsonType),
-            Parameter.Styles.Form => new FormPrimitiveValueParser(parameter.Explode, jsonType),
+            Parameter.Styles.Matrix => new MatrixPrimitiveValueParser(parameter),
+            Parameter.Styles.Simple => new SimplePrimitiveValueParser(parameter),
+            Parameter.Styles.Label => new LabelPrimitiveValueParser(parameter),
+            Parameter.Styles.Form => new FormPrimitiveValueParser(parameter),
             _ => throw new ArgumentException(nameof(parameter.Style),
                 $"Style '{parameter.Style}' does not support primitive types")
         };

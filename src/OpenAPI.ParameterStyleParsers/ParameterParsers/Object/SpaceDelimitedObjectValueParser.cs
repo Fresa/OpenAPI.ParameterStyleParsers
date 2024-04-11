@@ -1,11 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
-using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
 
-internal sealed class SpaceDelimitedObjectValueParser(bool explode, JsonSchema schema)
-    : ObjectValueParser(schema, explode)
+internal sealed class SpaceDelimitedObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
     public override bool TryParse(
         string? value,

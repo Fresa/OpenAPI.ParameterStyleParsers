@@ -4,7 +4,7 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
 
-internal sealed class FormArrayValueParser(bool explode, JsonSchema schema) : ArrayValueParser(schema, explode)
+internal sealed class FormArrayValueParser(Parameter parameter) : ArrayValueParser(parameter)
 {
     public override bool TryParse(
         string? value,

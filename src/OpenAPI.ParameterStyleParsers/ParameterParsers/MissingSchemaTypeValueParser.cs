@@ -1,9 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
-using Json.Schema;
 using OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
 using OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
-using OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers;
 
@@ -18,11 +16,9 @@ internal sealed class MissingSchemaTypeValueParser : IValueParser
 
     internal static MissingSchemaTypeValueParser Create(Parameter parameter)
     {
-        var stringSchema = new JsonSchemaBuilder().Type(SchemaValueType.String);
         if (parameter.Style == Parameter.Styles.DeepObject)
-            return new MissingSchemaTypeValueParser(new DeepObjectValueParser(parameter.Explode, stringSchema));
-        var arrayValueParser = ArrayValueParser.Create(parameter,
-            new JsonSchemaBuilder().Type(SchemaValueType.Array).Items(stringSchema));
+            return new MissingSchemaTypeValueParser(new DeepObjectValueParser(parameter));
+        var arrayValueParser = ArrayValueParser.Create(parameter);
         return new MissingSchemaTypeValueParser(arrayValueParser);
     }
 

@@ -3,8 +3,7 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
-internal sealed class MatrixPrimitiveValueParser(bool explode, SchemaValueType type)
-    : PrimitiveValueParser(explode, type)
+internal sealed class MatrixPrimitiveValueParser(Parameter parameter) : PrimitiveValueParser(parameter)
 {
     protected override bool TryParse(
         string? input,

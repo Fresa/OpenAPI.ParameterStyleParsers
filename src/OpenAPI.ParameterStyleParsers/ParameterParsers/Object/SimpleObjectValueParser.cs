@@ -4,21 +4,21 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
 
-internal sealed class FormObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
+internal sealed class SimpleObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
     public override bool TryParse(
         string? value,
         out JsonNode? obj,
         [NotNullWhen(false)] out string? error)
     {
+        var keyAndValues = value?.Split(',');
         if (Explode)
         {
-            error = "form style with explode not supported for objects as the parameter name cannot be determined";
-            obj = null;
-            return false;
+            keyAndValues = keyAndValues?
+                .SelectMany(value => value
+                    .Split('='))
+                .ToArray();
         }
-
-        var keyAndValues = value?.Split(',');
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 }

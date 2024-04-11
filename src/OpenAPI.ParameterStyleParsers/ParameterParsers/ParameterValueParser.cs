@@ -35,9 +35,9 @@ public sealed class ParameterValueParser : IParameterValueParser
                 SchemaValueType.Integer or
                 SchemaValueType.Number or
                 SchemaValueType.Null
-                => PrimitiveValueParser.Create(parameter, jsonSchema),
-            SchemaValueType.Array => ArrayValueParser.Create(parameter, jsonSchema),
-            SchemaValueType.Object => ObjectValueParser.Create(parameter, jsonSchema),
+                => PrimitiveValueParser.Create(parameter),
+            SchemaValueType.Array => ArrayValueParser.Create(parameter),
+            SchemaValueType.Object => ObjectValueParser.Create(parameter),
             _ => throw new NotSupportedException($"Json type {Enum.GetName(jsonType.Value)} is not supported")
         };
     }

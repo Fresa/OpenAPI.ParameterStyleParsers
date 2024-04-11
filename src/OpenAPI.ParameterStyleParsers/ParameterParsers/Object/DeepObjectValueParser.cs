@@ -4,7 +4,7 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
 
-internal sealed class DeepObjectValueParser(bool explode, JsonSchema schema) : ObjectValueParser(schema, explode)
+internal sealed class DeepObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
     public override bool TryParse(
         string? value,

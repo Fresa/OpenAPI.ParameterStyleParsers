@@ -15,19 +15,57 @@ public class SchemaParameterValueConverterTests
     [MemberData(nameof(Integer))]
     [MemberData(nameof(Boolean))]
     [MemberData(nameof(Null))]
+    public void Given_a_primitive_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
+        string parameterJson,
+        string? value,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        Test(parameterJson, value, shouldMap, jsonInstance);
+    }
+
+    [Theory]
     [MemberData(nameof(EmptySchema))]
+    public void Given_a_parameter_with_empty_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
+        string parameterJson,
+        string? value,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        Test(parameterJson, value, shouldMap, jsonInstance);
+    }
+
+    [Theory]
     [MemberData(nameof(ArrayLabel))]
     [MemberData(nameof(ArrayForm))]
     [MemberData(nameof(ArrayMatrix))]
     [MemberData(nameof(ArraySimple))]
     [MemberData(nameof(ArraySpaceDelimited))]
     [MemberData(nameof(ArrayPipeDelimited))]
+    public void Given_an_array_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
+        string parameterJson,
+        string? value,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        Test(parameterJson, value, shouldMap, jsonInstance);
+    }
+
+    [Theory]
     [MemberData(nameof(ObjectForm))]
     [MemberData(nameof(ObjectMatrix))]
     [MemberData(nameof(ObjectLabel))]
     [MemberData(nameof(DeepObject))]
-    public void Given_a_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
+    public void Given_a_object_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
         string parameterJson,
+        string? value,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        Test(parameterJson, value, shouldMap, jsonInstance);
+    }
+
+    private void Test(string parameterJson,
         string? value,
         bool shouldMap,
         string? jsonInstance)
@@ -38,7 +76,7 @@ public class SchemaParameterValueConverterTests
                      throw new InvalidOperationException("json schema is missing");
         var parameter =
             Parameter.Parse(
-                reader.Read("style").GetValue<string>(), 
+                reader.Read("style").GetValue<string>(),
                 reader.Read("in").GetValue<string>(),
                 reader.Read("explode").GetValue<bool>(),
                 schema);

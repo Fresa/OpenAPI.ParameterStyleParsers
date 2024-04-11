@@ -1,26 +1,26 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using Json.Schema;
-using OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
 using OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
 
-internal abstract class ObjectValueParser(JsonSchema schema, bool explode) : IValueParser
+internal abstract class ObjectValueParser(Parameter parameter) : IValueParser
 {
-    private readonly PropertySchemaResolver _propertySchemaResolver = new(schema);
+    private readonly PropertySchemaResolver _propertySchemaResolver = new(parameter.JsonSchema);
 
-    internal bool Explode { get; } = explode;
+    internal bool Explode { get; } = parameter.Explode;
 
-    internal static ObjectValueParser Create(Parameter parameter, JsonSchema schema) =>
+    internal static ObjectValueParser Create(Parameter parameter) =>
         parameter.Style switch
         {
-            Parameter.Styles.Matrix => new MatrixObjectValueParser(parameter.Explode, schema),
-            Parameter.Styles.Label => new LabelObjectValueParser(parameter.Explode, schema),
-            Parameter.Styles.Form => new FormObjectValueParser(parameter.Explode, schema),
-            Parameter.Styles.DeepObject => new DeepObjectValueParser(parameter.Explode, schema),
-            Parameter.Styles.PipeDelimited => new PipeDelimitedObjectValueParser(parameter.Explode, schema),
-            Parameter.Styles.SpaceDelimited => new SpaceDelimitedObjectValueParser(parameter.Explode, schema),
+            Parameter.Styles.Matrix => new MatrixObjectValueParser(parameter),
+            Parameter.Styles.Label => new LabelObjectValueParser(parameter),
+            Parameter.Styles.Form => new FormObjectValueParser(parameter),
+            Parameter.Styles.Simple => new SimpleObjectValueParser(parameter),
+            Parameter.Styles.DeepObject => new DeepObjectValueParser(parameter),
+            Parameter.Styles.PipeDelimited => new PipeDelimitedObjectValueParser(parameter),
+            Parameter.Styles.SpaceDelimited => new SpaceDelimitedObjectValueParser(parameter),
             _ => throw new ArgumentException(nameof(parameter.Style),
                 $"Style '{parameter.Style}' not supported for object")
         };
@@ -39,7 +39,7 @@ internal abstract class ObjectValueParser(JsonSchema schema, bool explode) : IVa
         if (keyAndValues == null)
         {
             obj = null;
-            error = null; 
+            error = null;
             return true;
         }
 
@@ -48,27 +48,14 @@ internal abstract class ObjectValueParser(JsonSchema schema, bool explode) : IVa
         {
             var propertyName = keyAndValues[i];
             var propertyValue = Uri.UnescapeDataString(keyAndValues.Count == i + 1 ? string.Empty : keyAndValues[i + 1]);
-            JsonNode? value;
-            if (_propertySchemaResolver.TryGetSchemaForProperty(propertyName, out var propertySchema))
-            {
-                var jsonType = propertySchema.GetJsonType();
-                if (jsonType == null)
-                {
-                    obj = null;
-                    error = $"Missing 'type' attribute for object schema property '{propertyName}'";
-                    return false;
-                }
+            _propertySchemaResolver.TryGetSchemaForProperty(propertyName, out var propertySchema);
+            // Undefined type? Use string as default as any value should be valid
+            var jsonType = propertySchema?.GetJsonType() ?? SchemaValueType.String;
 
-                if (!PrimitiveJsonConverter.TryConvert(propertyValue, jsonType.Value, out value, out error))
-                {
-                    obj = null;
-                    return false;
-                }
-            }
-            else
+            if (!PrimitiveJsonConverter.TryConvert(propertyValue, jsonType, out var value, out error))
             {
-                // Undefined type, use string as default as any value should be valid
-                value = JsonValue.Create(propertyValue);
+                obj = null;
+                return false;
             }
             jsonObject[propertyName] = value;
         }

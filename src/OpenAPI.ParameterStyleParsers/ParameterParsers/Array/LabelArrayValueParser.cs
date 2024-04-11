@@ -4,7 +4,7 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
 
-internal sealed class LabelArrayValueParser(bool explode, JsonSchema schema) : ArrayValueParser(schema, explode)
+internal sealed class LabelArrayValueParser(Parameter parameter) : ArrayValueParser(parameter)
 {
     public override bool TryParse(
         string? value,

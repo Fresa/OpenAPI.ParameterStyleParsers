@@ -10,32 +10,24 @@ internal abstract class ArrayValueParser : IValueParser
     private readonly SchemaValueType _jsonType;
 
     internal bool Explode { get; }
-    protected ArrayValueParser(JsonSchema schema, bool explode)
+    protected ArrayValueParser(Parameter parameter)
     {
-        Explode = explode;
-        var itemsSchema = schema.GetItems();
-        if (itemsSchema == null)
-        {
-            throw new ArgumentException("Missing 'items' keyword for array schema");
-        }
-        var jsonType = itemsSchema.GetJsonType();
-        if (jsonType == null)
-        {
-            throw new ArgumentException("Missing 'type' attribute for array schema items");
-        }
-
-        _jsonType = jsonType.Value;
+        Explode = parameter.Explode;
+        var itemsSchema = parameter.JsonSchema.GetItems();
+        var jsonType = itemsSchema?.GetJsonType();
+        
+        _jsonType = jsonType ?? SchemaValueType.String;
     }
     
-    internal static ArrayValueParser Create(Parameter parameter, JsonSchema schema) =>
+    internal static ArrayValueParser Create(Parameter parameter) =>
         parameter.Style switch
         {
-            Parameter.Styles.Matrix => new MatrixArrayValueParser(parameter.Explode, schema),
-            Parameter.Styles.Label => new LabelArrayValueParser(parameter.Explode, schema),
-            Parameter.Styles.Form => new FormArrayValueParser(parameter.Explode, schema),
-            Parameter.Styles.Simple => new SimpleArrayValueParser(parameter.Explode, schema),
-            Parameter.Styles.SpaceDelimited => new SpaceDelimitedArrayValueParser(parameter.Explode, schema),
-            Parameter.Styles.PipeDelimited => new PipeDelimitedArrayValueParser(parameter.Explode, schema),
+            Parameter.Styles.Matrix => new MatrixArrayValueParser(parameter),
+            Parameter.Styles.Label => new LabelArrayValueParser(parameter),
+            Parameter.Styles.Form => new FormArrayValueParser(parameter),
+            Parameter.Styles.Simple => new SimpleArrayValueParser(parameter),
+            Parameter.Styles.SpaceDelimited => new SpaceDelimitedArrayValueParser(parameter),
+            Parameter.Styles.PipeDelimited => new PipeDelimitedArrayValueParser(parameter),
             _ => throw new ArgumentException(nameof(parameter.Style),
                 $"Style '{parameter.Style}' does not support arrays")
         };

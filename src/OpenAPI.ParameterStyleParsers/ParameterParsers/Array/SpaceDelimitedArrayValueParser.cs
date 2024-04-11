@@ -4,8 +4,7 @@ using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
 
-internal sealed class SpaceDelimitedArrayValueParser(bool explode, JsonSchema schema)
-    : ArrayValueParser(schema, explode)
+internal sealed class SpaceDelimitedArrayValueParser(Parameter parameter) : ArrayValueParser(parameter)
 {
     public override bool TryParse(
         string? value,
