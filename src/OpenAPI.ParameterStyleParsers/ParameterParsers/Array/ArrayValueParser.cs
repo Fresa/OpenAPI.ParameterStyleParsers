@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using Json.Schema;
@@ -76,57 +75,4 @@ internal abstract class ArrayValueParser : IValueParser
         array = new JsonArray(items);
         return true;
     }
-}
-
-public record Parameter
-{
-    private static readonly ConcurrentDictionary<(string Style, bool Explode), Parameter> Parameters = new();
-
-    public static class Styles
-    {
-        public const string Matrix = "matrix";
-        public const string Label = "label";
-        public const string Simple = "simple";
-        public const string Form = "form";
-        public const string SpaceDelimited = "spaceDelimited";
-        public const string PipeDelimited = "pipeDelimited";
-        public const string DeepObject = "deepObject";
-    } 
-
-    private static Parameter Get(string style, bool explode) =>
-        Parameters.GetOrAdd((style, explode), input => new Parameter
-        {
-            Style = input.Style,
-            Explode = input.Explode
-        });
-
-    public static Parameter Parse(string style, bool explode) =>
-        style switch
-        {
-            Styles.Matrix => Matrix(explode),
-            Styles.Label => Label(explode),
-            Styles.Simple => Simple(explode),
-            Styles.Form => Form(explode),
-            Styles.SpaceDelimited => SpaceDelimited(explode),
-            Styles.PipeDelimited => PipeDelimited(explode),
-            Styles.DeepObject => DeepObject(explode),
-            _ => throw new NotSupportedException($"Style {style} is not supported")
-        };
-    public static Parameter Matrix(bool explode) => 
-        Get(Styles.Matrix, explode);
-    public static Parameter Label(bool explode) =>
-        Get(Styles.Label, explode);
-    public static Parameter Simple(bool explode) =>
-        Get(Styles.Simple, explode);
-    public static Parameter Form(bool explode) =>
-        Get(Styles.Form, explode);
-    public static Parameter SpaceDelimited(bool explode) =>
-        Get(Styles.SpaceDelimited, explode);
-    public static Parameter PipeDelimited(bool explode) =>
-        Get(Styles.PipeDelimited, explode);
-    public static Parameter DeepObject(bool explode) =>
-        Get(Styles.DeepObject, explode);
-
-    public string Style { get; private init; }
-    public bool Explode { get; private init; }
 }

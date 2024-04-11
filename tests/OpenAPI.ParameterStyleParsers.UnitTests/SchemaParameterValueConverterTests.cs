@@ -1,11 +1,9 @@
-﻿using System.Net.Http.Headers;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Nodes;
 using FluentAssertions;
 using Json.Pointer;
 using Json.Schema;
 using OpenAPI.ParameterStyleParsers.ParameterParsers;
-using OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
 
 namespace OpenAPI.ParameterStyleParsers.UnitTests;
 
@@ -36,12 +34,15 @@ public class SchemaParameterValueConverterTests
     {
         var parameterJsonNode = JsonNode.Parse(parameterJson)!;
         var reader = new JsonNodeReader(parameterJsonNode, JsonPointer.Empty);
-        var schema = parameterJsonNode["schema"].Deserialize<JsonSchema>();
+        var schema = parameterJsonNode["schema"].Deserialize<JsonSchema>() ??
+                     throw new InvalidOperationException("json schema is missing");
         var parameter =
             Parameter.Parse(
                 reader.Read("style").GetValue<string>(), 
-                reader.Read("explode").GetValue<bool>());
-        var parser = ParameterValueParser.Create(parameter, schema!);
+                reader.Read("in").GetValue<string>(),
+                reader.Read("explode").GetValue<bool>(),
+                schema);
+        var parser = ParameterValueParser.Create(parameter);
         parser.TryParse(value, out var instance, out var mappingError).Should().Be(shouldMap, mappingError);
         if (!shouldMap)
         {
@@ -66,6 +67,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "object",
                     "properties": {
@@ -91,6 +93,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "object",
                     "additionalProperties": { 
@@ -111,6 +114,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "object",
                     "properties": {
@@ -136,6 +140,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "object",
                     "additionalProperties": { 
@@ -153,6 +158,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "object",
                     "properties": {
@@ -178,6 +184,7 @@ public class SchemaParameterValueConverterTests
         {
         """
             {
+                "in": "path",
                 "schema": {
                     "type": "object",
                     "additionalProperties": { 
@@ -191,6 +198,21 @@ public class SchemaParameterValueConverterTests
         ".R.100.G.200.B.",
         true,
         """{"R":"100","G":"200","B":""}"""
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "object"
+                },
+                "style": "label",
+                "explode": false
+            }
+            """,
+            "",
+            true,
+            "{}"
         }
     };
     public static TheoryData<string, string, bool, string?> ObjectMatrix => new()
@@ -198,6 +220,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "object",
                     "properties": {
@@ -223,6 +246,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "object",
                     "additionalProperties": { 
@@ -240,6 +264,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "object",
                     "properties": {
@@ -265,6 +290,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "object",
                     "properties": {
@@ -293,6 +319,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "object",
                     "items": {
@@ -321,6 +348,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "object",
                     "properties": {
@@ -346,6 +374,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "object",
                     "additionalProperties": { 
@@ -363,6 +392,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "object",
                     "patternProperties": {
@@ -394,6 +424,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -411,6 +442,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -428,6 +460,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -449,6 +482,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -466,6 +500,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -487,6 +522,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -504,6 +540,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -521,6 +558,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -542,6 +580,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -559,6 +598,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -576,6 +616,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -597,6 +638,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -614,6 +656,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -631,6 +674,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -648,6 +692,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -669,6 +714,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -686,6 +732,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -703,6 +750,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -720,6 +768,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "array",
                     "items": {
@@ -742,6 +791,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "string" 
                 },
@@ -760,6 +810,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "number" 
                 },
@@ -778,6 +829,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "integer" 
                 },
@@ -796,6 +848,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "boolean" 
                 },
@@ -813,6 +866,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "null" 
                 },
@@ -827,6 +881,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                     "type": "null"
                 },
@@ -845,6 +900,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                 },
                 "style": "form",
@@ -858,6 +914,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "query",
                 "schema": {
                 },
                 "style": "form",
@@ -871,6 +928,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                 },
                 "style": "simple",
@@ -884,6 +942,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "in": "path",
                 "schema": {
                 },
                 "style": "label",
