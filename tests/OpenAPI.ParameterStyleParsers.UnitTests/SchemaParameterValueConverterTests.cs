@@ -55,6 +55,21 @@ public class SchemaParameterValueConverterTests
     }
 
     [Theory]
+    [MemberData(nameof(StringSimple))]
+    [MemberData(nameof(NumberSimple))]
+    [MemberData(nameof(IntegerSimple))]
+    [MemberData(nameof(BooleanSimple))]
+    [MemberData(nameof(NullSimple))]
+    public void Given_a_simple_primitive_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
+        string parameterJson,
+        string? value,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        Test(parameterJson, value, shouldMap, jsonInstance);
+    }
+
+    [Theory]
     [MemberData(nameof(EmptySchema))]
     public void Given_a_parameter_with_empty_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
         string parameterJson,
@@ -1572,6 +1587,21 @@ public class SchemaParameterValueConverterTests
             ";foo=test",
             true,
             "\"test\""
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "string"
+                },
+                "style": "matrix",
+                "explode": false
+            }
+            """,
+            ";foo=test",
+            true,
+            "\"test\""
         }
     };
 
@@ -1586,6 +1616,21 @@ public class SchemaParameterValueConverterTests
                 },
                 "style": "matrix",
                 "explode": true
+            }
+            """,
+            ";foo=1.2",
+            true,
+            "1.2"
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "number"
+                },
+                "style": "matrix",
+                "explode": false
             }
             """,
             ";foo=1.2",
@@ -1610,6 +1655,21 @@ public class SchemaParameterValueConverterTests
             ";foo=1",
             true,
             "1"
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "integer"
+                },
+                "style": "matrix",
+                "explode": false
+            }
+            """,
+            ";foo=1",
+            true,
+            "1"
         }
     };
 
@@ -1623,7 +1683,23 @@ public class SchemaParameterValueConverterTests
                     "type": "boolean" 
                 },
                 "style": "matrix",
-                "explode": true}
+                "explode": true
+            }
+            """,
+            ";foo=true",
+            true,
+            "true"
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "boolean"
+                },
+                "style": "matrix",
+                "explode": false
+            }
             """,
             ";foo=true",
             true,
@@ -1641,7 +1717,7 @@ public class SchemaParameterValueConverterTests
                     "type": "null" 
                 },
                 "style": "matrix",
-                "explode": true
+                "explode": false
             }
             """,
             ";foo",
@@ -1656,6 +1732,221 @@ public class SchemaParameterValueConverterTests
                     "type": "null"
                 },
                 "style": "matrix",
+                "explode": false
+            }
+            """,
+            null,
+            true,
+            null
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "null"
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            ";foo=",
+            true,
+            null
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "null"
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            null,
+            true,
+            null
+        }
+    };
+
+    public static TheoryData<string, string, bool, string?> StringSimple => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "string" 
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            "test",
+            true,
+            "\"test\""
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "string"
+                },
+                "style": "simple",
+                "explode": false
+            }
+            """,
+            "test",
+            true,
+            "\"test\""
+        }
+    };
+
+    public static TheoryData<string, string, bool, string?> NumberSimple => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "number" 
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            "1.2",
+            true,
+            "1.2"
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "number"
+                },
+                "style": "simple",
+                "explode": false
+            }
+            """,
+            "1.2",
+            true,
+            "1.2"
+        }
+    };
+
+    public static TheoryData<string, string, bool, string?> IntegerSimple => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "integer" 
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            "1",
+            true,
+            "1"
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "integer"
+                },
+                "style": "simple",
+                "explode": false
+            }
+            """,
+            "1",
+            true,
+            "1"
+        }
+    };
+
+    public static TheoryData<string, string, bool, string?> BooleanSimple => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "boolean" 
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            "true",
+            true,
+            "true"
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "boolean"
+                },
+                "style": "simple",
+                "explode": false
+            }
+            """,
+            "true",
+            true,
+            "true"
+        }
+    };
+
+    public static TheoryData<string, string?, bool, string?> NullSimple => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "null" 
+                },
+                "style": "simple",
+                "explode": false
+            }
+            """,
+            "",
+            true,
+            null
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "null"
+                },
+                "style": "simple",
+                "explode": false
+            }
+            """,
+            null,
+            true,
+            null
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "null"
+                },
+                "style": "simple",
                 "explode": true
             }
             """,
@@ -1670,7 +1961,7 @@ public class SchemaParameterValueConverterTests
                 "schema": {
                     "type": "null"
                 },
-                "style": "matrix",
+                "style": "simple",
                 "explode": true
             }
             """,
