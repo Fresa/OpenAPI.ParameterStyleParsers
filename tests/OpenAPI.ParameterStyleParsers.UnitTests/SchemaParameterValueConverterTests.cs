@@ -68,6 +68,7 @@ public class SchemaParameterValueConverterTests
 
     [Theory]
     [MemberData(nameof(ObjectForm))]
+    [MemberData(nameof(ObjectSimple))]
     [MemberData(nameof(ObjectMatrix))]
     [MemberData(nameof(ObjectLabel))]
     [MemberData(nameof(DeepObject))]
@@ -493,7 +494,7 @@ public class SchemaParameterValueConverterTests
                         }                        
                     }
                 },
-                "style": "form",
+                "style": "simple",
                 "explode": false
             }
             """,
@@ -519,7 +520,7 @@ public class SchemaParameterValueConverterTests
                         }                        
                     }
                 },
-                "style": "form",
+                "style": "simple",
                 "explode": false
             }
             """,
@@ -537,7 +538,7 @@ public class SchemaParameterValueConverterTests
                         "type": "string" 
                     }
                 },
-                "style": "form",
+                "style": "simple",
                 "explode": false
             }
             """,
@@ -563,11 +564,110 @@ public class SchemaParameterValueConverterTests
                         "type": "string" 
                     }
                 },
-                "style": "form",
+                "style": "simple",
                 "explode": false
             }
             """,
             "R,100,G,200,B,",
+            true,
+            """{"R":100,"G":200,"B":""}"""
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "object",
+                    "items": {
+                        "type": "string"
+                    },
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        },
+                        "G": {
+                            "type": "number"
+                        },
+                        "B": {
+                            "type": "number"
+                        }                        
+                    }
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            "R=100,G=200,B=150",
+            true,
+            """{"R":100,"G":200,"B":150}"""
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "R": {
+                            "type": "string"
+                        },
+                        "G": {
+                            "type": "string"
+                        },
+                        "B": {
+                            "type": "string"
+                        }                        
+                    }
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            "R=100,G=200,B=",
+            true,
+            """{"R":"100","G":"200","B":""}"""
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "object",
+                    "additionalProperties": { 
+                        "type": "string" 
+                    }
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            "R=100,G=200,B=",
+            true,
+            """{"R":"100","G":"200","B":""}"""
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^R": { 
+                            "type": "number" 
+                        },
+                        "^G": {
+                            "type": "integer" 
+                        }
+                    },            
+                    "additionalProperties": { 
+                        "type": "string" 
+                    }
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            "R=100,G=200,B=",
             true,
             """{"R":100,"G":200,"B":""}"""
         }
