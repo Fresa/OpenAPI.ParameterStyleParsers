@@ -40,6 +40,21 @@ public class SchemaParameterValueConverterTests
     }
 
     [Theory]
+    [MemberData(nameof(StringMatrix))]
+    [MemberData(nameof(NumberMatrix))]
+    [MemberData(nameof(IntegerMatrix))]
+    [MemberData(nameof(BooleanMatrix))]
+    [MemberData(nameof(NullMatrix))]
+    public void Given_a_matrix_primitive_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
+        string parameterJson,
+        string? value,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        Test(parameterJson, value, shouldMap, jsonInstance);
+    }
+
+    [Theory]
     [MemberData(nameof(EmptySchema))]
     public void Given_a_parameter_with_empty_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
         string parameterJson,
@@ -1541,6 +1556,129 @@ public class SchemaParameterValueConverterTests
         }
     };
 
+    public static TheoryData<string, string, bool, string?> StringMatrix => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "string" 
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            ";foo=test",
+            true,
+            "\"test\""
+        }
+    };
+
+    public static TheoryData<string, string, bool, string?> NumberMatrix => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "number" 
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            ";foo=1.2",
+            true,
+            "1.2"
+        }
+    };
+
+    public static TheoryData<string, string, bool, string?> IntegerMatrix => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "integer" 
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            ";foo=1",
+            true,
+            "1"
+        }
+    };
+
+    public static TheoryData<string, string, bool, string?> BooleanMatrix => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "boolean" 
+                },
+                "style": "matrix",
+                "explode": true}
+            """,
+            ";foo=true",
+            true,
+            "true"
+        }
+    };
+
+    public static TheoryData<string, string?, bool, string?> NullMatrix => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "null" 
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            ";foo",
+            true,
+            null
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "null"
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            "",
+            true,
+            null
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "null"
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            null,
+            true,
+            null
+        }
+    };
 
     public static TheoryData<string, string?, bool, string?> EmptySchema => new()
     {

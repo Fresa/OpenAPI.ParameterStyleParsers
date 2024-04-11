@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
-using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
 
@@ -16,7 +15,7 @@ internal sealed class LabelObjectValueParser(Parameter parameter) : ObjectValueP
         if (Explode)
         {
             keyAndValues = keyAndValues?
-                .SelectMany(value => value
+                .SelectMany(keyAndValue => keyAndValue
                     .Split('='))
                 .ToArray();
         }
