@@ -17,7 +17,10 @@ internal sealed class SpaceDelimitedObjectValueParser(Parameter parameter) : Obj
             return false;
         }
 
-        var keyAndValues = value?.Split("%20");
+        var keyAndValues = value?
+            .Split('=')
+            .Last()
+            .Split("%20");
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 }

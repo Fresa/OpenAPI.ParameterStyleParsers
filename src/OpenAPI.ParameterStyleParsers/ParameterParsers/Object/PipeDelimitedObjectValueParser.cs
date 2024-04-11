@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
-using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
 
@@ -18,7 +17,10 @@ internal sealed class PipeDelimitedObjectValueParser(Parameter parameter) : Obje
             return false;
         }
 
-        var keyAndValues = value?.Split('|');
+        var keyAndValues = value?
+            .Split('=')
+            .Last()    
+            .Split('|');
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 }

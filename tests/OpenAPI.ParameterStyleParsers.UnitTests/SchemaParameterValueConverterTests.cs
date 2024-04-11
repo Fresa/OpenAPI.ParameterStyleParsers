@@ -71,6 +71,8 @@ public class SchemaParameterValueConverterTests
     [MemberData(nameof(ObjectSimple))]
     [MemberData(nameof(ObjectMatrix))]
     [MemberData(nameof(ObjectLabel))]
+    [MemberData(nameof(ObjectSpaceDelimited))]
+    [MemberData(nameof(ObjectPipeDelimited))]
     [MemberData(nameof(DeepObject))]
     public void Given_a_object_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
         string parameterJson,
@@ -670,6 +672,270 @@ public class SchemaParameterValueConverterTests
             "R=100,G=200,B=",
             true,
             """{"R":100,"G":200,"B":""}"""
+        }
+    };
+
+    public static TheoryData<string, string, bool, string?> ObjectSpaceDelimited => new()
+    {
+        {
+            """
+            {
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "items": {
+                        "type": "string"
+                    },
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        },
+                        "G": {
+                            "type": "number"
+                        },
+                        "B": {
+                            "type": "number"
+                        }                        
+                    }
+                },
+                "style": "spaceDelimited",
+                "explode": false
+            }
+            """,
+            "color=R%20100%20G%20200%20B%20150",
+            true,
+            """{"R":100,"G":200,"B":150}"""
+        },
+        {
+            """
+            {
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "R": {
+                            "type": "string"
+                        },
+                        "G": {
+                            "type": "string"
+                        },
+                        "B": {
+                            "type": "string"
+                        }                        
+                    }
+                },
+                "style": "spaceDelimited",
+                "explode": false
+            }
+            """,
+            "color=R%20100%20G%20200%20B%20",
+            true,
+            """{"R":"100","G":"200","B":""}"""
+        },
+        {
+            """
+            {
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "additionalProperties": { 
+                        "type": "string" 
+                    }
+                },
+                "style": "spaceDelimited",
+                "explode": false
+            }
+            """,
+            "R%20100%20G%20200%20B%20",
+            true,
+            """{"R":"100","G":"200","B":""}"""
+        },
+        {
+            """
+            {
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^R": { 
+                            "type": "number" 
+                        },
+                        "^G": {
+                            "type": "integer" 
+                        }
+                    },            
+                    "additionalProperties": { 
+                        "type": "string" 
+                    }
+                },
+                "style": "spaceDelimited",
+                "explode": false
+            }
+            """,
+            "R%20100%20G%20200%20B%20",
+            true,
+            """{"R":100,"G":200,"B":""}"""
+        },
+        {
+            """
+            {
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "items": {
+                        "type": "string"
+                    },
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        },
+                        "G": {
+                            "type": "number"
+                        },
+                        "B": {
+                            "type": "number"
+                        }                        
+                    }
+                },
+                "style": "spaceDelimited",
+                "explode": true
+            }
+            """,
+            "R=100%20G=200%20B=150",
+            false,
+            null
+        }
+    };
+
+    public static TheoryData<string, string, bool, string?> ObjectPipeDelimited => new()
+    {
+        {
+            """
+            {
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "items": {
+                        "type": "string"
+                    },
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        },
+                        "G": {
+                            "type": "number"
+                        },
+                        "B": {
+                            "type": "number"
+                        }                        
+                    }
+                },
+                "style": "pipeDelimited",
+                "explode": false
+            }
+            """,
+            "color=R|100|G|200|B|150",
+            true,
+            """{"R":100,"G":200,"B":150}"""
+        },
+        {
+            """
+            {
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "R": {
+                            "type": "string"
+                        },
+                        "G": {
+                            "type": "string"
+                        },
+                        "B": {
+                            "type": "string"
+                        }                        
+                    }
+                },
+                "style": "pipeDelimited",
+                "explode": false
+            }
+            """,
+            "color=R|100|G|200|B|",
+            true,
+            """{"R":"100","G":"200","B":""}"""
+        },
+        {
+            """
+            {
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "additionalProperties": { 
+                        "type": "string" 
+                    }
+                },
+                "style": "pipeDelimited",
+                "explode": false
+            }
+            """,
+            "R|100|G|200|B|",
+            true,
+            """{"R":"100","G":"200","B":""}"""
+        },
+        {
+            """
+            {
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^R": { 
+                            "type": "number" 
+                        },
+                        "^G": {
+                            "type": "integer" 
+                        }
+                    },            
+                    "additionalProperties": { 
+                        "type": "string" 
+                    }
+                },
+                "style": "pipeDelimited",
+                "explode": false
+            }
+            """,
+            "R|100|G|200|B|",
+            true,
+            """{"R":100,"G":200,"B":""}"""
+        },
+        {
+            """
+            {
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "items": {
+                        "type": "string"
+                    },
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        },
+                        "G": {
+                            "type": "number"
+                        },
+                        "B": {
+                            "type": "number"
+                        }                        
+                    }
+                },
+                "style": "pipeDelimited",
+                "explode": true
+            }
+            """,
+            "R=100|G=200|B=150",
+            false,
+            null
         }
     };
     #endregion
