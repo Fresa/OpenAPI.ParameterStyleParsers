@@ -6,9 +6,8 @@ namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
 internal abstract class PrimitiveValueParser : IValueParser
 {
-    public SchemaValueType Type { get; }
-    internal bool Explode { get; }
-
+    private SchemaValueType Type { get; }
+    
     protected PrimitiveValueParser(Parameter parameter)
     {
         var type = parameter.JsonSchema.GetJsonType() ?? SchemaValueType.String;
@@ -20,7 +19,6 @@ internal abstract class PrimitiveValueParser : IValueParser
                 throw new ArgumentException(nameof(type),
                     $"Type '{Enum.GetName(type)}' is not a primitive type");
         }
-        Explode = parameter.Explode;
         Type = type;
     }
 

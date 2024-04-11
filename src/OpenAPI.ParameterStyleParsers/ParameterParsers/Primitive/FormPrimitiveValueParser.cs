@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 

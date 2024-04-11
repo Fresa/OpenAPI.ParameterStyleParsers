@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
-using Json.Schema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
 
