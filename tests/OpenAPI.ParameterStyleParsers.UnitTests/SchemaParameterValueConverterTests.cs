@@ -10,12 +10,27 @@ namespace OpenAPI.ParameterStyleParsers.UnitTests;
 public class SchemaParameterValueConverterTests
 {
     [Theory]
-    [MemberData(nameof(String))]
-    [MemberData(nameof(Number))]
-    [MemberData(nameof(Integer))]
-    [MemberData(nameof(Boolean))]
-    [MemberData(nameof(Null))]
-    public void Given_a_primitive_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
+    [MemberData(nameof(StringForm))]
+    [MemberData(nameof(NumberForm))]
+    [MemberData(nameof(IntegerForm))]
+    [MemberData(nameof(BooleanForm))]
+    [MemberData(nameof(NullForm))]
+    public void Given_a_form_primitive_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
+        string parameterJson,
+        string? value,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        Test(parameterJson, value, shouldMap, jsonInstance);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringLabel))]
+    [MemberData(nameof(NumberLabel))]
+    [MemberData(nameof(IntegerLabel))]
+    [MemberData(nameof(BooleanLabel))]
+    [MemberData(nameof(NullLabel))]
+    public void Given_a_label_primitive_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
         string parameterJson,
         string? value,
         bool shouldMap,
@@ -65,7 +80,7 @@ public class SchemaParameterValueConverterTests
         Test(parameterJson, value, shouldMap, jsonInstance);
     }
 
-    private void Test(string parameterJson,
+    private static void Test(string parameterJson,
         string? value,
         bool shouldMap,
         string? jsonInstance)
@@ -379,7 +394,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "R,100,G,200,B,150",
+            "color=R,100,G,200,B,150",
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -405,7 +420,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "R,100,G,200,B,",
+            "color=R,100,G,200,B,",
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -423,7 +438,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "R,100,G,200,B,",
+            "color=R,100,G,200,B,",
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -431,6 +446,109 @@ public class SchemaParameterValueConverterTests
             """
             {
                 "in": "query",
+                "schema": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^R": { 
+                            "type": "number" 
+                        },
+                        "^G": {
+                            "type": "integer" 
+                        }
+                    },            
+                    "additionalProperties": { 
+                        "type": "string" 
+                    }
+                },
+                "style": "form",
+                "explode": false
+            }
+            """,
+            "color=R,100,G,200,B,",
+            true,
+            """{"R":100,"G":200,"B":""}"""
+        }
+    };
+
+    public static TheoryData<string, string, bool, string?> ObjectSimple => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "object",
+                    "items": {
+                        "type": "string"
+                    },
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        },
+                        "G": {
+                            "type": "number"
+                        },
+                        "B": {
+                            "type": "number"
+                        }                        
+                    }
+                },
+                "style": "form",
+                "explode": false
+            }
+            """,
+            "R,100,G,200,B,150",
+            true,
+            """{"R":100,"G":200,"B":150}"""
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "R": {
+                            "type": "string"
+                        },
+                        "G": {
+                            "type": "string"
+                        },
+                        "B": {
+                            "type": "string"
+                        }                        
+                    }
+                },
+                "style": "form",
+                "explode": false
+            }
+            """,
+            "R,100,G,200,B,",
+            true,
+            """{"R":"100","G":"200","B":""}"""
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "object",
+                    "additionalProperties": { 
+                        "type": "string" 
+                    }
+                },
+                "style": "form",
+                "explode": false
+            }
+            """,
+            "R,100,G,200,B,",
+            true,
+            """{"R":"100","G":"200","B":""}"""
+        },
+        {
+            """
+            {
+                "in": "path",
                 "schema": {
                     "type": "object",
                     "patternProperties": {
@@ -824,7 +942,7 @@ public class SchemaParameterValueConverterTests
     };
     #endregion
 
-    public static TheoryData<string, string, bool, string?> String => new()
+    public static TheoryData<string, string, bool, string?> StringForm => new()
     {
         {
             """
@@ -843,7 +961,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string, bool, string?> Number => new()
+    public static TheoryData<string, string, bool, string?> NumberForm => new()
     {
         {
             """
@@ -862,7 +980,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string, bool, string?> Integer => new()
+    public static TheoryData<string, string, bool, string?> IntegerForm => new()
     {
         {
             """
@@ -881,7 +999,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string, bool, string?> Boolean => new()
+    public static TheoryData<string, string, bool, string?> BooleanForm => new()
     {
         {
             """
@@ -899,7 +1017,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?, bool, string?> Null => new()
+    public static TheoryData<string, string?, bool, string?> NullForm => new()
     {
         {
             """
@@ -932,6 +1050,131 @@ public class SchemaParameterValueConverterTests
             null
         }
     };
+
+    public static TheoryData<string, string, bool, string?> StringLabel => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "string" 
+                },
+                "style": "label",
+                "explode": true
+            }
+            """,
+            ".test",
+            true,
+            "\"test\""
+        }
+    };
+
+    public static TheoryData<string, string, bool, string?> NumberLabel => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "number" 
+                },
+                "style": "label",
+                "explode": true
+            }
+            """,
+            ".1.2",
+            true,
+            "1.2"
+        }
+    };
+
+    public static TheoryData<string, string, bool, string?> IntegerLabel => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "integer" 
+                },
+                "style": "label",
+                "explode": true
+            }
+            """,
+            ".1",
+            true,
+            "1"
+        }
+    };
+
+    public static TheoryData<string, string, bool, string?> BooleanLabel => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "boolean" 
+                },
+                "style": "label",
+                "explode": true}
+            """,
+            ".true",
+            true,
+            "true"
+        }
+    };
+
+    public static TheoryData<string, string?, bool, string?> NullLabel => new()
+    {
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "null" 
+                },
+                "style": "label",
+                "explode": true
+            }
+            """,
+            ".",
+            true,
+            null
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "null"
+                },
+                "style": "label",
+                "explode": true
+            }
+            """,
+            "",
+            true,
+            null
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "null"
+                },
+                "style": "label",
+                "explode": true
+            }
+            """,
+            null,
+            true,
+            null
+        }
+    };
+
 
     public static TheoryData<string, string?, bool, string?> EmptySchema => new()
     {

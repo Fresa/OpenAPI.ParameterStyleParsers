@@ -18,7 +18,10 @@ internal sealed class FormObjectValueParser(Parameter parameter) : ObjectValuePa
             return false;
         }
 
-        var keyAndValues = value?.Split(',');
+        var keyAndValues = value?
+            .Split('=')
+            .Last()
+            .Split(',');
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 }
