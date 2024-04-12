@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Nodes;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
@@ -15,6 +14,6 @@ internal sealed class FormPrimitiveValueParser(Parameter parameter) : PrimitiveV
         return true;
     }
 
-    public override string? Serialize(JsonNode? instance) => 
-        instance?.ToString();
+    protected override string Serialize(string value) => 
+        value;
 }

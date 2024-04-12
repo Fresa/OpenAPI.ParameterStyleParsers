@@ -15,6 +15,6 @@ internal sealed class SimplePrimitiveValueParser(Parameter parameter) : Primitiv
         return true;
     }
 
-    public override string? Serialize(JsonNode? instance) => 
-        instance?.ToString();
+    protected override string Serialize(string value) => 
+        value;
 }

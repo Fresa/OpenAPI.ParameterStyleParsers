@@ -36,7 +36,7 @@ internal abstract class PrimitiveValueParser : IValueParser
     }
 
     protected abstract bool TryParse(
-        string? input,
+        string input,
         out string? value,
         [NotNullWhen(false)] out string? error);
 
@@ -60,5 +60,7 @@ internal abstract class PrimitiveValueParser : IValueParser
         return false;
     }
 
-    public abstract string? Serialize(JsonNode? instance);
+    public string? Serialize(JsonNode? instance) =>
+        instance == null ? null : Serialize(Uri.EscapeDataString(instance.ToString()));
+    protected abstract string Serialize(string value);
 }

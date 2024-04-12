@@ -77,11 +77,26 @@ public class SchemaParameterValueConverterTests
     [MemberData(nameof(NullMatrix))]
     public void Given_a_matrix_primitive_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
         string parameterJson,
-        string? value,
+        string?[] values,
         bool shouldMap,
         string? jsonInstance)
     {
-        TestParsing(parameterJson, value, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringMatrix))]
+    [MemberData(nameof(NumberMatrix))]
+    [MemberData(nameof(IntegerMatrix))]
+    [MemberData(nameof(BooleanMatrix))]
+    [MemberData(nameof(NullMatrix))]
+    public void Given_a_matrix_primitive_parameter_with_schema_When_serializing_It_should_serialize_the_json_instance(
+        string parameterJson,
+        string?[] values,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
     }
 
     [Theory]
@@ -228,7 +243,7 @@ public class SchemaParameterValueConverterTests
                      throw new InvalidOperationException("json schema is missing");
         var parameter =
             Parameter.Parse(
-                reader.Read("style").GetValue<string>(),
+                reader.TryRead("name", out var nameReader) ? nameReader.GetValue<string>() : string.Empty,
                 reader.Read("style").GetValue<string>(),
                 reader.Read("in").GetValue<string>(),
                 reader.Read("explode").GetValue<bool>(),
@@ -1615,11 +1630,12 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string, bool, string?> StringMatrix => new()
+    public static TheoryData<string, string?[], bool, string?> StringMatrix => new()
     {
         {
             """
             {
+                "name": "foo",
                 "in": "path",
                 "schema": {
                     "type": "string" 
@@ -1628,13 +1644,14 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ";foo=test",
+            [";foo=test"],
             true,
             "\"test\""
         },
         {
             """
             {
+                "name": "foo",
                 "in": "path",
                 "schema": {
                     "type": "string"
@@ -1643,17 +1660,18 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            ";foo=test",
+            [";foo=test"],
             true,
             "\"test\""
         }
     };
 
-    public static TheoryData<string, string, bool, string?> NumberMatrix => new()
+    public static TheoryData<string, string?[], bool, string?> NumberMatrix => new()
     {
         {
             """
             {
+                "name": "foo",
                 "in": "path",
                 "schema": {
                     "type": "number" 
@@ -1662,13 +1680,14 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ";foo=1.2",
+            [";foo=1.2"],
             true,
             "1.2"
         },
         {
             """
             {
+                "name": "foo",
                 "in": "path",
                 "schema": {
                     "type": "number"
@@ -1677,17 +1696,18 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            ";foo=1.2",
+            [";foo=1.2"],
             true,
             "1.2"
         }
     };
 
-    public static TheoryData<string, string, bool, string?> IntegerMatrix => new()
+    public static TheoryData<string, string?[], bool, string?> IntegerMatrix => new()
     {
         {
             """
             {
+                "name": "foo",
                 "in": "path",
                 "schema": {
                     "type": "integer" 
@@ -1696,13 +1716,14 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ";foo=1",
+            [";foo=1"],
             true,
             "1"
         },
         {
             """
             {
+                "name": "foo",
                 "in": "path",
                 "schema": {
                     "type": "integer"
@@ -1711,17 +1732,18 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            ";foo=1",
+            [";foo=1"],
             true,
             "1"
         }
     };
 
-    public static TheoryData<string, string, bool, string?> BooleanMatrix => new()
+    public static TheoryData<string, string?[], bool, string?> BooleanMatrix => new()
     {
         {
             """
             {
+                "name": "foo",
                 "in": "path",
                 "schema": {
                     "type": "boolean" 
@@ -1730,13 +1752,14 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ";foo=true",
+            [";foo=true"],
             true,
             "true"
         },
         {
             """
             {
+                "name": "foo",
                 "in": "path",
                 "schema": {
                     "type": "boolean"
@@ -1745,17 +1768,18 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            ";foo=true",
+            [";foo=true"],
             true,
             "true"
         }
     };
 
-    public static TheoryData<string, string?, bool, string?> NullMatrix => new()
+    public static TheoryData<string, string?[], bool, string?> NullMatrix => new()
     {
         {
             """
             {
+                "name": "foo",
                 "in": "path",
                 "schema": {
                     "type": "null" 
@@ -1764,28 +1788,14 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            ";foo",
+            [";foo", null],
             true,
             null
         },
         {
             """
             {
-                "in": "path",
-                "schema": {
-                    "type": "null"
-                },
-                "style": "matrix",
-                "explode": false
-            }
-            """,
-            null,
-            true,
-            null
-        },
-        {
-            """
-            {
+                "name": "foo",
                 "in": "path",
                 "schema": {
                     "type": "null"
@@ -1794,22 +1804,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ";foo=",
-            true,
-            null
-        },
-        {
-            """
-            {
-                "in": "path",
-                "schema": {
-                    "type": "null"
-                },
-                "style": "matrix",
-                "explode": true
-            }
-            """,
-            null,
+            [";foo", null],
             true,
             null
         }
