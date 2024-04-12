@@ -37,10 +37,21 @@ internal abstract class ArrayValueParser : IValueParser
         out JsonNode? array,
         [NotNullWhen(false)] out string? error);
 
-    public string Serialize(JsonNode? instance)
+    public string? Serialize(JsonNode? instance)
     {
-        throw new NotImplementedException();
+        if (instance == null)
+        {
+            return null;
+        }
+
+        var values = instance
+            .AsArray()
+            .Select(node => node == null ? null : Uri.EscapeDataString(node.ToString()))
+            .ToArray();
+        return Serialize(values);
     }
+
+    protected abstract string Serialize(string?[] values);
 
     protected bool TryGetArrayItems(
         IReadOnlyList<string>? values,

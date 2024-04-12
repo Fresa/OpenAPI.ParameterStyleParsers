@@ -22,4 +22,11 @@ internal sealed class PipeDelimitedArrayValueParser(Parameter parameter) : Array
 
         return TryGetArrayItems(arrayValues, out array, out error);
     }
+
+    protected override string Serialize(string?[] values)
+    {
+        var serialized = string.Join((Explode ? '&' : '|'),
+            values.Select(value => Explode ? $"{parameter.Name}={value}" : value));
+        return Explode ? serialized : $"{parameter.Name}={serialized}";
+    }
 }
