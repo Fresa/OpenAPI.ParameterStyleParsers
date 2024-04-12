@@ -175,7 +175,7 @@ public class SchemaParameterValueConverterTests
     [MemberData(nameof(ArraySimple))]
     [MemberData(nameof(ArraySpaceDelimited))]
     [MemberData(nameof(ArrayPipeDelimited))]
-    public void Given_an_array_parameter_with_empty_schema_When_serializing_It_should_serialize_the_json_instance(
+    public void Given_an_array_parameter_with_schema_When_serializing_It_should_serialize_the_json_instance(
         string parameterJson,
         string?[] value,
         bool shouldMap,
@@ -194,11 +194,28 @@ public class SchemaParameterValueConverterTests
     [MemberData(nameof(DeepObject))]
     public void Given_a_object_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
         string parameterJson,
-        string? value,
+        string?[] values,
         bool shouldMap,
         string? jsonInstance)
     {
-        TestParsing(parameterJson, value, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+    }
+
+    [Theory]
+    [MemberData(nameof(ObjectForm))]
+    [MemberData(nameof(ObjectSimple))]
+    [MemberData(nameof(ObjectMatrix))]
+    [MemberData(nameof(ObjectLabel))]
+    [MemberData(nameof(ObjectSpaceDelimited))]
+    [MemberData(nameof(ObjectPipeDelimited))]
+    [MemberData(nameof(DeepObject))]
+    public void Given_an_object_parameter_with_schema_When_serializing_It_should_serialize_the_json_instance(
+        string parameterJson,
+        string?[] value,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        TestSerializing(parameterJson, value, shouldMap, jsonInstance);
     }
 
     private static void TestParsing(string parameterJson,
@@ -206,10 +223,7 @@ public class SchemaParameterValueConverterTests
         bool shouldMap,
         string? jsonInstance)
     {
-        foreach (var value in values)
-        {
-            TestParsing(parameterJson, value, shouldMap, jsonInstance);
-        }
+        TestParsing(parameterJson, values.First(), shouldMap, jsonInstance);
     }
 
     private static void TestParsing(string parameterJson,
@@ -261,7 +275,7 @@ public class SchemaParameterValueConverterTests
         serialized.Should().ContainAny(expectedValues);
     }
 
-    private static IParameterValueParser CreateParameterValueParser(
+    private static ParameterValueParser CreateParameterValueParser(
         string parameterJson)
     {
         var parameterJsonNode = JsonNode.Parse(parameterJson)!;
@@ -279,11 +293,12 @@ public class SchemaParameterValueConverterTests
     }
 
     #region Object
-    public static TheoryData<string, string, bool, string?> DeepObject => new()
+    public static TheoryData<string, string?[], bool, string?> DeepObject => new()
     {
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -303,13 +318,14 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "color[R]=100&color[G]=200&color[B]=150",
+            ["color[R]=100&color[G]=200&color[B]=150"],
             true,
             """{"R":100,"G":200,"B":150}"""
         },
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -321,16 +337,17 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "color[R]=100&color[G]=200&color[B]=",
+            ["color[R]=100&color[G]=200&color[B]="],
             true,
             """{"R":"100","G":"200","B":""}"""
         }
     };
-    public static TheoryData<string, string, bool, string?> ObjectLabel => new()
+    public static TheoryData<string, string?[], bool, string?> ObjectLabel => new()
     {
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -350,7 +367,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ".R=100.G=200.B=150",
+            [".R=100.G=200.B=150"],
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -368,7 +385,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ".R=100.G=200.B",
+            [".R=100.G=200.B"],
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -394,7 +411,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            ".R.100.G.200.B.150",
+            [".R.100.G.200.B.150"],
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -412,9 +429,9 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-        ".R.100.G.200.B.",
-        true,
-        """{"R":"100","G":"200","B":""}"""
+            [".R.100.G.200.B."],
+            true,
+            """{"R":"100","G":"200","B":""}"""
         },
         {
             """
@@ -427,12 +444,12 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "",
+            [""],
             true,
             "{}"
         }
     };
-    public static TheoryData<string, string, bool, string?> ObjectMatrix => new()
+    public static TheoryData<string, string?[], bool, string?> ObjectMatrix => new()
     {
         {
             """
@@ -456,7 +473,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ";R=100;G=200;B=150",
+            [";R=100;G=200;B=150"],
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -474,13 +491,14 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ";R=100;G=200;B",
+            [";R=100;G=200;B"],
             true,
             """{"R":"100","G":"200","B":""}"""
         },
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -500,13 +518,14 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            ";color=R,100,G,200,B,150",
+            [";color=R,100,G,200,B,150"],
             true,
             """{"R":100,"G":200,"B":150}"""
         },
         {
             """
             {
+                "name": "keys",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -526,16 +545,17 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            ";keys=comma,%2C,dot,.,semi,%3B",
+            [";keys=comma,%2C,dot,.,semi,%3B"],
             true,
             """{"comma":",","dot":".","semi":";"}"""
         }
     };
-    public static TheoryData<string, string, bool, string?> ObjectForm => new()
+    public static TheoryData<string, string?[], bool, string?> ObjectForm => new()
     {
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -558,13 +578,14 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "color=R,100,G,200,B,150",
+            ["color=R,100,G,200,B,150"],
             true,
             """{"R":100,"G":200,"B":150}"""
         },
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -584,13 +605,14 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "color=R,100,G,200,B,",
+            ["color=R,100,G,200,B,"],
             true,
             """{"R":"100","G":"200","B":""}"""
         },
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -602,13 +624,14 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "color=R,100,G,200,B,",
+            ["color=R,100,G,200,B,"],
             true,
             """{"R":"100","G":"200","B":""}"""
         },
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -628,13 +651,13 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "color=R,100,G,200,B,",
+            ["color=R,100,G,200,B,"],
             true,
             """{"R":100,"G":200,"B":""}"""
         }
     };
 
-    public static TheoryData<string, string, bool, string?> ObjectSimple => new()
+    public static TheoryData<string, string?[], bool, string?> ObjectSimple => new()
     {
         {
             """
@@ -661,7 +684,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "R,100,G,200,B,150",
+            new [] {"R,100","G,200","B,150"}.GenerateAllPermutations(','),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -687,7 +710,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "R,100,G,200,B,",
+            new []{"R,100","G,200","B,"}.GenerateAllPermutations(','),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -705,7 +728,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "R,100,G,200,B,",
+            new []{"R,100","G,200","B,"}.GenerateAllPermutations(','),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -731,7 +754,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "R,100,G,200,B,",
+            new []{"R,100","G,200","B,"}.GenerateAllPermutations(','),
             true,
             """{"R":100,"G":200,"B":""}"""
         },
@@ -760,7 +783,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "R=100,G=200,B=150",
+            new []{"R=100","G=200","B=150"}.GenerateAllPermutations(','),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -786,7 +809,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "R=100,G=200,B=",
+            new []{"R=100","G=200","B="}.GenerateAllPermutations(','),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -804,7 +827,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "R=100,G=200,B=",
+            new []{"R=100","G=200","B="}.GenerateAllPermutations(','),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -830,17 +853,18 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "R=100,G=200,B=",
+            new []{"R=100","G=200","B="}.GenerateAllPermutations(','),
             true,
             """{"R":100,"G":200,"B":""}"""
         }
     };
 
-    public static TheoryData<string, string, bool, string?> ObjectSpaceDelimited => new()
+    public static TheoryData<string, string?[], bool, string?> ObjectSpaceDelimited => new()
     {
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -863,13 +887,16 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "color=R%20100%20G%20200%20B%20150",
+            new []{ "R%20100", "G%20200", "B%20150"}.GenerateAllPermutations("%20")
+                .Select(str => $"color={str}")
+                .ToArray(),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -889,7 +916,9 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "color=R%20100%20G%20200%20B%20",
+            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20")
+                .Select(str => $"color={str}")
+                .ToArray(),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -907,7 +936,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "R%20100%20G%20200%20B%20",
+            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20"),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -933,7 +962,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "R%20100%20G%20200%20B%20",
+            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20"),
             true,
             """{"R":100,"G":200,"B":""}"""
         },
@@ -962,17 +991,18 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "R=100%20G=200%20B=150",
+            new []{ "R=100", "G=200", "B=150"}.GenerateAllPermutations("%20"),
             false,
             null
         }
     };
 
-    public static TheoryData<string, string, bool, string?> ObjectPipeDelimited => new()
+    public static TheoryData<string, string?[], bool, string?> ObjectPipeDelimited = new()
     {
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -995,13 +1025,16 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "color=R|100|G|200|B|150",
+            new []{"R|100","G|200","B|150"}.GenerateAllPermutations('|')
+                .Select(str => $"color={str}")
+                .ToArray(),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -1021,7 +1054,9 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "color=R|100|G|200|B|",
+            new []{"R|100","G|200","B|"}.GenerateAllPermutations('|')
+                .Select(str => $"color={str}")
+                .ToArray(),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -1039,7 +1074,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "R|100|G|200|B|",
+            new []{"R|100","G|200","B|"}.GenerateAllPermutations('|'),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -1065,7 +1100,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "R|100|G|200|B|",
+            new []{"R|100","G|200","B|"}.GenerateAllPermutations('|'),
             true,
             """{"R":100,"G":200,"B":""}"""
         },
@@ -1094,7 +1129,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "R=100|G=200|B=150",
+            new []{"R|100","G|200","B|150"}.GenerateAllPermutations('|'),
             false,
             null
         }
@@ -1102,7 +1137,7 @@ public class SchemaParameterValueConverterTests
     #endregion
 
     #region Array
-    public static TheoryData<string, string?[], bool, string?> ArrayLabel => new()
+    public static TheoryData<string, string?[], bool, string?> ArrayLabel = new()
     {
         {
             """
@@ -1570,7 +1605,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ["", null],
+            [null],
             true,
             null
         }
@@ -1661,10 +1696,25 @@ public class SchemaParameterValueConverterTests
                     "type": "null" 
                 },
                 "style": "label",
+                "explode": false
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "in": "path",
+                "schema": {
+                    "type": "null"
+                },
+                "style": "label",
                 "explode": true
             }
             """,
-            [".", "", null],
+            [null],
             true,
             null
         }
@@ -1822,13 +1872,13 @@ public class SchemaParameterValueConverterTests
                 "name": "foo",
                 "in": "path",
                 "schema": {
-                    "type": "null" 
+                    "type": "null"
                 },
                 "style": "matrix",
                 "explode": false
             }
             """,
-            [";foo", null],
+            [null],
             true,
             null
         },
@@ -1844,7 +1894,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            [";foo", null],
+            [null],
             true,
             null
         }
@@ -1993,13 +2043,13 @@ public class SchemaParameterValueConverterTests
             {
                 "in": "path",
                 "schema": {
-                    "type": "null" 
+                    "type": "null"
                 },
                 "style": "simple",
                 "explode": false
             }
             """,
-            ["", null],
+            [null],
             true,
             null
         },
@@ -2014,7 +2064,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ["", null],
+            [null],
             true,
             null
         }
