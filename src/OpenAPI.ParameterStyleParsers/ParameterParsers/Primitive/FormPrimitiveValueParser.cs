@@ -15,8 +15,6 @@ internal sealed class FormPrimitiveValueParser(Parameter parameter) : PrimitiveV
         return true;
     }
 
-    public override string Serialize(JsonNode? instance)
-    {
-        throw new NotImplementedException();
-    }
+    public override string? Serialize(JsonNode? instance) => 
+        instance?.ToString();
 }

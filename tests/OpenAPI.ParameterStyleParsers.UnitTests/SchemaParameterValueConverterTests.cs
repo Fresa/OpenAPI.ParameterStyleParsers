@@ -17,26 +17,26 @@ public class SchemaParameterValueConverterTests
     [MemberData(nameof(NullForm))]
     public void Given_a_form_primitive_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
         string parameterJson,
-        string? value,
+        string?[] values,
         bool shouldMap,
         string? jsonInstance)
     {
-        TestParsing(parameterJson, value, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance);
     }
 
     [Theory]
     [MemberData(nameof(StringForm))]
-    //[MemberData(nameof(NumberForm))]
-    //[MemberData(nameof(IntegerForm))]
-    //[MemberData(nameof(BooleanForm))]
-    //[MemberData(nameof(NullForm))]
+    [MemberData(nameof(NumberForm))]
+    [MemberData(nameof(IntegerForm))]
+    [MemberData(nameof(BooleanForm))]
+    [MemberData(nameof(NullForm))]
     public void Given_a_form_primitive_parameter_with_schema_When_serializing_It_should_serialize_the_json_instance(
         string parameterJson,
-        string? value,
+        string?[] values,
         bool shouldMap,
         string? jsonInstance)
     {
-        //TestSerializing(parameterJson, value, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
     }
 
     [Theory]
@@ -1412,7 +1412,7 @@ public class SchemaParameterValueConverterTests
     };
     #endregion
 
-    public static TheoryData<string, string, bool, string?> StringForm => new()
+    public static TheoryData<string, string?[], bool, string?> StringForm => new()
     {
         {
             """
@@ -1425,13 +1425,13 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "test",
+            ["test"],
             true,
             "\"test\""
         }
     };
 
-    public static TheoryData<string, string, bool, string?> NumberForm => new()
+    public static TheoryData<string, string?[], bool, string?> NumberForm => new()
     {
         {
             """
@@ -1444,13 +1444,13 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "1.2",
+            ["1.2"],
             true,
             "1.2"
         }
     };
 
-    public static TheoryData<string, string, bool, string?> IntegerForm => new()
+    public static TheoryData<string, string?[], bool, string?> IntegerForm => new()
     {
         {
             """
@@ -1463,13 +1463,13 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "1",
+            ["1"],
             true,
             "1"
         }
     };
 
-    public static TheoryData<string, string, bool, string?> BooleanForm => new()
+    public static TheoryData<string, string?[], bool, string?> BooleanForm => new()
     {
         {
             """
@@ -1481,13 +1481,13 @@ public class SchemaParameterValueConverterTests
                 "style": "form",
                 "explode": true}
             """,
-            "true",
+            ["true"],
             true,
             "true"
         }
     };
 
-    public static TheoryData<string, string?, bool, string?> NullForm => new()
+    public static TheoryData<string, string?[], bool, string?> NullForm => new()
     {
         {
             """
@@ -1500,22 +1500,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "",
-            true,
-            null
-        },
-        {
-            """
-            {
-                "in": "query",
-                "schema": {
-                    "type": "null"
-                },
-                "style": "form",
-                "explode": true
-            }
-            """,
-            null,
+            ["", null],
             true,
             null
         }
