@@ -293,7 +293,7 @@ public class SchemaParameterValueConverterTests
     }
 
     #region Object
-    public static TheoryData<string, string?[], bool, string?> DeepObject => new()
+    public static readonly TheoryData<string, string?[], bool, string?> DeepObject = new()
     {
         {
             """
@@ -318,7 +318,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ["color[R]=100&color[G]=200&color[B]=150"],
+            new []{ "color[R]=100", "color[G]=200", "color[B]=150"}.GenerateAllPermutations('&'),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -337,12 +337,12 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ["color[R]=100&color[G]=200&color[B]="],
+            new []{ "color[R]=100", "color[G]=200", "color[B]="}.GenerateAllPermutations('&'),
             true,
             """{"R":"100","G":"200","B":""}"""
         }
     };
-    public static TheoryData<string, string?[], bool, string?> ObjectLabel => new()
+    public static readonly TheoryData<string, string?[], bool, string?> ObjectLabel = new()
     {
         {
             """
@@ -367,7 +367,9 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            [".R=100.G=200.B=150"],
+            new []{ "R=100", "G=200", "B=150"}.GenerateAllPermutations('.')
+                .Select(str => $".{str}")
+                .ToArray(),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -385,7 +387,9 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            [".R=100.G=200.B"],
+            new []{ "R=100", "G=200", "B="}.GenerateAllPermutations('.')
+                .Select(str => $".{str}")
+                .ToArray(),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -411,7 +415,9 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            [".R.100.G.200.B.150"],
+            new []{ "R.100", "G.200", "B.150"}.GenerateAllPermutations('.')
+                .Select(str => $".{str}")
+                .ToArray(),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -429,7 +435,9 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            [".R.100.G.200.B."],
+            new []{ "R.100", "G.200", "B."}.GenerateAllPermutations('.')
+                .Select(str => $".{str}")
+                .ToArray(),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -449,7 +457,7 @@ public class SchemaParameterValueConverterTests
             "{}"
         }
     };
-    public static TheoryData<string, string?[], bool, string?> ObjectMatrix => new()
+    public static readonly TheoryData<string, string?[], bool, string?> ObjectMatrix = new()
     {
         {
             """
@@ -473,7 +481,9 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            [";R=100;G=200;B=150"],
+            new []{ "R=100", "G=200", "B=150"}.GenerateAllPermutations(';')
+                .Select(str => $";{str}")
+                .ToArray(),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -491,7 +501,9 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            [";R=100;G=200;B"],
+            new []{ "R=100", "G=200", "B"}.GenerateAllPermutations(';')
+                .Select(str => $";{str}")
+                .ToArray(),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -518,7 +530,9 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            [";color=R,100,G,200,B,150"],
+            new []{ "R,100", "G,200", "B,150"}.GenerateAllPermutations(',')
+                .Select(str => $";color={str}")
+                .ToArray(),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -545,12 +559,14 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            [";keys=comma,%2C,dot,.,semi,%3B"],
+            new []{ "comma,%2C", "dot,.", "semi,%3B"}.GenerateAllPermutations(',')
+                .Select(str => $";keys={str}")
+                .ToArray(),
             true,
             """{"comma":",","dot":".","semi":";"}"""
         }
     };
-    public static TheoryData<string, string?[], bool, string?> ObjectForm => new()
+    public static readonly TheoryData<string, string?[], bool, string?> ObjectForm = new()
     {
         {
             """
@@ -578,7 +594,9 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            ["color=R,100,G,200,B,150"],
+            new []{ "R,100", "G,200", "B,150"}.GenerateAllPermutations(',')
+                .Select(str => $";color={str}")
+                .ToArray(),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -605,7 +623,9 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            ["color=R,100,G,200,B,"],
+            new []{ "R,100", "G,200", "B,"}.GenerateAllPermutations(',')
+                .Select(str => $";color={str}")
+                .ToArray(),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -624,7 +644,9 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            ["color=R,100,G,200,B,"],
+            new []{ "R,100", "G,200", "B,"}.GenerateAllPermutations(',')
+                .Select(str => $";color={str}")
+                .ToArray(),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -651,13 +673,15 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            ["color=R,100,G,200,B,"],
+            new []{ "R,100", "G,200", "B,"}.GenerateAllPermutations(',')
+                .Select(str => $";color={str}")
+                .ToArray(),
             true,
             """{"R":100,"G":200,"B":""}"""
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> ObjectSimple => new()
+    public static readonly TheoryData<string, string?[], bool, string?> ObjectSimple = new()
     {
         {
             """
@@ -859,7 +883,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> ObjectSpaceDelimited => new()
+    public static readonly TheoryData<string, string?[], bool, string?> ObjectSpaceDelimited = new()
     {
         {
             """
@@ -997,7 +1021,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> ObjectPipeDelimited = new()
+    public static readonly TheoryData<string, string?[], bool, string?> ObjectPipeDelimited = new()
     {
         {
             """
@@ -1137,7 +1161,7 @@ public class SchemaParameterValueConverterTests
     #endregion
 
     #region Array
-    public static TheoryData<string, string?[], bool, string?> ArrayLabel = new()
+    public static readonly TheoryData<string, string?[], bool, string?> ArrayLabel = new()
     {
         {
             """
@@ -1195,7 +1219,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> ArrayForm => new()
+    public static readonly TheoryData<string, string?[], bool, string?> ArrayForm = new()
     {
         {
             """
@@ -1237,7 +1261,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> ArrayMatrix => new()
+    public static readonly TheoryData<string, string?[], bool, string?> ArrayMatrix = new()
     {
         {
             """
@@ -1298,7 +1322,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> ArraySimple => new()
+    public static readonly TheoryData<string, string?[], bool, string?> ArraySimple = new()
     {
         {
             """
@@ -1356,7 +1380,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> ArraySpaceDelimited => new()
+    public static readonly TheoryData<string, string?[], bool, string?> ArraySpaceDelimited = new()
     {
         {
             """
@@ -1436,7 +1460,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> ArrayPipeDelimited => new()
+    public static readonly TheoryData<string, string?[], bool, string?> ArrayPipeDelimited = new()
     {
         {
             """
@@ -1517,7 +1541,7 @@ public class SchemaParameterValueConverterTests
     };
     #endregion
 
-    public static TheoryData<string, string?[], bool, string?> StringForm => new()
+    public static readonly TheoryData<string, string?[], bool, string?> StringForm = new()
     {
         {
             """
@@ -1536,7 +1560,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> NumberForm => new()
+    public static TheoryData<string, string?[], bool, string?> NumberForm = new()
     {
         {
             """
@@ -1555,7 +1579,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> IntegerForm => new()
+    public static readonly TheoryData<string, string?[], bool, string?> IntegerForm = new()
     {
         {
             """
@@ -1574,7 +1598,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> BooleanForm => new()
+    public static readonly TheoryData<string, string?[], bool, string?> BooleanForm = new()
     {
         {
             """
@@ -1592,7 +1616,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> NullForm => new()
+    public static readonly TheoryData<string, string?[], bool, string?> NullForm = new()
     {
         {
             """
@@ -1611,7 +1635,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> StringLabel => new()
+    public static readonly TheoryData<string, string?[], bool, string?> StringLabel = new()
     {
         {
             """
@@ -1630,7 +1654,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> NumberLabel => new()
+    public static readonly TheoryData<string, string?[], bool, string?> NumberLabel = new()
     {
         {
             """
@@ -1649,7 +1673,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> IntegerLabel => new()
+    public static readonly TheoryData<string, string?[], bool, string?> IntegerLabel = new()
     {
         {
             """
@@ -1668,7 +1692,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> BooleanLabel => new()
+    public static readonly TheoryData<string, string?[], bool, string?> BooleanLabel = new()
     {
         {
             """
@@ -1686,7 +1710,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> NullLabel => new()
+    public static readonly TheoryData<string, string?[], bool, string?> NullLabel = new()
     {
         {
             """
@@ -1720,7 +1744,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> StringMatrix => new()
+    public static readonly TheoryData<string, string?[], bool, string?> StringMatrix = new()
     {
         {
             """
@@ -1756,7 +1780,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> NumberMatrix => new()
+    public static readonly TheoryData<string, string?[], bool, string?> NumberMatrix = new()
     {
         {
             """
@@ -1792,7 +1816,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> IntegerMatrix => new()
+    public static readonly TheoryData<string, string?[], bool, string?> IntegerMatrix = new()
     {
         {
             """
@@ -1828,7 +1852,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> BooleanMatrix => new()
+    public static readonly TheoryData<string, string?[], bool, string?> BooleanMatrix = new()
     {
         {
             """
@@ -1864,7 +1888,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> NullMatrix => new()
+    public static readonly TheoryData<string, string?[], bool, string?> NullMatrix = new()
     {
         {
             """
@@ -1900,7 +1924,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> StringSimple => new()
+    public static readonly TheoryData<string, string?[], bool, string?> StringSimple = new()
     {
         {
             """
@@ -1934,7 +1958,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> NumberSimple => new()
+    public static readonly TheoryData<string, string?[], bool, string?> NumberSimple = new()
     {
         {
             """
@@ -1968,7 +1992,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> IntegerSimple => new()
+    public static readonly TheoryData<string, string?[], bool, string?> IntegerSimple = new()
     {
         {
             """
@@ -2002,7 +2026,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> BooleanSimple => new()
+    public static readonly TheoryData<string, string?[], bool, string?> BooleanSimple = new()
     {
         {
             """
@@ -2036,7 +2060,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> NullSimple => new()
+    public static readonly TheoryData<string, string?[], bool, string?> NullSimple = new()
     {
         {
             """
@@ -2070,7 +2094,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> EmptySchema => new()
+    public static readonly TheoryData<string, string?[], bool, string?> EmptySchema = new()
     {
         {
             """

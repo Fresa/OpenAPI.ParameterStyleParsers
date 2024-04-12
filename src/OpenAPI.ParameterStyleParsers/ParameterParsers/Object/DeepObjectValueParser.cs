@@ -33,4 +33,9 @@ internal sealed class DeepObjectValueParser(Parameter parameter) : ObjectValuePa
             .ToArray();
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
+
+    protected override string Serialize(IDictionary<string, string?> values) =>
+        $";{(Explode ? "" : $"{parameter.Name}=")}{string.Join(Explode ? '&' : ',',
+            values.Select(pair =>
+                $"{parameter.Name}[{pair.Key}]{(Explode ? "=" : ",")}{pair.Value}"))}";
 }

@@ -23,4 +23,9 @@ internal sealed class MatrixObjectValueParser(Parameter parameter) : ObjectValue
 
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
+
+    protected override string Serialize(IDictionary<string, string?> values) =>
+        $";{(Explode ? "" : $"{parameter.Name}=")}{string.Join(Explode ? ';' : ',',
+            values.Select(pair => 
+                $"{pair.Key}{(Explode ? string.IsNullOrEmpty(pair.Value) ? "" : "=" : ",")}{pair.Value}"))}";
 }

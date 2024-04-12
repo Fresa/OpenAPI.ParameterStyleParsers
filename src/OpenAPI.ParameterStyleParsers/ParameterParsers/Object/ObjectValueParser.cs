@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using Json.Schema;
@@ -30,11 +31,23 @@ internal abstract class ObjectValueParser(Parameter parameter) : IValueParser
         out JsonNode? obj,
         [NotNullWhen(false)] out string? error);
 
-    public string Serialize(JsonNode? instance)
+    public string? Serialize(JsonNode? instance)
     {
-        throw new NotImplementedException();
+        if (instance == null)
+        {
+            return null;
+        }
+
+        var values = instance
+            .AsObject()
+            .ToImmutableDictionary(
+                property => property.Key,
+                property =>
+                    property.Value == null ? null : Uri.EscapeDataString(property.Value.ToString()));
+        return Serialize(values);
     }
 
+    protected abstract string Serialize(IDictionary<string, string?> values);
 
     protected bool TryGetObjectProperties(
         IReadOnlyList<string>? keyAndValues,

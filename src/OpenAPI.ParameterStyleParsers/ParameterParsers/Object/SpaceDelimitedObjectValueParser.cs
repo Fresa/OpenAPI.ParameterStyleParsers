@@ -23,4 +23,9 @@ internal sealed class SpaceDelimitedObjectValueParser(Parameter parameter) : Obj
             .Split("%20");
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
+
+    protected override string Serialize(IDictionary<string, string?> values) =>
+        $";{(Explode ? "" : $"{parameter.Name}=")}{string.Join(Explode ? "&" : "%20",
+            values.Select(pair =>
+                $"{pair.Key}{(Explode ? "=" : "%20")}{pair.Value}"))}";
 }
