@@ -9,4 +9,6 @@ internal interface IValueParser
         string? value,
         out JsonNode? instance,
         [NotNullWhen(false)] out string? error);
+
+    string? Serialize(JsonNode? instance);
 }

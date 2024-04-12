@@ -9,4 +9,12 @@ public interface IParameterValueParser
         string value,
         out JsonNode? instance,
         [NotNullWhen(false)] out string? mappingError);
+
+    /// <summary>
+    /// Serializes a json node according to the specified parameter.
+    /// It's assumed that the instance is valid according to the parameter's schema.
+    /// </summary>
+    /// <param name="instance"></param>
+    /// <returns></returns>
+    string? Serialize(JsonNode? instance);
 }

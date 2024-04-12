@@ -31,14 +31,15 @@ public record Parameter
         [Locations.Cookie] = [Styles.Form],
     };
 
-    private Parameter(string style, bool explode, JsonSchema jsonSchema)
+    private Parameter(string name, string style, bool explode, JsonSchema jsonSchema)
     {
+        Name = name;
         Style = style;
         Explode = explode;
         JsonSchema = jsonSchema;
     }
 
-    public static Parameter Parse(string style, string location, bool explode, JsonSchema jsonSchema)
+    public static Parameter Parse(string name, string style, string location, bool explode, JsonSchema jsonSchema)
     {
         if (!LocationToStylesMap.TryGetValue(location, out var styles))
         {
@@ -52,9 +53,10 @@ public record Parameter
                 $"location '{location}' does not support style '{style}'. Supported styles are {string.Join(", ", styles)}");
         }
 
-        return new Parameter(style, explode, jsonSchema);
+        return new Parameter(name, style, explode, jsonSchema);
     }
-    
+
+    public string Name { get; private init; }
     public string Style { get; private init; }
     public bool Explode { get; private init; }
     public JsonSchema JsonSchema { get; private init; }

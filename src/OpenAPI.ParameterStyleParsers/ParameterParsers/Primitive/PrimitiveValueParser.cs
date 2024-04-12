@@ -59,4 +59,6 @@ internal abstract class PrimitiveValueParser : IValueParser
         instance = null;
         return false;
     }
+
+    public abstract string? Serialize(JsonNode? instance);
 }

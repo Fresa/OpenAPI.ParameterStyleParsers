@@ -37,6 +37,11 @@ internal abstract class ArrayValueParser : IValueParser
         out JsonNode? array,
         [NotNullWhen(false)] out string? error);
 
+    public string Serialize(JsonNode? instance)
+    {
+        throw new NotImplementedException();
+    }
+
     protected bool TryGetArrayItems(
         IReadOnlyList<string>? values,
         out JsonNode? array,

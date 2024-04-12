@@ -27,4 +27,9 @@ internal sealed class MissingSchemaTypeValueParser : IValueParser
     {
         return _valueParser.TryParse(value, out instance, out error);
     }
+
+    public string Serialize(JsonNode? instance)
+    {
+        throw new NotImplementedException();
+    }
 }

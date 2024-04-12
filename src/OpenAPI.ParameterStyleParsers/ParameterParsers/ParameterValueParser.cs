@@ -45,4 +45,7 @@ public sealed class ParameterValueParser : IParameterValueParser
     public bool TryParse(string? value, out JsonNode? instance,
         [NotNullWhen(false)] out string? mappingError) =>
         _valueParser.TryParse(value, out instance, out mappingError);
+
+    public string Serialize(JsonNode? instance) => 
+        _valueParser.Serialize(instance);
 }

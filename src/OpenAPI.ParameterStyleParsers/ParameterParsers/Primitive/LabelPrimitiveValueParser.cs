@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
@@ -12,5 +13,10 @@ internal sealed class LabelPrimitiveValueParser(Parameter parameter) : Primitive
         error = null;
         value = input?.TrimStart('.');
         return true;
+    }
+
+    public override string Serialize(JsonNode? instance)
+    {
+        throw new NotImplementedException();
     }
 }

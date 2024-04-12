@@ -30,6 +30,11 @@ internal abstract class ObjectValueParser(Parameter parameter) : IValueParser
         out JsonNode? obj,
         [NotNullWhen(false)] out string? error);
 
+    public string Serialize(JsonNode? instance)
+    {
+        throw new NotImplementedException();
+    }
+
 
     protected bool TryGetObjectProperties(
         IReadOnlyList<string>? keyAndValues,

@@ -21,7 +21,22 @@ public class SchemaParameterValueConverterTests
         bool shouldMap,
         string? jsonInstance)
     {
-        Test(parameterJson, value, shouldMap, jsonInstance);
+        TestParsing(parameterJson, value, shouldMap, jsonInstance);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringForm))]
+    //[MemberData(nameof(NumberForm))]
+    //[MemberData(nameof(IntegerForm))]
+    //[MemberData(nameof(BooleanForm))]
+    //[MemberData(nameof(NullForm))]
+    public void Given_a_form_primitive_parameter_with_schema_When_serializing_It_should_serialize_the_json_instance(
+        string parameterJson,
+        string? value,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        //TestSerializing(parameterJson, value, shouldMap, jsonInstance);
     }
 
     [Theory]
@@ -36,7 +51,7 @@ public class SchemaParameterValueConverterTests
         bool shouldMap,
         string? jsonInstance)
     {
-        Test(parameterJson, value, shouldMap, jsonInstance);
+        TestParsing(parameterJson, value, shouldMap, jsonInstance);
     }
 
     [Theory]
@@ -51,7 +66,7 @@ public class SchemaParameterValueConverterTests
         bool shouldMap,
         string? jsonInstance)
     {
-        Test(parameterJson, value, shouldMap, jsonInstance);
+        TestParsing(parameterJson, value, shouldMap, jsonInstance);
     }
 
     [Theory]
@@ -62,12 +77,28 @@ public class SchemaParameterValueConverterTests
     [MemberData(nameof(NullSimple))]
     public void Given_a_simple_primitive_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
         string parameterJson,
-        string? value,
+        string?[] values,
         bool shouldMap,
         string? jsonInstance)
     {
-        Test(parameterJson, value, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance);
     }
+
+    [Theory]
+    [MemberData(nameof(StringSimple))]
+    [MemberData(nameof(NumberSimple))]
+    [MemberData(nameof(IntegerSimple))]
+    [MemberData(nameof(BooleanSimple))]
+    [MemberData(nameof(NullSimple))]
+    public void Given_a_simple_primitive_parameter_with_schema_When_serializing_It_should_serialize_the_json_instance(
+        string parameterJson,
+        string?[] value,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        TestSerializing(parameterJson, value, shouldMap, jsonInstance);
+    }
+
 
     [Theory]
     [MemberData(nameof(EmptySchema))]
@@ -77,7 +108,7 @@ public class SchemaParameterValueConverterTests
         bool shouldMap,
         string? jsonInstance)
     {
-        Test(parameterJson, value, shouldMap, jsonInstance);
+        TestParsing(parameterJson, value, shouldMap, jsonInstance);
     }
 
     [Theory]
@@ -93,7 +124,7 @@ public class SchemaParameterValueConverterTests
         bool shouldMap,
         string? jsonInstance)
     {
-        Test(parameterJson, value, shouldMap, jsonInstance);
+        TestParsing(parameterJson, value, shouldMap, jsonInstance);
     }
 
     [Theory]
@@ -110,10 +141,21 @@ public class SchemaParameterValueConverterTests
         bool shouldMap,
         string? jsonInstance)
     {
-        Test(parameterJson, value, shouldMap, jsonInstance);
+        TestParsing(parameterJson, value, shouldMap, jsonInstance);
     }
 
-    private static void Test(string parameterJson,
+    private static void TestParsing(string parameterJson,
+        string?[] values,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        foreach (var value in values)
+        {
+            TestParsing(parameterJson, value, shouldMap, jsonInstance);
+        }
+    }
+
+    private static void TestParsing(string parameterJson,
         string? value,
         bool shouldMap,
         string? jsonInstance)
@@ -124,6 +166,7 @@ public class SchemaParameterValueConverterTests
                      throw new InvalidOperationException("json schema is missing");
         var parameter =
             Parameter.Parse(
+                reader.Read("style").GetValue<string>(),
                 reader.Read("style").GetValue<string>(),
                 reader.Read("in").GetValue<string>(),
                 reader.Read("explode").GetValue<bool>(),
@@ -145,6 +188,37 @@ public class SchemaParameterValueConverterTests
             jsonInstance.Should().NotBeNull();
             instance.ToJsonString().Should().BeEquivalentTo(jsonInstance);
         }
+    }
+
+    private static void TestSerializing(string parameterJson,
+        string?[] expectedValues,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        if (!shouldMap)
+            return;
+
+        var parser = CreateParameterValueParser(parameterJson);
+        var serialized = parser.Serialize(jsonInstance == null ? null : JsonNode.Parse(jsonInstance));
+
+        serialized.Should().ContainAny(expectedValues);
+    }
+
+    private static IParameterValueParser CreateParameterValueParser(
+        string parameterJson)
+    {
+        var parameterJsonNode = JsonNode.Parse(parameterJson)!;
+        var reader = new JsonNodeReader(parameterJsonNode, JsonPointer.Empty);
+        var schema = parameterJsonNode["schema"].Deserialize<JsonSchema>() ??
+                     throw new InvalidOperationException("json schema is missing");
+        var parameter =
+            Parameter.Parse(
+                reader.Read("style").GetValue<string>(),
+                reader.Read("style").GetValue<string>(),
+                reader.Read("in").GetValue<string>(),
+                reader.Read("explode").GetValue<bool>(),
+                schema);
+        return ParameterValueParser.Create(parameter);
     }
 
     #region Object
@@ -1771,7 +1845,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string, bool, string?> StringSimple => new()
+    public static TheoryData<string, string?[], bool, string?> StringSimple => new()
     {
         {
             """
@@ -1784,7 +1858,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "test",
+            ["test"],
             true,
             "\"test\""
         },
@@ -1799,13 +1873,13 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "test",
+            ["test"],
             true,
             "\"test\""
         }
     };
 
-    public static TheoryData<string, string, bool, string?> NumberSimple => new()
+    public static TheoryData<string, string?[], bool, string?> NumberSimple => new()
     {
         {
             """
@@ -1818,7 +1892,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "1.2",
+            ["1.2"],
             true,
             "1.2"
         },
@@ -1833,13 +1907,13 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "1.2",
+            ["1.2"],
             true,
             "1.2"
         }
     };
 
-    public static TheoryData<string, string, bool, string?> IntegerSimple => new()
+    public static TheoryData<string, string?[], bool, string?> IntegerSimple => new()
     {
         {
             """
@@ -1852,7 +1926,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "1",
+            ["1"],
             true,
             "1"
         },
@@ -1867,13 +1941,13 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "1",
+            ["1"],
             true,
             "1"
         }
     };
 
-    public static TheoryData<string, string, bool, string?> BooleanSimple => new()
+    public static TheoryData<string, string?[], bool, string?> BooleanSimple => new()
     {
         {
             """
@@ -1886,7 +1960,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "true",
+            ["true"],
             true,
             "true"
         },
@@ -1901,13 +1975,13 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "true",
+            ["true"],
             true,
             "true"
         }
     };
 
-    public static TheoryData<string, string?, bool, string?> NullSimple => new()
+    public static TheoryData<string, string?[], bool, string?> NullSimple => new()
     {
         {
             """
@@ -1920,22 +1994,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            "",
-            true,
-            null
-        },
-        {
-            """
-            {
-                "in": "path",
-                "schema": {
-                    "type": "null"
-                },
-                "style": "simple",
-                "explode": false
-            }
-            """,
-            null,
+            ["", null],
             true,
             null
         },
@@ -1950,22 +2009,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            "",
-            true,
-            null
-        },
-        {
-            """
-            {
-                "in": "path",
-                "schema": {
-                    "type": "null"
-                },
-                "style": "simple",
-                "explode": true
-            }
-            """,
-            null,
+            ["", null],
             true,
             null
         }
