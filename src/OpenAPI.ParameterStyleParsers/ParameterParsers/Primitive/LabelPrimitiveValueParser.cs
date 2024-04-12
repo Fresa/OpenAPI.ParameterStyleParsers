@@ -15,8 +15,6 @@ internal sealed class LabelPrimitiveValueParser(Parameter parameter) : Primitive
         return true;
     }
 
-    public override string Serialize(JsonNode? instance)
-    {
-        throw new NotImplementedException();
-    }
+    public override string? Serialize(JsonNode? instance) => 
+        instance == null ? null : $".{instance}";
 }

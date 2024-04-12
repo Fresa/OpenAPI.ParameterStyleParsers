@@ -47,11 +47,26 @@ public class SchemaParameterValueConverterTests
     [MemberData(nameof(NullLabel))]
     public void Given_a_label_primitive_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
         string parameterJson,
-        string? value,
+        string?[] values,
         bool shouldMap,
         string? jsonInstance)
     {
-        TestParsing(parameterJson, value, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringLabel))]
+    [MemberData(nameof(NumberLabel))]
+    [MemberData(nameof(IntegerLabel))]
+    [MemberData(nameof(BooleanLabel))]
+    [MemberData(nameof(NullLabel))]
+    public void Given_a_label_primitive_parameter_with_schema_When_serializing_It_should_serialize_the_json_instance(
+        string parameterJson,
+        string?[] values,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
     }
 
     [Theory]
@@ -1506,7 +1521,7 @@ public class SchemaParameterValueConverterTests
         }
     };
 
-    public static TheoryData<string, string, bool, string?> StringLabel => new()
+    public static TheoryData<string, string?[], bool, string?> StringLabel => new()
     {
         {
             """
@@ -1519,13 +1534,13 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ".test",
+            [".test"],
             true,
             "\"test\""
         }
     };
 
-    public static TheoryData<string, string, bool, string?> NumberLabel => new()
+    public static TheoryData<string, string?[], bool, string?> NumberLabel => new()
     {
         {
             """
@@ -1538,13 +1553,13 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ".1.2",
+            [".1.2"],
             true,
             "1.2"
         }
     };
 
-    public static TheoryData<string, string, bool, string?> IntegerLabel => new()
+    public static TheoryData<string, string?[], bool, string?> IntegerLabel => new()
     {
         {
             """
@@ -1557,13 +1572,13 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ".1",
+            [".1"],
             true,
             "1"
         }
     };
 
-    public static TheoryData<string, string, bool, string?> BooleanLabel => new()
+    public static TheoryData<string, string?[], bool, string?> BooleanLabel => new()
     {
         {
             """
@@ -1575,13 +1590,13 @@ public class SchemaParameterValueConverterTests
                 "style": "label",
                 "explode": true}
             """,
-            ".true",
+            [".true"],
             true,
             "true"
         }
     };
 
-    public static TheoryData<string, string?, bool, string?> NullLabel => new()
+    public static TheoryData<string, string?[], bool, string?> NullLabel => new()
     {
         {
             """
@@ -1594,37 +1609,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ".",
-            true,
-            null
-        },
-        {
-            """
-            {
-                "in": "path",
-                "schema": {
-                    "type": "null"
-                },
-                "style": "label",
-                "explode": true
-            }
-            """,
-            "",
-            true,
-            null
-        },
-        {
-            """
-            {
-                "in": "path",
-                "schema": {
-                    "type": "null"
-                },
-                "style": "label",
-                "explode": true
-            }
-            """,
-            null,
+            [".", "", null],
             true,
             null
         }
