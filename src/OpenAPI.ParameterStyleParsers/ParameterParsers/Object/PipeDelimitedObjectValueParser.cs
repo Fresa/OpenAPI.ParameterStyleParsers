@@ -25,7 +25,7 @@ internal sealed class PipeDelimitedObjectValueParser(Parameter parameter) : Obje
     }
 
     protected override string Serialize(IDictionary<string, string?> values) =>
-        $";{(Explode ? "" : $"{parameter.Name}=")}{string.Join(Explode ? '&' : '|',
+        $"{(Explode ? $"{parameter.Name}=" : "")}{string.Join(Explode ? '&' : '|',
             values.Select(pair =>
                 $"{pair.Key}{(Explode ? "=" : "|")}{pair.Value}"))}";
 }

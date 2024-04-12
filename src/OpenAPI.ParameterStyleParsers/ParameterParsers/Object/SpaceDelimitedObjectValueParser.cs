@@ -25,7 +25,7 @@ internal sealed class SpaceDelimitedObjectValueParser(Parameter parameter) : Obj
     }
 
     protected override string Serialize(IDictionary<string, string?> values) =>
-        $";{(Explode ? "" : $"{parameter.Name}=")}{string.Join(Explode ? "&" : "%20",
+        $"{(Explode ? $"{parameter.Name}=" : "")}{string.Join(Explode ? "&" : "%20",
             values.Select(pair =>
                 $"{pair.Key}{(Explode ? "=" : "%20")}{pair.Value}"))}";
 }

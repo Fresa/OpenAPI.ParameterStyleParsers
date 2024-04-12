@@ -272,7 +272,7 @@ public class SchemaParameterValueConverterTests
         var parser = CreateParameterValueParser(parameterJson);
         var serialized = parser.Serialize(jsonInstance == null ? null : JsonNode.Parse(jsonInstance));
 
-        serialized.Should().ContainAny(expectedValues);
+        expectedValues.Should().Contain(serialized);
     }
 
     private static ParameterValueParser CreateParameterValueParser(
@@ -911,9 +911,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new []{ "R%20100", "G%20200", "B%20150"}.GenerateAllPermutations("%20")
-                .Select(str => $"color={str}")
-                .ToArray(),
+            new []{ "R%20100", "G%20200", "B%20150"}.GenerateAllPermutations("%20"),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -940,15 +938,14 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20")
-                .Select(str => $"color={str}")
-                .ToArray(),
+            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20"),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -967,6 +964,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -993,6 +991,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -1049,9 +1048,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new []{"R|100","G|200","B|150"}.GenerateAllPermutations('|')
-                .Select(str => $"color={str}")
-                .ToArray(),
+            new []{"R|100","G|200","B|150"}.GenerateAllPermutations('|'),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -1078,9 +1075,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new []{"R|100","G|200","B|"}.GenerateAllPermutations('|')
-                .Select(str => $"color={str}")
-                .ToArray(),
+            new []{"R|100","G|200","B|"}.GenerateAllPermutations('|'),
             true,
             """{"R":"100","G":"200","B":""}"""
         },

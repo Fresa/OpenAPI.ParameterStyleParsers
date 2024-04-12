@@ -22,7 +22,11 @@ internal sealed class LabelObjectValueParser(Parameter parameter) : ObjectValueP
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 
-    protected override string Serialize(IDictionary<string, string?> values) =>
-        $".{string.Join('.',
+    protected override string Serialize(IDictionary<string, string?> values)
+    {
+        if (!values.Any())
+            return string.Empty;
+        return $".{string.Join('.',
             values.Select(pair => $"{pair.Key}{(Explode ? "=" : ".")}{pair.Value}"))}";
+    }
 }

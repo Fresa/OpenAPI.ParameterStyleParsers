@@ -35,7 +35,7 @@ internal sealed class DeepObjectValueParser(Parameter parameter) : ObjectValuePa
     }
 
     protected override string Serialize(IDictionary<string, string?> values) =>
-        $";{(Explode ? "" : $"{parameter.Name}=")}{string.Join(Explode ? '&' : ',',
+        $"{(Explode ? "" : $"{parameter.Name}=")}{string.Join(Explode ? '&' : ',',
             values.Select(pair =>
                 $"{parameter.Name}[{pair.Key}]{(Explode ? "=" : ",")}{pair.Value}"))}";
 }
