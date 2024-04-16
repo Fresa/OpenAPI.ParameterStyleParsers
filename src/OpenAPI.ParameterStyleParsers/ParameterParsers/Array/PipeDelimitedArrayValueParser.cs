@@ -26,7 +26,7 @@ internal sealed class PipeDelimitedArrayValueParser(Parameter parameter) : Array
     protected override string Serialize(string?[] values)
     {
         var serialized = string.Join((Explode ? '&' : '|'),
-            values.Select(value => Explode ? $"{parameter.Name}={value}" : value));
-        return Explode ? serialized : $"{parameter.Name}={serialized}";
+            values.Select(value => Explode ? $"{ParameterName}={value}" : value));
+        return Explode ? serialized : $"{ParameterName}={serialized}";
     }
 }

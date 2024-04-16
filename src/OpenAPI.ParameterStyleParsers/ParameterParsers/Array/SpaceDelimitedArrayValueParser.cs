@@ -26,7 +26,7 @@ internal sealed class SpaceDelimitedArrayValueParser(Parameter parameter) : Arra
     protected override string Serialize(string?[] values)
     {
         var serialized = string.Join((Explode ? "&" : "%20"),
-            values.Select(value => Explode ? $"{parameter.Name}={value}" : value));
-        return Explode ? serialized : $"{parameter.Name}={serialized}";
+            values.Select(value => Explode ? $"{ParameterName}={value}" : value));
+        return Explode ? serialized : $"{ParameterName}={serialized}";
     }
 }

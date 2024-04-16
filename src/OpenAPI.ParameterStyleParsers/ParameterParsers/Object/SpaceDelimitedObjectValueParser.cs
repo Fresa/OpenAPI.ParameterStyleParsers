@@ -24,8 +24,8 @@ internal sealed class SpaceDelimitedObjectValueParser(Parameter parameter) : Obj
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 
-    protected override string Serialize(IDictionary<string, string?> values) =>
-        $"{(Explode ? $"{parameter.Name}=" : "")}{string.Join(Explode ? "&" : "%20",
-            values.Select(pair =>
-                $"{pair.Key}{(Explode ? "=" : "%20")}{pair.Value}"))}";
+    protected override string Serialize(IDictionary<string, string?> properties) =>
+        $"{(Explode ? $"{ParameterName}=" : "")}{string.Join(Explode ? "&" : "%20",
+            properties.Select(property =>
+                $"{property.Key}{(Explode ? "=" : "%20")}{property.Value}"))}";
 }

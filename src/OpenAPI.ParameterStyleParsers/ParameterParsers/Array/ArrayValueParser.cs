@@ -9,10 +9,12 @@ internal abstract class ArrayValueParser : IValueParser
 {
     private readonly SchemaValueType _jsonType;
 
-    internal bool Explode { get; }
+    protected bool Explode { get; }
+    protected string ParameterName { get; }
     protected ArrayValueParser(Parameter parameter)
     {
         Explode = parameter.Explode;
+        ParameterName = parameter.Name;
         var itemsSchema = parameter.JsonSchema.GetItems();
         var jsonType = itemsSchema?.GetJsonType();
         

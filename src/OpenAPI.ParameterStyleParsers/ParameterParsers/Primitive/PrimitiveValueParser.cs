@@ -8,9 +8,12 @@ internal abstract class PrimitiveValueParser : IValueParser
 {
     private SchemaValueType Type { get; }
     
+    protected string ParameterName { get; }
+
     protected PrimitiveValueParser(Parameter parameter)
     {
         var type = parameter.JsonSchema.GetJsonType() ?? SchemaValueType.String;
+        ParameterName = parameter.Name;
 
         switch (type)
         {

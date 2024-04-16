@@ -25,7 +25,7 @@ internal sealed class FormObjectValueParser(Parameter parameter) : ObjectValuePa
     }
 
     protected override string Serialize(IDictionary<string, string?> values) =>
-        $";{(Explode ? "" : $"{parameter.Name}=")}{string.Join(Explode ? '&' : ',',
+        $";{(Explode ? "" : $"{ParameterName}=")}{string.Join(Explode ? '&' : ',',
             values.Select(pair =>
                 $"{pair.Key}{(Explode ? "=" : ",")}{pair.Value}"))}";
 }

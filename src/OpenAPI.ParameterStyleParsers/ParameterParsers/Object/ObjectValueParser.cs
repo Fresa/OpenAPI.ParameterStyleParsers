@@ -10,7 +10,8 @@ internal abstract class ObjectValueParser(Parameter parameter) : IValueParser
 {
     private readonly PropertySchemaResolver _propertySchemaResolver = new(parameter.JsonSchema);
 
-    internal bool Explode { get; } = parameter.Explode;
+    protected bool Explode { get; } = parameter.Explode;
+    protected string ParameterName { get; } = parameter.Name;
 
     internal static ObjectValueParser Create(Parameter parameter) =>
         parameter.Style switch
@@ -38,16 +39,16 @@ internal abstract class ObjectValueParser(Parameter parameter) : IValueParser
             return null;
         }
 
-        var values = instance
+        var properties = instance
             .AsObject()
             .ToImmutableDictionary(
                 property => property.Key,
                 property =>
                     property.Value == null ? null : Uri.EscapeDataString(property.Value.ToString()));
-        return Serialize(values);
+        return Serialize(properties);
     }
 
-    protected abstract string Serialize(IDictionary<string, string?> values);
+    protected abstract string Serialize(IDictionary<string, string?> properties);
 
     protected bool TryGetObjectProperties(
         IReadOnlyList<string>? keyAndValues,

@@ -16,7 +16,7 @@ internal sealed class MatrixPrimitiveValueParser(Parameter parameter) : Primitiv
 
     protected override string Serialize(string value)
     {
-        var serialized = $";{parameter.Name}";
+        var serialized = $";{ParameterName}";
         return value == string.Empty ? serialized : $"{serialized}={value}";
     }
 }
