@@ -7,7 +7,7 @@ using OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers;
 
-public sealed class ParameterValueParser : IParameterValueParser
+public sealed class ParameterValueParser
 {
     private readonly IValueParser _valueParser;
 
@@ -16,6 +16,11 @@ public sealed class ParameterValueParser : IParameterValueParser
         _valueParser = valueParser;
     }
 
+    /// <summary>
+    /// Creates a parameter value parser corresponding to the specified parameter
+    /// </summary>
+    /// <param name="parameter">The parameter specification</param>
+    /// <returns>Parameter value parser</returns>
     public static ParameterValueParser Create(Parameter parameter)
     {
         var valueParser = CreateValueParser(parameter);
@@ -42,10 +47,24 @@ public sealed class ParameterValueParser : IParameterValueParser
         };
     }
 
+    /// <summary>
+    /// Parses a style formatted parameter value to a json node.
+    /// It's assumed that the input is valid according to the style format.
+    /// </summary>
+    /// <param name="value">Style formatted input</param>
+    /// <param name="instance">The parsed json if this method returns true</param>
+    /// <param name="error">Parsing error if this method returns false</param>
+    /// <returns>true if an instance could be constructed, false if there are errors</returns>
     public bool TryParse(string? value, out JsonNode? instance,
-        [NotNullWhen(false)] out string? mappingError) =>
-        _valueParser.TryParse(value, out instance, out mappingError);
+        [NotNullWhen(false)] out string? error) =>
+        _valueParser.TryParse(value, out instance, out error);
 
-    public string Serialize(JsonNode? instance) => 
+    /// <summary>
+    /// Serializes a json node according to the specified parameter.
+    /// It's assumed that the instance is valid according to the parameter's schema.
+    /// </summary>
+    /// <param name="instance">Json instance</param>
+    /// <returns>Style formatted instance</returns>
+    public string? Serialize(JsonNode? instance) => 
         _valueParser.Serialize(instance);
 }
