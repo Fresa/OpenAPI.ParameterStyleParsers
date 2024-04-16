@@ -24,8 +24,8 @@ internal sealed class FormObjectValueParser(Parameter parameter) : ObjectValuePa
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 
-    protected override string Serialize(IDictionary<string, string?> values) =>
+    protected override string Serialize(IDictionary<string, string?> properties) =>
         $";{(Explode ? "" : $"{ParameterName}=")}{string.Join(Explode ? '&' : ',',
-            values.Select(pair =>
+            properties.Select(pair =>
                 $"{pair.Key}{(Explode ? "=" : ",")}{pair.Value}"))}";
 }
