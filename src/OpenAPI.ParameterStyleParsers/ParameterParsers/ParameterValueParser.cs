@@ -7,6 +7,9 @@ using OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers;
 
+/// <summary>
+/// Represents a parameter value parser for OpenAPI styles
+/// </summary>
 public sealed class ParameterValueParser
 {
     private readonly IValueParser _valueParser;
