@@ -9,7 +9,6 @@ env:
   project_path: src/OpenAPI.ParameterStyleParsers
   project_name: OpenAPI.ParameterStyleParsers
   package_id: ParameterStyleParsers.OpenAPI
-  repository_name: Fresa/OpenAPI.ParameterStyleParsers
   dotnet_version: 8.0.x
 
 jobs:
@@ -35,7 +34,7 @@ jobs:
     name: Create Release
     needs: [test]
     runs-on: ubuntu-latest
-    if: github.repository == '${{ env.repository_name }}' && github.actor != 'dependabot[bot]'
+    if: github.repository == 'Fresa/OpenAPI.ParameterStyleParsers' && github.actor != 'dependabot[bot]'
     permissions: 
       contents: write
     steps:
