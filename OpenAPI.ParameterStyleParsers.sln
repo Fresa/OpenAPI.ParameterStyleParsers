@@ -9,6 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{412FEECD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAPI.ParameterStyleParsers.UnitTests", "tests\OpenAPI.ParameterStyleParsers.UnitTests\OpenAPI.ParameterStyleParsers.UnitTests.csproj", "{E5A39848-D898-43F1-8F9E-BF2B14210366}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7F07EA6F-90BF-43C6-B73F-888AE57DE73F}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\cd.yml = .github\workflows\cd.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
