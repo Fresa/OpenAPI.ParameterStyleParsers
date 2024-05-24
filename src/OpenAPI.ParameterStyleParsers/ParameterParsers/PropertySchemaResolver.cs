@@ -1,24 +1,23 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
-using Json.Schema;
+using OpenAPI.ParameterStyleParsers.JsonSchema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers;
 
 internal sealed class PropertySchemaResolver
 {
-    private readonly IReadOnlyDictionary<string, JsonSchema>? _propertySchemas;
-    private readonly JsonSchema? _additionalPropertiesSchema;
-    private readonly IReadOnlyDictionary<Regex, JsonSchema>? _patternPropertySchemas;
+    private readonly IReadOnlyDictionary<string, IJsonSchema>? _propertySchemas;
+    private readonly IJsonSchema? _additionalPropertiesSchema;
+    private readonly IReadOnlyDictionary<Regex, IJsonSchema>? _patternPropertySchemas;
 
-    public PropertySchemaResolver(JsonSchema schema)
+    public PropertySchemaResolver(IJsonSchema schema)
     {
         _propertySchemas = schema.GetProperties();
         _additionalPropertiesSchema = schema.GetAdditionalProperties();
         _patternPropertySchemas = schema.GetPatternProperties();
-
     }
 
-    public bool TryGetSchemaForProperty(string propertyName, [NotNullWhen(true)] out JsonSchema? schema)
+    public bool TryGetSchemaForProperty(string propertyName, [NotNullWhen(true)] out IJsonSchema? schema)
     {
         if (_propertySchemas?.TryGetValue(propertyName, out schema) ?? false)
             return true;

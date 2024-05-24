@@ -12,29 +12,16 @@ internal sealed class JsonNodeReader
     private readonly ConcurrentDictionary<JsonPointer, JsonNodeReader?> _nodeCache = new();
     private static readonly JsonPointer RefPointer = JsonPointer.Create("$ref");
 
-    internal JsonNodeReader(JsonNode root, JsonPointer trail)
+    internal JsonNodeReader(JsonNode root)
     {
         _root = root;
-        Trail = trail;
         RootPath = JsonPointer.Parse(root.GetPointerFromRoot());
-        Key = RootPath.Segments.LastOrDefault()?.Value ?? string.Empty;
     }
-
-    /// <summary>
-    /// The trail leading to this node 
-    /// <remarks>This pointer might not be possible to evaluate, it describes the way taken to get to this node</remarks>
-    /// </summary>
-    internal JsonPointer Trail { get; }
 
     /// <summary>
     /// The absolute path to this node from root
     /// </summary>
     internal JsonPointer RootPath { get; }
-
-    /// <summary>
-    /// The current json node's key
-    /// </summary>
-    internal string Key { get; }
 
     internal JsonNodeReader Read(params PointerSegment[] pointerSegments) =>
         Read(JsonPointer.Create(pointerSegments));
@@ -67,7 +54,7 @@ internal sealed class JsonNodeReader
             return null;
         }
 
-        return new JsonNodeReader(node, reader.Trail.Combine(pointer));
+        return new JsonNodeReader(node);
     }
 
     private JsonNodeReader ResolveReferences()
@@ -82,40 +69,10 @@ internal sealed class JsonNodeReader
             throw new InvalidOperationException("Only local (fragment) $ref pointers are supported");
 
         var referencePointer = JsonPointer.Parse(referencePointerExpression);
-        var reader = new JsonNodeReader(_root.Root, Trail.Combine(RefPointer)).Read(
+        var reader = new JsonNodeReader(_root.Root).Read(
             referencePointer);
         return reader.ResolveReferences();
     }
 
     internal T GetValue<T>() => _root.GetValue<T>();
-
-    internal IEnumerable<JsonNodeReader> ReadChildren()
-    {
-        switch (_root)
-        {
-            case JsonArray array:
-                for (var i = 0; i < array.Count; i++)
-                {
-                    yield return Read(JsonPointer.Create(i));
-                }
-
-                break;
-            case JsonObject @object:
-                foreach (var child in @object)
-                {
-                    yield return Read(JsonPointer.Create(child.Key));
-                }
-
-                break;
-            case JsonValue:
-                throw new InvalidOperationException("Current node is a value and hence has no children");
-            default:
-                throw new NotImplementedException($"Nodes of type {_root.GetType()} is currently not supported");
-        }
-    }
-    internal void Deconstruct(out string key, out JsonNode? value)
-    {
-        key = Key;
-        value = _root;
-    }
 }

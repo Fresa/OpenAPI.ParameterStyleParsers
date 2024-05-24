@@ -1,5 +1,4 @@
-using JetBrains.Annotations;
-using Json.Schema;
+using OpenAPI.ParameterStyleParsers.JsonSchema;
 
 namespace OpenAPI.ParameterStyleParsers;
 
@@ -27,7 +26,7 @@ public record Parameter
     /// <summary>
     /// Supported OpenAPI parameter locations
     /// </summary>
-    [PublicAPI]
+    // ReSharper disable once MemberCanBePrivate.Global Part of public contract
     public static class Locations
     {
         #pragma warning disable CS1591
@@ -41,7 +40,7 @@ public record Parameter
     /// <summary>
     /// A map between parameter locations and supported styles
     /// </summary>
-    [PublicAPI]
+    // ReSharper disable once MemberCanBePrivate.Global Part of public contract
     public static readonly Dictionary<string, string[]> LocationToStylesMap = new()
     {
         [Locations.Path] = [Styles.Matrix, Styles.Label, Styles.Simple],
@@ -50,7 +49,7 @@ public record Parameter
         [Locations.Cookie] = [Styles.Form],
     };
 
-    private Parameter(string name, string style, bool explode, JsonSchema jsonSchema)
+    private Parameter(string name, string style, bool explode, IJsonSchema jsonSchema)
     {
         Name = name;
         Style = style;
@@ -68,7 +67,7 @@ public record Parameter
     /// <param name="jsonSchema">The parameters json schema</param>
     /// <returns>A parameter specification</returns>
     /// <exception cref="InvalidOperationException">Thrown if location and styles are incompatible</exception>
-    public static Parameter Parse(string name, string style, string location, bool explode, JsonSchema jsonSchema)
+    public static Parameter Parse(string name, string style, string location, bool explode, IJsonSchema jsonSchema)
     {
         if (!LocationToStylesMap.TryGetValue(location, out var styles))
         {
@@ -100,5 +99,5 @@ public record Parameter
     /// <summary>
     /// The parameter's json schema
     /// </summary>
-    public JsonSchema JsonSchema { get; private init; }
+    public IJsonSchema JsonSchema { get; private init; }
 }

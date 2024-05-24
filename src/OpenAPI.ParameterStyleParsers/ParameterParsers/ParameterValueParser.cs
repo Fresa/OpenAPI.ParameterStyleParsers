@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
-using Json.Schema;
+using OpenAPI.ParameterStyleParsers.JsonSchema;
 using OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
 using OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
 using OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
@@ -33,19 +33,18 @@ public sealed class ParameterValueParser
     private static IValueParser CreateValueParser(Parameter parameter)
     {
         var jsonSchema = parameter.JsonSchema;
-        var jsonType = jsonSchema.GetJsonType();
+        var jsonType = jsonSchema.GetInstanceType();
 
         return jsonType switch
         {
             null => MissingSchemaTypeValueParser.Create(parameter),
-            SchemaValueType.String or
-                SchemaValueType.Boolean or
-                SchemaValueType.Integer or
-                SchemaValueType.Number or
-                SchemaValueType.Null
-                => PrimitiveValueParser.Create(parameter),
-            SchemaValueType.Array => ArrayValueParser.Create(parameter),
-            SchemaValueType.Object => ObjectValueParser.Create(parameter),
+            InstanceType.String or
+                InstanceType.Boolean or
+                InstanceType.Integer or
+                InstanceType.Number or
+                InstanceType.Null => PrimitiveValueParser.Create(parameter),
+            InstanceType.Array => ArrayValueParser.Create(parameter),
+            InstanceType.Object => ObjectValueParser.Create(parameter),
             _ => throw new NotSupportedException($"Json type {Enum.GetName(jsonType.Value)} is not supported")
         };
     }

@@ -1,8 +1,6 @@
-﻿using System.Text.Json;
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using FluentAssertions;
-using Json.Pointer;
-using Json.Schema;
+using OpenAPI.ParameterStyleParsers.JsonSchema;
 using OpenAPI.ParameterStyleParsers.ParameterParsers;
 
 namespace OpenAPI.ParameterStyleParsers.UnitTests;
@@ -232,9 +230,8 @@ public class SchemaParameterValueConverterTests
         string? jsonInstance)
     {
         var parameterJsonNode = JsonNode.Parse(parameterJson)!;
-        var reader = new JsonNodeReader(parameterJsonNode, JsonPointer.Empty);
-        var schema = parameterJsonNode["schema"].Deserialize<JsonSchema>() ??
-                     throw new InvalidOperationException("json schema is missing");
+        var reader = new JsonNodeReader(parameterJsonNode);
+        var schema = new JsonSchema202012(parameterJsonNode["schema"]);
         var parameter =
             Parameter.Parse(
                 reader.Read("style").GetValue<string>(),
@@ -279,9 +276,8 @@ public class SchemaParameterValueConverterTests
         string parameterJson)
     {
         var parameterJsonNode = JsonNode.Parse(parameterJson)!;
-        var reader = new JsonNodeReader(parameterJsonNode, JsonPointer.Empty);
-        var schema = parameterJsonNode["schema"].Deserialize<JsonSchema>() ??
-                     throw new InvalidOperationException("json schema is missing");
+        var reader = new JsonNodeReader(parameterJsonNode);
+        var schema = new JsonSchema202012(parameterJsonNode["schema"]);
         var parameter =
             Parameter.Parse(
                 reader.TryRead("name", out var nameReader) ? nameReader.GetValue<string>() : string.Empty,
