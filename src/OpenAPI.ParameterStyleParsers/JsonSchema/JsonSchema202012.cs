@@ -1,13 +1,14 @@
 using System.Collections.Immutable;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
-using OpenAPI.ParameterStyleParsers.ParameterParsers;
+using OpenAPI.ParameterStyleParsers.Json;
 
 namespace OpenAPI.ParameterStyleParsers.JsonSchema;
 
 internal sealed class JsonSchema202012 : IJsonSchema
 {
-    private readonly JsonNode? _schema;
+    private readonly Lazy<JsonNode?> _schemaResolver;
+    private JsonNode? Schema => _schemaResolver.Value;
     private Lazy<InstanceType?>? _jsonValueType;
     private Lazy<IJsonSchema?>? _items;
     private Lazy<IReadOnlyDictionary<string, IJsonSchema>?>? _properties;
@@ -16,18 +17,18 @@ internal sealed class JsonSchema202012 : IJsonSchema
 
     internal JsonSchema202012(JsonNode? schema)
     {
-        _schema = schema;
+        _schemaResolver = new Lazy<JsonNode?>(schema.ResolveRef);
     }
 
     public InstanceType? GetInstanceType()
     {
-        _jsonValueType ??= new Lazy<InstanceType?>(() => _schema?["type"] switch
+        _jsonValueType ??= new Lazy<InstanceType?>(() => Schema?["type"] switch
         {
             null => null,
             JsonArray array => array
-                .Select(type => 
+                .Select(type =>
                     ParseType(type?.GetValue<string>()))
-                .Aggregate((jsonValueTypes, jsonValueType) => 
+                .Aggregate((jsonValueTypes, jsonValueType) =>
                     jsonValueTypes | jsonValueType),
             JsonValue jsonValue => ParseType(jsonValue.GetValue<string>()),
             _ => throw new InvalidOperationException("Expected 'type' to be an array or string")
@@ -44,7 +45,7 @@ internal sealed class JsonSchema202012 : IJsonSchema
             "array" => InstanceType.Array,
             "string" => InstanceType.String,
             "number" => InstanceType.Number,
-            "integer" =>  InstanceType.Integer,
+            "integer" => InstanceType.Integer,
             "boolean" => InstanceType.Boolean,
             "null" => InstanceType.Null,
             _ => throw new InvalidOperationException($"type '{type}' is invalid")
@@ -54,7 +55,7 @@ internal sealed class JsonSchema202012 : IJsonSchema
     {
         _items ??= new Lazy<IJsonSchema?>(() =>
         {
-            var items = (_schema as JsonObject)?["items"];
+            var items = (Schema as JsonObject)?["items"];
             return items == null ? null : new JsonSchema202012(items);
         });
         return _items.Value;
@@ -64,7 +65,7 @@ internal sealed class JsonSchema202012 : IJsonSchema
     {
         _properties ??= new Lazy<IReadOnlyDictionary<string, IJsonSchema>?>(() =>
         {
-            if ((_schema as JsonObject)?["properties"] is not JsonObject properties)
+            if ((Schema as JsonObject)?["properties"] is not JsonObject properties)
                 return null;
             return properties.ToImmutableDictionary<KeyValuePair<string, JsonNode?>, string, IJsonSchema>(
                 pair => pair.Key,
@@ -77,7 +78,7 @@ internal sealed class JsonSchema202012 : IJsonSchema
     {
         _additionalProperties ??= new Lazy<IJsonSchema?>(() =>
         {
-            var items = (_schema as JsonObject)?["additionalProperties"];
+            var items = (Schema as JsonObject)?["additionalProperties"];
             return items == null ? null : new JsonSchema202012(items);
         });
         return _additionalProperties.Value;
@@ -87,7 +88,7 @@ internal sealed class JsonSchema202012 : IJsonSchema
     {
         _patternProperties ??= new Lazy<IReadOnlyDictionary<Regex, IJsonSchema>?>(() =>
         {
-            if ((_schema as JsonObject)?["patternProperties"] is not JsonObject properties)
+            if ((Schema as JsonObject)?["patternProperties"] is not JsonObject properties)
                 return null;
             return properties.ToImmutableDictionary<KeyValuePair<string, JsonNode?>, Regex, IJsonSchema>(
                 pair => new Regex(pair.Key),
