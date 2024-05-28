@@ -5,7 +5,8 @@ using OpenAPI.ParameterStyleParsers.Json;
 
 namespace OpenAPI.ParameterStyleParsers.JsonSchema;
 
-internal sealed class JsonSchema202012 : IJsonSchema
+/// <inheritdoc />
+public sealed class JsonSchema202012 : IJsonSchema
 {
     private readonly Lazy<JsonNode?> _schemaResolver;
     private JsonNode? Schema => _schemaResolver.Value;
@@ -15,11 +16,16 @@ internal sealed class JsonSchema202012 : IJsonSchema
     private Lazy<IJsonSchema?>? _additionalProperties;
     private Lazy<IReadOnlyDictionary<Regex, IJsonSchema>?>? _patternProperties;
 
-    internal JsonSchema202012(JsonNode? schema)
+    /// <summary>
+    /// Instantiate from a Json Schema draft 2020-12
+    /// </summary>
+    /// <param name="schema">Json Schema draft 2020-12</param>
+    public JsonSchema202012(JsonNode? schema)
     {
         _schemaResolver = new Lazy<JsonNode?>(schema.ResolveRef);
     }
 
+    /// <inheritdoc />
     public InstanceType? GetInstanceType()
     {
         _jsonValueType ??= new Lazy<InstanceType?>(() => Schema?["type"] switch
@@ -51,6 +57,7 @@ internal sealed class JsonSchema202012 : IJsonSchema
             _ => throw new InvalidOperationException($"type '{type}' is invalid")
         };
 
+    /// <inheritdoc />
     public IJsonSchema? GetItems()
     {
         _items ??= new Lazy<IJsonSchema?>(() =>
@@ -61,6 +68,7 @@ internal sealed class JsonSchema202012 : IJsonSchema
         return _items.Value;
     }
 
+    /// <inheritdoc />
     public IReadOnlyDictionary<string, IJsonSchema>? GetProperties()
     {
         _properties ??= new Lazy<IReadOnlyDictionary<string, IJsonSchema>?>(() =>
@@ -74,6 +82,7 @@ internal sealed class JsonSchema202012 : IJsonSchema
         return _properties.Value;
     }
 
+    /// <inheritdoc />
     public IJsonSchema? GetAdditionalProperties()
     {
         _additionalProperties ??= new Lazy<IJsonSchema?>(() =>
@@ -84,6 +93,7 @@ internal sealed class JsonSchema202012 : IJsonSchema
         return _additionalProperties.Value;
     }
 
+    /// <inheritdoc />
     public IReadOnlyDictionary<Regex, IJsonSchema>? GetPatternProperties()
     {
         _patternProperties ??= new Lazy<IReadOnlyDictionary<Regex, IJsonSchema>?>(() =>
