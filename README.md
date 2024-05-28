@@ -13,35 +13,38 @@ dotnet add package ParameterStyleParsers.OpenAPI
 https://www.nuget.org/packages/ParameterStyleParsers.OpenAPI/
 
 ## Getting Started
-Parse the OpenAPI 3.1 parameter from the specification, and create a parameter value parser.
+Create the parser by providing the OpenAPI 3.1 parameter specification.
 ```dotnet
-/* Parameter specification example:
-{
-    "name": "color",
-    "in": "query",
-    "schema": {
-        "type": "array",
-        "items": {
-            "type": "string"
-        }
-    },
-    "style": "form",
-    "explode": true
-}
-*/
-
+var parser = OpenAPI.ParameterStyleParsers.ParameterParsers.ParameterValueParser.FromOpenApi31ParameterSpecification(
+    JsonNode.Parse("""
+    {
+        "name": "color",
+        "in": "query",
+        "schema": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "style": "form",
+        "explode": true
+    }
+    """)!.AsObject());
+```
+It's also possible to manually construct the parser.
+```dotnet
 var parameter = OpenAPI.ParameterStyleParsers.Parameter.Parse(
     name: "color",
     style: "form",
     location: "query",
     explode: true,
-    JsonSchema.FromText("""
+    new JsonSchema202012(JsonNode.Parse("""
     {
         "type": "array",
         "items": {
             "type": "string"
     }
-    """)
+    """))
 );
 var parser = OpenAPI.ParameterStyleParsers.ParameterParsers.ParameterValueParser.Create(parameter);
 ```
@@ -63,6 +66,9 @@ string styleSerializedParameter = parser.Serialize(json);
 Console.WriteLine(styleSerializedParameter);
 // color=blue&color=black&color=brown
 ``` 
+
+### Schema References
+[Json pointers represented as URI fragments](https://www.rfc-editor.org/rfc/rfc6901#section-6) are supported, other URI's are currently not. It is possible to bring your own Json Schema implementation though.
 
 # Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
