@@ -1,24 +1,24 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
-using Json.Schema;
+using OpenAPI.ParameterStyleParsers.JsonSchema;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
 internal abstract class PrimitiveValueParser : IValueParser
 {
-    private SchemaValueType Type { get; }
+    private InstanceType Type { get; }
     
     protected string ParameterName { get; }
 
     protected PrimitiveValueParser(Parameter parameter)
     {
-        var type = parameter.JsonSchema.GetJsonType() ?? SchemaValueType.String;
+        var type = parameter.JsonSchema.GetInstanceType() ?? InstanceType.String;
         ParameterName = parameter.Name;
 
         switch (type)
         {
-            case SchemaValueType.Object:
-            case SchemaValueType.Array:
+            case InstanceType.Object:
+            case InstanceType.Array:
                 throw new ArgumentException(nameof(type),
                     $"Type '{Enum.GetName(type)}' is not a primitive type");
         }

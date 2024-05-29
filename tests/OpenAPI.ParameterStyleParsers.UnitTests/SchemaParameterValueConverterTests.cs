@@ -1,8 +1,6 @@
-﻿using System.Text.Json;
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using FluentAssertions;
-using Json.Pointer;
-using Json.Schema;
+using OpenAPI.ParameterStyleParsers.JsonSchema;
 using OpenAPI.ParameterStyleParsers.ParameterParsers;
 
 namespace OpenAPI.ParameterStyleParsers.UnitTests;
@@ -232,9 +230,8 @@ public class SchemaParameterValueConverterTests
         string? jsonInstance)
     {
         var parameterJsonNode = JsonNode.Parse(parameterJson)!;
-        var reader = new JsonNodeReader(parameterJsonNode, JsonPointer.Empty);
-        var schema = parameterJsonNode["schema"].Deserialize<JsonSchema>() ??
-                     throw new InvalidOperationException("json schema is missing");
+        var reader = new JsonNodeReader(parameterJsonNode);
+        var schema = new JsonSchema202012(parameterJsonNode["schema"]);
         var parameter =
             Parameter.Parse(
                 reader.Read("style").GetValue<string>(),
@@ -278,18 +275,8 @@ public class SchemaParameterValueConverterTests
     private static ParameterValueParser CreateParameterValueParser(
         string parameterJson)
     {
-        var parameterJsonNode = JsonNode.Parse(parameterJson)!;
-        var reader = new JsonNodeReader(parameterJsonNode, JsonPointer.Empty);
-        var schema = parameterJsonNode["schema"].Deserialize<JsonSchema>() ??
-                     throw new InvalidOperationException("json schema is missing");
-        var parameter =
-            Parameter.Parse(
-                reader.TryRead("name", out var nameReader) ? nameReader.GetValue<string>() : string.Empty,
-                reader.Read("style").GetValue<string>(),
-                reader.Read("in").GetValue<string>(),
-                reader.Read("explode").GetValue<bool>(),
-                schema);
-        return ParameterValueParser.Create(parameter);
+        var parameterJsonNode = JsonNode.Parse(parameterJson)!.AsObject();
+        return ParameterValueParser.FromOpenApi31ParameterSpecification(parameterJsonNode);
     }
 
     #region Object
@@ -376,6 +363,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -396,6 +384,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -424,6 +413,7 @@ public class SchemaParameterValueConverterTests
         {
         """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -444,6 +434,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object"
@@ -462,6 +453,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -490,6 +482,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -686,6 +679,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -715,6 +709,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -741,6 +736,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -759,6 +755,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -785,6 +782,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -814,6 +812,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -840,6 +839,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -858,6 +858,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "object",
@@ -1082,6 +1083,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -1100,6 +1102,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -1126,6 +1129,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "object",
@@ -1161,6 +1165,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "array",
@@ -1179,6 +1184,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "array",
@@ -1197,6 +1203,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "array",
@@ -1322,6 +1329,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "array",
@@ -1340,6 +1348,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "array",
@@ -1358,6 +1367,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "array",
@@ -1541,6 +1551,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "string" 
@@ -1560,6 +1571,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "number" 
@@ -1579,6 +1591,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "integer" 
@@ -1598,6 +1611,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "boolean" 
@@ -1616,6 +1630,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "query",
                 "schema": {
                     "type": "null" 
@@ -1635,6 +1650,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "string" 
@@ -1654,6 +1670,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "number" 
@@ -1673,6 +1690,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "integer" 
@@ -1692,6 +1710,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "boolean" 
@@ -1710,6 +1729,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "null" 
@@ -1725,6 +1745,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "null"
@@ -1924,6 +1945,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "string" 
@@ -1939,6 +1961,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "string"
@@ -1958,6 +1981,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "number" 
@@ -1973,6 +1997,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "number"
@@ -1992,6 +2017,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "integer" 
@@ -2007,6 +2033,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "integer"
@@ -2026,6 +2053,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "boolean" 
@@ -2041,6 +2069,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "boolean"
@@ -2060,6 +2089,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "null"
@@ -2075,6 +2105,7 @@ public class SchemaParameterValueConverterTests
         {
             """
             {
+                "name": "color",
                 "in": "path",
                 "schema": {
                     "type": "null"

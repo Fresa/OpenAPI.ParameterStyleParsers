@@ -1,13 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
-using Json.Schema;
+using OpenAPI.ParameterStyleParsers.JsonSchema;
 using OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
 
 internal abstract class ArrayValueParser : IValueParser
 {
-    private readonly SchemaValueType _jsonType;
+    private readonly InstanceType _jsonType;
 
     protected bool Explode { get; }
     protected string ParameterName { get; }
@@ -16,9 +16,9 @@ internal abstract class ArrayValueParser : IValueParser
         Explode = parameter.Explode;
         ParameterName = parameter.Name;
         var itemsSchema = parameter.JsonSchema.GetItems();
-        var jsonType = itemsSchema?.GetJsonType();
+        var jsonType = itemsSchema?.GetInstanceType();
         
-        _jsonType = jsonType ?? SchemaValueType.String;
+        _jsonType = jsonType ?? InstanceType.String;
     }
     
     internal static ArrayValueParser Create(Parameter parameter) =>

@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
-using Json.Schema;
+using OpenAPI.ParameterStyleParsers.JsonSchema;
 using OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
@@ -69,7 +69,7 @@ internal abstract class ObjectValueParser(Parameter parameter) : IValueParser
             var propertyValue = Uri.UnescapeDataString(keyAndValues.Count == i + 1 ? string.Empty : keyAndValues[i + 1]);
             _propertySchemaResolver.TryGetSchemaForProperty(propertyName, out var propertySchema);
             // Undefined type? Use string as default as any value should be valid
-            var jsonType = propertySchema?.GetJsonType() ?? SchemaValueType.String;
+            var jsonType = propertySchema?.GetInstanceType() ?? InstanceType.String;
 
             if (!PrimitiveJsonConverter.TryConvert(propertyValue, jsonType, out var value, out error))
             {

@@ -1,5 +1,4 @@
-using JetBrains.Annotations;
-using Json.Schema;
+using OpenAPI.ParameterStyleParsers.JsonSchema;
 
 namespace OpenAPI.ParameterStyleParsers;
 
@@ -13,7 +12,7 @@ public record Parameter
     /// </summary>
     public static class Styles
     {
-        #pragma warning disable CS1591
+#pragma warning disable CS1591
         public const string Matrix = "matrix";
         public const string Label = "label";
         public const string Simple = "simple";
@@ -21,27 +20,29 @@ public record Parameter
         public const string SpaceDelimited = "spaceDelimited";
         public const string PipeDelimited = "pipeDelimited";
         public const string DeepObject = "deepObject";
-        #pragma warning restore CS1591
+        public static readonly string[] All = [Matrix, Label, Simple, Form, SpaceDelimited, PipeDelimited, DeepObject];
+#pragma warning restore CS1591
     }
 
     /// <summary>
     /// Supported OpenAPI parameter locations
     /// </summary>
-    [PublicAPI]
+    // ReSharper disable once MemberCanBePrivate.Global Part of public contract
     public static class Locations
     {
-        #pragma warning disable CS1591
+#pragma warning disable CS1591
         public const string Path = "path";
         public const string Header = "header";
         public const string Query = "query";
         public const string Cookie = "cookie";
-        #pragma warning restore CS1591
+        public static readonly string[] All = [Path, Header, Query, Cookie];
+#pragma warning restore CS1591
     }
 
     /// <summary>
     /// A map between parameter locations and supported styles
     /// </summary>
-    [PublicAPI]
+    // ReSharper disable once MemberCanBePrivate.Global Part of public contract
     public static readonly Dictionary<string, string[]> LocationToStylesMap = new()
     {
         [Locations.Path] = [Styles.Matrix, Styles.Label, Styles.Simple],
@@ -50,7 +51,21 @@ public record Parameter
         [Locations.Cookie] = [Styles.Form],
     };
 
-    private Parameter(string name, string style, bool explode, JsonSchema jsonSchema)
+    /// <summary>
+    /// Relevant field names for the parameter
+    /// </summary>
+    public static class FieldNames
+    {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        public const string Name = "name";
+        public const string In = "in";
+        public const string Style = "style";
+        public const string Explode = "explode";
+        public const string Schema = "schema";
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+    }
+
+    private Parameter(string name, string style, bool explode, IJsonSchema jsonSchema)
     {
         Name = name;
         Style = style;
@@ -68,7 +83,7 @@ public record Parameter
     /// <param name="jsonSchema">The parameters json schema</param>
     /// <returns>A parameter specification</returns>
     /// <exception cref="InvalidOperationException">Thrown if location and styles are incompatible</exception>
-    public static Parameter Parse(string name, string style, string location, bool explode, JsonSchema jsonSchema)
+    public static Parameter Parse(string name, string style, string location, bool explode, IJsonSchema jsonSchema)
     {
         if (!LocationToStylesMap.TryGetValue(location, out var styles))
         {
@@ -100,5 +115,5 @@ public record Parameter
     /// <summary>
     /// The parameter's json schema
     /// </summary>
-    public JsonSchema JsonSchema { get; private init; }
+    public IJsonSchema JsonSchema { get; private init; }
 }
