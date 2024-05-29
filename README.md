@@ -43,17 +43,19 @@ var parameter = OpenAPI.ParameterStyleParsers.Parameter.Parse(
         "type": "array",
         "items": {
             "type": "string"
+        }
     }
-    """))
-);
+    """)));
 var parser = OpenAPI.ParameterStyleParsers.ParameterParsers.ParameterValueParser.Create(parameter);
 ```
 
 ### Parse a style serialized parameter
 ```dotnet
 string styleSerializedParameter = "color=blue&color=black&color=brown";
-parser.TryParse(styleSerializedParameter, out JsonNode? parameter, out string? error);
-Console.WriteLine(parameter.ToJsonString());
+Console.WriteLine(
+    parser.TryParse(styleSerializedParameter, out JsonNode? json, out string? error)
+        ? json?.ToJsonString()
+        : error);
 // ["blue","black","brown"]
 ```
 
@@ -62,7 +64,7 @@ Console.WriteLine(parameter.ToJsonString());
 var json = JsonNode.Parse("""
     ["blue","black","brown"]
 """);
-string styleSerializedParameter = parser.Serialize(json);
+var styleSerializedParameter = parser.Serialize(json);
 Console.WriteLine(styleSerializedParameter);
 // color=blue&color=black&color=brown
 ``` 
