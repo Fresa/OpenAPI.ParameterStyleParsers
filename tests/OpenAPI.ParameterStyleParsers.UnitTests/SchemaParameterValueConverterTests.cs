@@ -234,7 +234,7 @@ public class SchemaParameterValueConverterTests
         var schema = new JsonSchema202012(parameterJsonNode["schema"]);
         var parameter =
             Parameter.Parse(
-                reader.Read("style").GetValue<string>(),
+                reader.Read("name").GetValue<string>(),
                 reader.Read("style").GetValue<string>(),
                 reader.Read("in").GetValue<string>(),
                 reader.Read("explode").GetValue<bool>(),
@@ -1560,7 +1560,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ["test"],
+            ["color=test"],
             true,
             "\"test\""
         }
@@ -1580,7 +1580,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ["1.2"],
+            ["color=1.2"],
             true,
             "1.2"
         }
@@ -1600,7 +1600,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            ["1"],
+            ["color=1"],
             true,
             "1"
         }
@@ -1619,7 +1619,7 @@ public class SchemaParameterValueConverterTests
                 "style": "form",
                 "explode": true}
             """,
-            ["true"],
+            ["color=true"],
             true,
             "true"
         }
