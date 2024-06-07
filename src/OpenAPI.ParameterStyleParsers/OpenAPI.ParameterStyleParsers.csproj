@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<PackageReleaseNotes>$([System.IO.File]::ReadAllText('$(MSBuildStartupDirectory)/release_notes.txt'))</PackageReleaseNotes>
+		<PackageReleaseNotes>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)/release_notes.txt'))</PackageReleaseNotes>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageId>ParameterStyleParsers.OpenAPI</PackageId>
