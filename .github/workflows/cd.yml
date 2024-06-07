@@ -70,7 +70,7 @@ jobs:
           path_to_commits: ./commit_logs.json
       - name: Write Release Notes to File
         run: | 
-          echo "${{ steps.release_notes.outputs.release_notes }}" > release_notes.txt
+          echo "${{ steps.release_notes.outputs.release_notes }}" > "${{ env.project_path }}/release_notes.txt"
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
