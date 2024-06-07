@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using OpenAPI.ParameterStyleParsers.Json;
 using OpenAPI.ParameterStyleParsers.JsonSchema;
@@ -49,7 +50,47 @@ public class JsonSchema202012_InstanceTypeTests
         }
 
         properties.Should().NotBeNull();
+        if (expectedPropertyNames.Length == 0)
+        {
+            properties.Should().BeEmpty();
+            return;
+        }
+
         properties.Should().ContainKeys(expectedPropertyNames);
+        properties!.Values.Should().AllSatisfy(propertySchema =>
+            propertySchema.GetInstanceType()
+                .Should().Be(InstanceType.String));
+    }
+
+    [Theory]
+    [MemberData(nameof(PatternProperties))]
+    public void Given_a_json_schema_when_parsing_It_should_parse_pattern_properties(
+        string pointer,
+        string schemaAsJson,
+        string[]? expectedPropertyNames)
+    {
+        var jsonSchemaNode = JsonNode
+            .Parse(schemaAsJson)
+            .Resolve(JsonPointer.Parse(pointer));
+        var schema = new JsonSchema202012(jsonSchemaNode);
+        var properties = schema.GetPatternProperties();
+        if (expectedPropertyNames is null)
+        {
+            properties.Should().BeNull();
+            return;
+        }
+
+        properties.Should().NotBeNull();
+        if (expectedPropertyNames.Length == 0)
+        {
+            properties.Should().BeEmpty();
+            return;
+        }
+
+        properties!.Keys
+            .Select(regex => regex.ToString())
+            .Should()
+            .Contain(expectedPropertyNames);
         properties!.Values.Should().AllSatisfy(propertySchema =>
             propertySchema.GetInstanceType()
                 .Should().Be(InstanceType.String));
@@ -215,9 +256,57 @@ public class JsonSchema202012_InstanceTypeTests
             "#",
             """
             {
+                "properties": {}
+            }
+            """,
+            []
+        },
+        {
+            "#",
+            """
+            {
             }
             """,
             null
+        }
+    };
+
+    public static readonly TheoryData<string, string, string[]?> PatternProperties = new()
+    {
+        {
+            "#/schema",
+            """
+            {
+                "schema": {
+                    "patternProperties": {
+                        "^[Ff]oo$": {
+                            "type": "string"
+                        },
+                        "^[Bb]ar$": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+            """,
+            ["^[Ff]oo$", "^[Bb]ar$"]
+        },
+        {
+            "#",
+            """
+            {
+            }
+            """,
+            null
+        },
+        {
+            "#",
+            """
+            {
+                "patternProperties": {}
+            }
+            """,
+            []
         }
     };
 
