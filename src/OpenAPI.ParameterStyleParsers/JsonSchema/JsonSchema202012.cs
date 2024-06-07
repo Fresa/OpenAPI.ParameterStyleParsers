@@ -28,7 +28,7 @@ public sealed class JsonSchema202012 : IJsonSchema
     /// <inheritdoc />
     public InstanceType? GetInstanceType()
     {
-        _jsonValueType ??= new Lazy<InstanceType?>(() => Schema?["type"] switch
+        _jsonValueType ??= new Lazy<InstanceType?>(() => (Schema as JsonObject)?["type"] switch
         {
             null => null,
             JsonArray array => array
