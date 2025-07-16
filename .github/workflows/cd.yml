@@ -43,6 +43,8 @@ jobs:
     uses: Fresa/Library.Net.ContinuousDelivery/.github/workflows/release.yml@v0
     needs: test
     if: github.repository == needs.test.outputs.repository && github.actor != 'dependabot[bot]'
+    permissions: 
+      contents: write
     with:
       project_path: ${{ needs.test.outputs.project_path }}
       project_name: ${{ needs.test.outputs.project_name }}
