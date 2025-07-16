@@ -9,7 +9,7 @@ env:
   project_path: src/OpenAPI.ParameterStyleParsers
   project_name: OpenAPI.ParameterStyleParsers
   package_id: ParameterStyleParsers.OpenAPI
-  dotnet_version: 8.0.x
+  dotnet_version: 9.0.x
 
 jobs:
   test:
