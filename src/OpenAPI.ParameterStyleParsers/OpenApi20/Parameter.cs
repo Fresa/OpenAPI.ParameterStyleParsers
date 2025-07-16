@@ -143,7 +143,11 @@ public record Parameter
                 $"Items object cannot be null when type is '{type}'");
         }
         
-        return new Parameter(name, collectionFormat, @in, type);
+        return new Parameter(name,
+            collectionFormat: collectionFormat, 
+            @in: @in, 
+            type: type,
+            items: items);
     }
 
     /// <summary>
