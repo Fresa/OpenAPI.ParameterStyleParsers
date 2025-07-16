@@ -6,6 +6,7 @@ on:
       - "**"
     tags-ignore:
       - '**'
+
 env:
   repository: Fresa/OpenAPI.ParameterStyleParsers
   project_path: src/OpenAPI.ParameterStyleParsers
@@ -33,15 +34,18 @@ jobs:
         run: dotnet test -c Release --no-build --verbosity normal
     outputs:
       dotnet_version: ${{ steps.dotnet.outputs.dotnet-version }}
+      repository: ${{ env.repository }}
+      project_path: ${{ env.project_path }}
+      project_name: ${{ env.project_name }}
 
   release:
     name: Create Release
     uses: Fresa/Library.Net.ContinuousDelivery/.github/workflows/release.yml@v0
     needs: test
-    if: ${{ github.repository == env.repository && github.actor != 'dependabot[bot]' }}
+    if: github.repository == needs.test.outputs.repository && github.actor != 'dependabot[bot]'
     with:
-      project_path: ${{ env.project_path }}
-      project_name: ${{ env.project_name }}
-      dotnet_version: ${{ env.dotnet_version }}
+      project_path: ${{ needs.test.outputs.project_path }}
+      project_name: ${{ needs.test.outputs.project_name }}
+      dotnet_version: ${{ needs.test.outputs.dotnet_version }}
     secrets:
       nuget_api_key: ${{ secrets.NUGET_API_KEY }}
