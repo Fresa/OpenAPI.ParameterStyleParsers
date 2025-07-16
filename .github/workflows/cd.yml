@@ -38,7 +38,7 @@ jobs:
     name: Create Release
     uses: Fresa/Library.Net.ContinuousDelivery/.github/workflows/release.yml@v0
     needs: test
-    if: github.repository == env.repository && github.actor != 'dependabot[bot]'
+    if: ${{ github.repository == env.repository && github.actor != 'dependabot[bot]' }}
     with:
       project_path: ${{ env.project_path }}
       project_name: ${{ env.project_name }}
