@@ -49,7 +49,7 @@ public record Parameter
         [Locations.Path] = [CollectionFormats.Csv, CollectionFormats.Ssv, CollectionFormats.Tsv, CollectionFormats.Pipes],
         [Locations.Header] = [CollectionFormats.Csv, CollectionFormats.Ssv, CollectionFormats.Tsv, CollectionFormats.Pipes],
         [Locations.Query] = [CollectionFormats.Csv, CollectionFormats.Ssv, CollectionFormats.Tsv, CollectionFormats.Pipes, CollectionFormats.Multi],
-        [Locations.FormData] = [CollectionFormats.Multi],
+        [Locations.FormData] = [CollectionFormats.Csv, CollectionFormats.Ssv, CollectionFormats.Tsv, CollectionFormats.Pipes, CollectionFormats.Multi],
         [Locations.Body] = [],
     };
 
