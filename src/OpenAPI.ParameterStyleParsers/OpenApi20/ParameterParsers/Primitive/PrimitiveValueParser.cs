@@ -29,7 +29,7 @@ internal abstract class PrimitiveValueParser : IValueParser
             _ when parameter.IsFormData || parameter.IsQuery => new KeyValuePrimitiveValueParser(parameter),
             _ when parameter.IsPath || parameter.IsHeader => new ValuePrimitiveValueParser(parameter),
             _ => throw new ArgumentException(nameof(parameter.Type),
-                $"Parameter '{parameter.Name}' is not a primitive types")
+                $"Parameter '{parameter.Name}' is not a primitive type")
         };
     }
     
@@ -59,7 +59,7 @@ internal abstract class PrimitiveValueParser : IValueParser
         [NotNullWhen(false)] out string? error);
 
     public string? Serialize(JsonNode? instance) =>
-        instance == null ? null : $"{ParameterName}={Uri.EscapeDataString(instance.ToString())}";
+        instance == null ? null : Serialize(Uri.EscapeDataString(instance.ToString()));
 
     protected abstract string Serialize(string value);
 }
