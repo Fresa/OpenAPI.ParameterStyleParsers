@@ -12,8 +12,13 @@ internal abstract class CharacterSeparatedValuesArrayValueParser(Parameter param
         out JsonNode? array,
         [NotNullWhen(false)] out string? error)
     {
-        var valueAndKey = input?.Split('=');
-        var value = valueAndKey?.Length == 1 ? string.Empty : valueAndKey?.Last();
+        var value = input;
+        if (ValueIncludesKey)
+        {
+            var valueAndKey = input?.Split('=');
+            value = valueAndKey?.Length == 1 ? string.Empty : valueAndKey?.Last();            
+        }
+        
         var values = value?.Split(Separator);
 
         return TryGetArrayItems(values, out array, out error);
