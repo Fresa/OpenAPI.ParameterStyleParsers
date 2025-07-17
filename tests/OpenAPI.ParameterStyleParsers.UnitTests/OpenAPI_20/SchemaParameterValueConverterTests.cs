@@ -8,10 +8,10 @@ namespace OpenAPI.ParameterStyleParsers.UnitTests.OpenAPI_20;
 public class SchemaParameterValueConverterTests
 {
     [Theory]
-    [MemberData(nameof(StringSimple))]
-    [MemberData(nameof(NumberSimple))]
-    [MemberData(nameof(IntegerSimple))]
-    [MemberData(nameof(BooleanSimple))]
+    [MemberData(nameof(String))]
+    [MemberData(nameof(Number))]
+    [MemberData(nameof(Integer))]
+    [MemberData(nameof(Boolean))]
     public void Given_a_simple_primitive_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
         string parameterJson,
         string?[] values,
@@ -22,10 +22,10 @@ public class SchemaParameterValueConverterTests
     }
 
     [Theory]
-    [MemberData(nameof(StringSimple))]
-    [MemberData(nameof(NumberSimple))]
-    [MemberData(nameof(IntegerSimple))]
-    [MemberData(nameof(BooleanSimple))]
+    [MemberData(nameof(String))]
+    [MemberData(nameof(Number))]
+    [MemberData(nameof(Integer))]
+    [MemberData(nameof(Boolean))]
     public void Given_a_simple_primitive_parameter_with_schema_When_serializing_It_should_serialize_the_json_instance(
         string parameterJson,
         string?[] value,
@@ -200,6 +200,14 @@ public class SchemaParameterValueConverterTests
         ["formData"] = true
     };
 
+    private static string[] AllParameterLocations =>
+    [
+        OpenApi20.Parameter.Locations.Path,
+        OpenApi20.Parameter.Locations.FormData, 
+        OpenApi20.Parameter.Locations.Header,
+        OpenApi20.Parameter.Locations.Query
+    ]; 
+    
     private static (string, string?[], bool, string?)[] CreateArrayCommaSeparated(string @in) => CreateArray(@in, ',');
     private static (string, string?[], bool, string?)[] CreateArraySpaceSeparated(string @in) => CreateArray(@in, ' ');
     private static (string, string?[], bool, string?)[] CreateArrayPipeSeparated(string @in) => CreateArray(@in, '|');
@@ -250,91 +258,93 @@ public class SchemaParameterValueConverterTests
     }
     #endregion
 
-    public static readonly TheoryData<string, string?[], bool, string?> StringSimple = new()
-    {
-        {
-            """
-            {
-                "name": "color",
-                "in": "path",
-                "type": "string"
-            }
-            """,
-            ["test"],
-            true,
-            "\"test\""
-        },
-        {
-            """
-            {
-                "name": "color",
-                "in": "path",
-                "type": "string"
-            }
-            """,
-            ["test"],
-            true,
-            "\"test\""
-        }
-    };
+    public static readonly TheoryData<string, string?[], bool, string?> String =
+        new TheoryData<string, string?[], bool, string?>()
+            .AddRange(CreateString(AllParameterLocations));
 
-    public static readonly TheoryData<string, string?[], bool, string?> NumberSimple = new()
-    {
+    private static (string, string?[], bool, string?)[] CreateString(params string[] ins) =>
+        ins.Select<string, (string, string?[], bool, string?)>(@in =>
         {
-            """
-            {
-                "name": "color",
-                "in": "path",
-                "type": "number"
-            }
-            """,
-            ["1.2"],
-            true,
-            "1.2"
-        },
-        {
-            """
-            {
-                "name": "color",
-                "in": "path",
-                "type": "number"
-            }
-            """,
-            ["1.2"],
-            true,
-            "1.2"
-        }
-    };
+            var hasKey = LocationToHasKeyMap[@in];
+            var key = hasKey ? "color=" : "";
+            return (
+                $$"""
+                  {
+                      "name": "color",
+                      "in": "{{@in}}",
+                      "type": "string"
+                  }
+                  """,
+                [$"{key}test"],
+                true,
+                "\"test\""
+            );
+        }).ToArray();
 
-    public static readonly TheoryData<string, string?[], bool, string?> IntegerSimple = new()
-    {
+    public static readonly TheoryData<string, string?[], bool, string?> Number =
+        new TheoryData<string, string?[], bool, string?>()
+            .AddRange(CreateNumber(AllParameterLocations));
+    private static (string, string?[], bool, string?)[] CreateNumber(params string[] ins) =>
+        ins.Select<string, (string, string?[], bool, string?)>(@in =>
         {
-            """
-            {
-                "name": "color",
-                "in": "path",
-                "type": "integer"
-            }
-            """,
-            ["1"],
-            true,
-            "1"
-        }
-    };
+            var hasKey = LocationToHasKeyMap[@in];
+            var key = hasKey ? "color=" : "";
+            return (
+                $$"""
+                  {
+                      "name": "color",
+                      "in": "{{@in}}",
+                      "type": "number"
+                  }
+                  """,
+                [$"{key}1.2"],
+                true,
+                "1.2"
+            );
+        }).ToArray();
 
-    public static readonly TheoryData<string, string?[], bool, string?> BooleanSimple = new()
-    {
+    public static readonly TheoryData<string, string?[], bool, string?> Integer =
+        new TheoryData<string, string?[], bool, string?>()
+            .AddRange(CreateInteger(AllParameterLocations));
+
+    private static (string, string?[], bool, string?)[] CreateInteger(params string[] ins) =>
+        ins.Select<string, (string, string?[], bool, string?)>(@in =>
         {
-            """
-            {
-                "name": "color",
-                "in": "path",
-                "type": "boolean"
-            }
-            """,
-            ["true"],
-            true,
-            "true"
-        }
-    };
+            var hasKey = LocationToHasKeyMap[@in];
+            var key = hasKey ? "color=" : "";
+            return (
+                $$"""
+                  {
+                      "name": "color",
+                      "in": "{{@in}}",
+                      "type": "integer"
+                  }
+                  """,
+                [$"{key}1"],
+                true,
+                "1"
+            );
+        }).ToArray();
+
+    public static readonly TheoryData<string, string?[], bool, string?> Boolean =
+        new TheoryData<string, string?[], bool, string?>()
+            .AddRange(CreateBoolean(AllParameterLocations));
+    private static (string, string?[], bool, string?)[] CreateBoolean(params string[] ins) =>
+        ins.Select<string, (string, string?[], bool, string?)>(@in =>
+        {
+            var hasKey = LocationToHasKeyMap[@in];
+            var key = hasKey ? "color=" : "";
+            return (
+                $$"""
+                  {
+                      "name": "color",
+                      "in": "{{@in}}",
+                      "type": "boolean"
+                  }
+                  """,
+                [$"{key}true"],
+                true,
+                "true"
+            );
+        }).ToArray();
 }
