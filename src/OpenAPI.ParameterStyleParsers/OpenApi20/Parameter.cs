@@ -1,4 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
+using JetBrains.Annotations;
+using OpenAPI.ParameterStyleParsers.Json;
 using OpenAPI.ParameterStyleParsers.JsonSchema;
 using OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Array;
 
@@ -200,4 +203,80 @@ public record Parameter
     /// Does the parameter value include keys, i.e. key=value
     /// </summary>
     public bool ValueIncludesKey { get; }
+
+    /// <inheritdoc cref="GetSchema(JsonObject)" />
+    [PublicAPI]
+    public static JsonNode? GetSchema(string parameterSpecification)
+    {
+        var json = JsonNode.Parse(parameterSpecification) ??
+                   throw new InvalidOperationException("Parameter specification did not represent an object");
+        return GetSchema(json.AsObject());
+    }
+
+    /// <summary>
+    /// Resolve the schema representing the parameter from a parameter specification.
+    /// This will generate a schema based on the properties unless it's a body type parameter,
+    /// then it will return the schema property.
+    /// </summary>
+    /// <param name="parameterSpecification">Parameter specification defining the schema</param>
+    /// <returns>Schema representing the parameter</returns>
+    [PublicAPI]
+    public static JsonNode? GetSchema(JsonObject parameterSpecification)
+    {
+        var @in = parameterSpecification.GetRequiredPropertyValue<string>(FieldNames.In);
+        if (@in == Locations.Body)
+        {
+            return parameterSpecification.GetRequiredPropertyValue("schema");
+        }
+        
+        var type = parameterSpecification.GetRequiredPropertyValue<string>(FieldNames.Type);
+        if (type == Types.File)
+        {
+            return null;
+        }
+
+        return new JsonObject()
+            .CopyFrom(parameterSpecification)
+            .Property("description")
+            .Property("type")
+            .Property("format")
+            .Property("items", CopyItems)
+            .Property("default")
+            .Property("maximum")
+            .Property("exclusiveMaximum")
+            .Property("minimum")
+            .Property("exclusiveMinimum")
+            .Property("maxLength")
+            .Property("minLength")
+            .Property("pattern")
+            .Property("maxItems")
+            .Property("minItems")
+            .Property("uniqueItems")
+            .Property("enum")
+            .Property("multipleOf")
+            .PropertiesStartingWith("x-");
+    }
+
+    private static JsonObject CopyItems(JsonObject source)
+    {
+        return new JsonObject()
+            .CopyFrom(source)
+            .Property("type")
+            .Property("format")
+            .Property("items", CopyItems)
+            .Property("default")
+            .Property("maximum")
+            .Property("exclusiveMaximum")
+            .Property("minimum")
+            .Property("exclusiveMinimum")
+            .Property("maxLength")
+            .Property("minLength")
+            .Property("pattern")
+            .Property("maxItems")
+            .Property("minItems")
+            .Property("uniqueItems")
+            .Property("enum")
+            .Property("multipleOf")
+            .PropertiesStartingWith("x-");
+    }
 }
