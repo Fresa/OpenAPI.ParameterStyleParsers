@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
+using JetBrains.Annotations;
 using OpenAPI.ParameterStyleParsers.Json;
 using OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Array;
 using OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Primitive;
@@ -24,6 +25,7 @@ public sealed class ParameterValueParser
     /// </summary>
     /// <param name="parameter">The parameter specification</param>
     /// <returns>Parameter value parser</returns>
+    [PublicAPI]
     public static ParameterValueParser Create(Parameter parameter)
     {
         var valueParser = CreateValueParser(parameter);
