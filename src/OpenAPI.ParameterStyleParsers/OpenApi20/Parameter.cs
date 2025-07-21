@@ -23,7 +23,7 @@ public record Parameter
         public const string Tsv = "tsv";
         public const string Pipes = "pipes";
         public const string Multi = "multi";
-        public static readonly string[] All = [Csv, Ssv, Tsv, Pipes, Multi];
+        internal static readonly string[] All = [Csv, Ssv, Tsv, Pipes, Multi];
 #pragma warning restore CS1591
     }
 
@@ -39,7 +39,7 @@ public record Parameter
         public const string Query = "query";
         public const string FormData = "formData";
         public const string Body = "body";
-        public static readonly string[] All = [Path, Header, Query, FormData, Body];
+        internal static readonly string[] All = [Path, Header, Query, FormData, Body];
 #pragma warning restore CS1591
     }
 
@@ -68,8 +68,8 @@ public record Parameter
         public const string Boolean = "boolean";
         public const string Array = "array";
         public const string File = "file";
-        public static readonly string[] All = [String, Number, Integer, Boolean, Array, File];
-        public static readonly string[] Primitives = [String, Number, Integer, Boolean];
+        internal static readonly string[] All = [String, Number, Integer, Boolean, Array, File];
+        internal static readonly string[] Primitives = [String, Number, Integer, Boolean];
 #pragma warning restore CS1591
     }
     
@@ -151,7 +151,7 @@ public record Parameter
     /// <summary>
     /// The type of the parameter
     /// </summary>
-    public string? Type { get; set; }
+    public string? Type { get; }
 
     /// <summary>
     /// Is it an array type parameter?
