@@ -12,7 +12,7 @@ internal abstract class PrimitiveValueParser : IValueParser
 
     internal PrimitiveValueParser(Parameter parameter)
     {
-        if (parameter.IsBody || parameter.IsArray || !Parameter.Types.Primitives.Contains(parameter.Type))
+        if (parameter.InBody || parameter.IsArray || !Parameter.Types.Primitives.Contains(parameter.Type))
         {
             throw new InvalidOperationException(
                 $"Parameter '{parameter.Name}' does not declare a primitive type: {parameter.Type}");
@@ -26,8 +26,8 @@ internal abstract class PrimitiveValueParser : IValueParser
     {
         return parameter switch
         {
-            _ when parameter.IsFormData || parameter.IsQuery => new KeyValuePrimitiveValueParser(parameter),
-            _ when parameter.IsPath || parameter.IsHeader => new ValuePrimitiveValueParser(parameter),
+            _ when parameter.InFormData || parameter.InQuery => new KeyValuePrimitiveValueParser(parameter),
+            _ when parameter.InPath || parameter.InHeader => new ValuePrimitiveValueParser(parameter),
             _ => throw new ArgumentException(nameof(parameter.Type),
                 $"Parameter '{parameter.Name}' is not a primitive type")
         };

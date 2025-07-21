@@ -87,22 +87,21 @@ public record Parameter
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     }
 
-    private Parameter(string name, string @in, string collectionFormat, string? type = null, ItemsObject? items = null)
+    private Parameter(string name, string @in, string? collectionFormat, string? type = null, ItemsObject? items = null)
     {
         Name = name;
         CollectionFormat = collectionFormat;
-        IsBody = type == null;
         Type = type;
         Items = items;
         
-        IsPath = @in == Locations.Path;
-        IsFormData = @in == Locations.FormData;
-        IsQuery = @in == Locations.Query;
-        IsHeader = @in == Locations.Header;
+        InBody = type == null;
+        InPath = @in == Locations.Path;
+        InFormData = @in == Locations.FormData;
+        InQuery = @in == Locations.Query;
+        InHeader = @in == Locations.Header;
 
-        ValueIncludesKey = IsQuery || IsFormData;
+        ValueIncludesKey = InQuery || InFormData;
     }
-
 
     /// <summary>
     /// Parses an OpenAPI parameter
@@ -114,7 +113,7 @@ public record Parameter
     /// <param name="items">The item directive is type is array</param>
     /// <returns>A parameter specification</returns>
     /// <exception cref="InvalidOperationException">Thrown if location and styles are incompatible</exception>
-    public static Parameter Parse(string name, string @in, string? type, string collectionFormat = CollectionFormats.Csv, ItemsObject? items = null)
+    public static Parameter Parse(string name, string @in, string? type = null, string? collectionFormat = null, ItemsObject? items = null)
     {
         if (!LocationToCollectionFormatMap.TryGetValue(@in, out var collectionFormats))
         {
@@ -122,35 +121,18 @@ public record Parameter
                 $"Location '{@in}' is not a valid location. Valid locations are {string.Join(", ", Locations.All)}");
         }
 
-        if (!collectionFormats.Contains(collectionFormat))
+        return type switch
         {
-            throw new InvalidOperationException(
-                $"Location '{@in}' does not support collection format '{collectionFormat}'. Supported formats are {string.Join(", ", collectionFormats)}");
-        }
-
-        if (!Types.All.Contains(type))
-        {
-            throw new InvalidOperationException(
-                $"Unknown type '{type}', expected one of {string.Join(", ", Types.All)}");
-        }
-        
-        if (type == null && @in != Locations.Body)
-        {
-            throw new InvalidOperationException(
-                $"Type cannot be null when location is '{@in}'. It must be any of {string.Join(", ", Types.All)}'");
-        }
-
-        if (type == Types.Array && items == null)
-        {
-            throw new InvalidOperationException(
-                $"Items object cannot be null when type is '{type}'");
-        }
-        
-        return new Parameter(name,
-            collectionFormat: collectionFormat, 
-            @in: @in, 
-            type: type,
-            items: items);
+            null when @in != Locations.Body => throw new InvalidOperationException(
+                $"Type cannot be null when location is '{@in}'. It must be one of {string.Join(", ", Types.All)}'"),
+            Types.Array when items == null => throw new InvalidOperationException(
+                $"Items object cannot be null when type is '{type}'"),
+            Types.Array when !collectionFormats.Contains(collectionFormat) => throw new InvalidOperationException(
+                $"Location '{@in}' does not support collection format '{collectionFormat}'. Supported formats are {string.Join(", ", collectionFormats)}"),
+            not null when !Types.All.Contains(type) => throw new InvalidOperationException(
+                $"Unknown type '{type}', expected one of {string.Join(", ", Types.All)}"),
+            _ => new Parameter(name, collectionFormat: collectionFormat, @in: @in, type: type, items: items)
+        };
     }
 
     /// <summary>
@@ -160,12 +142,12 @@ public record Parameter
     /// <summary>
     /// The style of the parameter
     /// </summary>
-    public string CollectionFormat { get; private init; }
+    public string? CollectionFormat { get; private init; }
     /// <summary>
     /// Is the parameter the body directive?
     /// </summary>
     [MemberNotNullWhen(false, nameof(Type))] 
-    public bool IsBody { get; private init; }
+    public bool InBody { get; private init; }
     /// <summary>
     /// The type of the parameter
     /// </summary>
@@ -185,24 +167,24 @@ public record Parameter
     /// <summary>
     /// Is the parameter located in the header?
     /// </summary>
-    public bool IsHeader { get; }
+    public bool InHeader { get; }
     /// <summary>
     /// Is the parameter located in the path?
     /// </summary>
-    public bool IsPath { get; }
+    public bool InPath { get; }
     /// <summary>
     /// Is the parameter located in the query?
     /// </summary>
-    public bool IsQuery { get; }
+    public bool InQuery { get; }
     /// <summary>
     /// Is the parameter located in the form data?
     /// </summary>
-    public bool IsFormData { get; }
+    public bool InFormData { get; }
     
     /// <summary>
     /// Does the parameter value include keys, i.e. key=value
     /// </summary>
-    public bool ValueIncludesKey { get; }
+    internal bool ValueIncludesKey { get; }
 
     /// <inheritdoc cref="GetSchema(JsonObject)" />
     [PublicAPI]
