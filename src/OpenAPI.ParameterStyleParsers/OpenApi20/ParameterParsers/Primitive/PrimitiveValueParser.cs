@@ -43,10 +43,10 @@ internal abstract class PrimitiveValueParser : IValueParser
             return true;
         }
 
-        if (TryParse(value, out string? parsedValue, out error))
+        var unescapedValue = Uri.UnescapeDataString(value);
+        if (TryParse(unescapedValue, out string? parsedValue, out error))
         {
-            var unescapedValue = Uri.UnescapeDataString(parsedValue);
-            return PrimitiveJsonConverter.TryConvert(unescapedValue, Type, out instance, out error);
+            return PrimitiveJsonConverter.TryConvert(parsedValue, Type, out instance, out error);
         }
 
         instance = null;
