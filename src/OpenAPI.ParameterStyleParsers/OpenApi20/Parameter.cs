@@ -184,7 +184,7 @@ public record Parameter
     /// <summary>
     /// Does the parameter value include keys, i.e. key=value
     /// </summary>
-    internal bool ValueIncludesKey { get; }
+    public bool ValueIncludesKey { get; }
 
     /// <inheritdoc cref="GetSchema(JsonObject)" />
     [PublicAPI]
