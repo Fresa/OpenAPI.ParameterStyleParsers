@@ -32,67 +32,6 @@ public sealed class ParameterValueParser
         return new ParameterValueParser(valueParser);
     }
 
-    /// <summary>
-    /// Create a parameter value parser from an OpenAPI 2.0 parameter specification
-    /// <see href="https://spec.openapis.org/oas/v2.0#parameter-object"/>
-    /// </summary>
-    /// <param name="parameterSpecification">Specification of the parameter</param>
-    /// <returns>Parameter value parser, or null if In = Body</returns>
-    /// <exception cref="InvalidOperationException">The provided json object doesn't correspond to the specification</exception>
-    public static ParameterValueParser? FromOpenApi20ParameterSpecification(JsonObject parameterSpecification)
-    {
-        var name = parameterSpecification.GetRequiredPropertyValue<string>(Parameter.FieldNames.Name);
-        if (name == string.Empty)
-            throw new InvalidOperationException($"Property '{Parameter.FieldNames.Name}' is empty string");
-
-        var location = parameterSpecification.GetRequiredPropertyValue<string>(Parameter.FieldNames.In);
-        if (!Parameter.Locations.All.Contains(location))
-        {
-            throw new InvalidOperationException(
-                $"Property '{Parameter.FieldNames.In}' has an invalid value '{location}'. Expected any of {string.Join(", ", Parameter.Locations.All)}");
-        }
-
-        if (location == Parameter.Locations.Body)
-        {
-            return null;
-        }
-        
-        parameterSpecification.TryGetPropertyValue(Parameter.FieldNames.CollectionFormat, out var collectionFormatJson);
-        var collectionFormat = collectionFormatJson?.GetValue<string>() switch
-        {
-            null => Parameter.CollectionFormats.Csv,
-            var value when Parameter.CollectionFormats.All.Contains(value) => value!,
-            var value => throw new InvalidOperationException(
-                $"Property '{Parameter.FieldNames.CollectionFormat}' has an invalid value '{value}'. Expected any of {string.Join(", ", Parameter.CollectionFormats.All)}")
-        };
-
-        var type = parameterSpecification.GetRequiredPropertyValue<string>(Parameter.FieldNames.Type);
-        if (!Parameter.Types.All.Contains(type))
-        {
-            throw new InvalidOperationException(
-                $"Property '{Parameter.FieldNames.Type}' has an invalid value '{type}'. Expected any of {string.Join(", ", Parameter.Types.All)}");
-        }
-
-        ItemsObject? items = null;
-        if (type == Parameter.Types.Array)
-        {
-            if (parameterSpecification.GetRequiredPropertyValue(Parameter.FieldNames.Items) is not JsonObject itemType)
-            {
-                throw new InvalidOperationException(
-                    $"Property '{Parameter.FieldNames.Items}' has no value or is not an object");
-            }
-
-            items = ItemsObject.FromOpenApi20ItemsObjectSpecification(itemType);
-        }
-        var parameter = Parameter.Parse(
-            name, 
-            location, 
-            type: type,
-            collectionFormat: collectionFormat,
-            items: items);
-        return Create(parameter);
-    }
-
     private static IValueParser CreateValueParser(Parameter parameter)
     {
         var jsonType = parameter.Type;

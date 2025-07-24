@@ -15,6 +15,7 @@ public record Parameter
     /// <summary>
     /// Supported OpenAPI parameter collection formats
     /// </summary>
+    [PublicAPI]
     public static class CollectionFormats
     {
 #pragma warning disable CS1591
@@ -31,6 +32,7 @@ public record Parameter
     /// Supported OpenAPI parameter locations
     /// </summary>
     // ReSharper disable once MemberCanBePrivate.Global Part of public contract
+    [PublicAPI]
     public static class Locations
     {
 #pragma warning disable CS1591
@@ -47,6 +49,7 @@ public record Parameter
     /// A map between parameter locations and supported styles
     /// </summary>
     // ReSharper disable once MemberCanBePrivate.Global Part of public contract
+    [PublicAPI]
     public static readonly Dictionary<string, string[]> LocationToCollectionFormatMap = new()
     {
         [Locations.Path] = [CollectionFormats.Csv, CollectionFormats.Ssv, CollectionFormats.Tsv, CollectionFormats.Pipes],
@@ -59,6 +62,7 @@ public record Parameter
     /// <summary>
     /// Supported OpenAPI parameter types
     /// </summary>
+    [PublicAPI]
     public static class Types
     {
 #pragma warning disable CS1591
@@ -76,6 +80,7 @@ public record Parameter
     /// <summary>
     /// Relevant field names for the parameter
     /// </summary>
+    [PublicAPI]
     public static class FieldNames
     {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -87,7 +92,7 @@ public record Parameter
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     }
 
-    private Parameter(string name, string @in, string? collectionFormat, string? type = null, ItemsObject? items = null)
+    private Parameter(string name, string @in, string? collectionFormat = null, string? type = null, ItemsObject? items = null)
     {
         Name = name;
         CollectionFormat = collectionFormat;
@@ -113,6 +118,7 @@ public record Parameter
     /// <param name="items">The item directive is type is array</param>
     /// <returns>A parameter specification</returns>
     /// <exception cref="InvalidOperationException">Thrown if location and styles are incompatible</exception>
+    [PublicAPI]
     public static Parameter Parse(string name, string @in, string? type = null, string? collectionFormat = null, ItemsObject? items = null)
     {
         if (!LocationToCollectionFormatMap.TryGetValue(@in, out var collectionFormats))
@@ -135,6 +141,83 @@ public record Parameter
         };
     }
 
+    /// <summary>
+    /// Create a parameter from an OpenAPI 2.0 parameter specification
+    /// <see href="https://spec.openapis.org/oas/v2.0#parameter-object"/>
+    /// </summary>
+    /// <param name="parameterSpecificationAsJson">Specification of the parameter</param>
+    /// <returns>Parameter, or null if In = Body</returns>
+    /// <exception cref="InvalidOperationException">The provided json object doesn't correspond to the specification</exception>
+    [PublicAPI]
+    public static Parameter? FromOpenApi20ParameterSpecification(string parameterSpecificationAsJson)
+    {
+        var json = JsonNode.Parse(parameterSpecificationAsJson)?.AsObject() ??
+                   throw new InvalidOperationException("Parameter specification is not a json object");
+        return FromOpenApi20ParameterSpecification(json);
+    }
+    
+    /// <summary>
+    /// Create a parameter from an OpenAPI 2.0 parameter specification
+    /// <see href="https://spec.openapis.org/oas/v2.0#parameter-object"/>
+    /// </summary>
+    /// <param name="parameterSpecification">Specification of the parameter</param>
+    /// <returns>The parsed parameter</returns>
+    /// <exception cref="InvalidOperationException">The provided json object doesn't correspond to the specification</exception>
+    [PublicAPI]
+    public static Parameter FromOpenApi20ParameterSpecification(JsonObject parameterSpecification)
+    {
+        var name = parameterSpecification.GetRequiredPropertyValue<string>(FieldNames.Name);
+        if (name == string.Empty)
+            throw new InvalidOperationException($"Property '{FieldNames.Name}' is empty string");
+
+        var @in = parameterSpecification.GetRequiredPropertyValue<string>(FieldNames.In);
+        if (!Locations.All.Contains(@in))
+        {
+            throw new InvalidOperationException(
+                $"Property '{FieldNames.In}' has an invalid value '{@in}'. Expected any of {string.Join(", ", Locations.All)}");
+        }
+
+        if (@in == Locations.Body)
+        {
+            return new Parameter(name, @in);
+        }
+        
+        parameterSpecification.TryGetPropertyValue(FieldNames.CollectionFormat, out var collectionFormatJson);
+        var collectionFormat = collectionFormatJson?.GetValue<string>() switch
+        {
+            null => CollectionFormats.Csv,
+            var value when CollectionFormats.All.Contains(value) => value!,
+            var value => throw new InvalidOperationException(
+                $"Property '{FieldNames.CollectionFormat}' has an invalid value '{value}'. Expected any of {string.Join(", ", CollectionFormats.All)}")
+        };
+
+        var type = parameterSpecification.GetRequiredPropertyValue<string>(FieldNames.Type);
+        if (!Types.All.Contains(type))
+        {
+            throw new InvalidOperationException(
+                $"Property '{FieldNames.Type}' has an invalid value '{type}'. Expected any of {string.Join(", ", Types.All)}");
+        }
+
+        ItemsObject? items = null;
+        if (type == Types.Array)
+        {
+            if (parameterSpecification.GetRequiredPropertyValue(FieldNames.Items) is not JsonObject itemType)
+            {
+                throw new InvalidOperationException(
+                    $"Property '{FieldNames.Items}' has no value or is not an object");
+            }
+
+            items = ItemsObject.FromOpenApi20ItemsObjectSpecification(itemType);
+        }
+        
+        return Parse(
+            name, 
+            @in, 
+            type: type,
+            collectionFormat: collectionFormat,
+            items: items);
+    }
+    
     /// <summary>
     /// The name of the parameter
     /// </summary>

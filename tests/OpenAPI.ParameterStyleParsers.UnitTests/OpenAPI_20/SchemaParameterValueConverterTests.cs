@@ -78,10 +78,10 @@ public class SchemaParameterValueConverterTests
         bool shouldMap,
         string? jsonInstance)
     {
-        var parameter = JsonNode.Parse(parameterJson)!.AsObject();
-        var parser = ParameterValueParser.FromOpenApi20ParameterSpecification(parameter);
-        parser.Should().NotBeNull();
-        parser!.TryParse(value, out var instance, out var mappingError).Should().Be(shouldMap, mappingError);
+        var parameter = OpenApi20.Parameter.FromOpenApi20ParameterSpecification(parameterJson);
+        parameter.Should().NotBeNull();
+        var parser = ParameterValueParser.Create(parameter);
+        parser.TryParse(value, out var instance, out var mappingError).Should().Be(shouldMap, mappingError);
         if (!shouldMap)
         {
             mappingError.Should().NotBeNullOrEmpty();
@@ -116,10 +116,10 @@ public class SchemaParameterValueConverterTests
     private static ParameterValueParser CreateParameterValueParser(
         string parameterJson)
     {
-        var parameterJsonNode = JsonNode.Parse(parameterJson)!.AsObject();
-        var parser = ParameterValueParser.FromOpenApi20ParameterSpecification(parameterJsonNode);
-        parser.Should().NotBeNull();
-        return parser!;
+        var parameter = OpenApi20.Parameter.FromOpenApi20ParameterSpecification(parameterJson);
+        parameter.Should().NotBeNull();
+        var parser = ParameterValueParser.Create(parameter);
+        return parser;
     }
 
     #region Array
