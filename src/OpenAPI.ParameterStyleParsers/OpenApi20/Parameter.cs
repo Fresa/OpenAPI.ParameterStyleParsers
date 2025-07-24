@@ -149,7 +149,7 @@ public record Parameter
     /// <returns>Parameter, or null if In = Body</returns>
     /// <exception cref="InvalidOperationException">The provided json object doesn't correspond to the specification</exception>
     [PublicAPI]
-    public static Parameter? FromOpenApi20ParameterSpecification(string parameterSpecificationAsJson)
+    public static Parameter FromOpenApi20ParameterSpecification(string parameterSpecificationAsJson)
     {
         var json = JsonNode.Parse(parameterSpecificationAsJson)?.AsObject() ??
                    throw new InvalidOperationException("Parameter specification is not a json object");
