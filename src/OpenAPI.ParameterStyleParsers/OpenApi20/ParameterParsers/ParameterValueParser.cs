@@ -1,0 +1,70 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
+using JetBrains.Annotations;
+using OpenAPI.ParameterStyleParsers.Json;
+using OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Array;
+using OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Primitive;
+using OpenAPI.ParameterStyleParsers.ParameterParsers;
+
+namespace OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers;
+
+/// <summary>
+/// Represents a parameter value parser for OpenAPI styles
+/// </summary>
+public sealed class ParameterValueParser
+{
+    private readonly IValueParser _valueParser;
+
+    private ParameterValueParser(IValueParser valueParser)
+    {
+        _valueParser = valueParser;
+    }
+
+    /// <summary>
+    /// Creates a parameter value parser corresponding to the specified parameter
+    /// </summary>
+    /// <param name="parameter">The parameter specification</param>
+    /// <returns>Parameter value parser</returns>
+    [PublicAPI]
+    public static ParameterValueParser Create(Parameter parameter)
+    {
+        var valueParser = CreateValueParser(parameter);
+        return new ParameterValueParser(valueParser);
+    }
+
+    private static IValueParser CreateValueParser(Parameter parameter)
+    {
+        var jsonType = parameter.Type;
+
+        return jsonType switch
+        {
+            Parameter.Types.String or
+                Parameter.Types.Boolean or
+                Parameter.Types.Integer or
+                Parameter.Types.Number => PrimitiveValueParser.Create(parameter),
+            Parameter.Types.Array => ArrayValueParser.Create(parameter),
+            _ => throw new NotSupportedException($"Json type {jsonType} is not supported")
+        };
+    }
+
+    /// <summary>
+    /// Parses a style formatted parameter value to a json node.
+    /// It's assumed that the input is valid according to the style format.
+    /// </summary>
+    /// <param name="value">Style formatted input</param>
+    /// <param name="instance">The parsed json if this method returns true</param>
+    /// <param name="error">Parsing error if this method returns false</param>
+    /// <returns>true if an instance could be constructed, false if there are errors</returns>
+    public bool TryParse(string? value, out JsonNode? instance,
+        [NotNullWhen(false)] out string? error) =>
+        _valueParser.TryParse(value, out instance, out error);
+
+    /// <summary>
+    /// Serializes a json node according to the specified parameter.
+    /// It's assumed that the instance is valid according to the parameter's schema.
+    /// </summary>
+    /// <param name="instance">Json instance</param>
+    /// <returns>Style formatted instance</returns>
+    public string? Serialize(JsonNode? instance) => 
+        _valueParser.Serialize(instance);
+}

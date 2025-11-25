@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Nodes;
-using FluentAssertions;
 using Json.More;
 using OpenAPI.ParameterStyleParsers.Json;
 

@@ -1,0 +1,347 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
+using JetBrains.Annotations;
+using OpenAPI.ParameterStyleParsers.Json;
+using OpenAPI.ParameterStyleParsers.JsonSchema;
+using OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Array;
+
+namespace OpenAPI.ParameterStyleParsers.OpenApi20;
+
+/// <summary>
+/// An OpenAPI parameter specification
+/// </summary>
+public record Parameter
+{
+    /// <summary>
+    /// Supported OpenAPI parameter collection formats
+    /// </summary>
+    [PublicAPI]
+    public static class CollectionFormats
+    {
+#pragma warning disable CS1591
+        public const string Csv = "csv";
+        public const string Ssv = "ssv";
+        public const string Tsv = "tsv";
+        public const string Pipes = "pipes";
+        public const string Multi = "multi";
+        internal static readonly string[] All = [Csv, Ssv, Tsv, Pipes, Multi];
+#pragma warning restore CS1591
+    }
+
+    /// <summary>
+    /// Supported OpenAPI parameter locations
+    /// </summary>
+    // ReSharper disable once MemberCanBePrivate.Global Part of public contract
+    [PublicAPI]
+    public static class Locations
+    {
+#pragma warning disable CS1591
+        public const string Path = "path";
+        public const string Header = "header";
+        public const string Query = "query";
+        public const string FormData = "formData";
+        public const string Body = "body";
+        internal static readonly string[] All = [Path, Header, Query, FormData, Body];
+#pragma warning restore CS1591
+    }
+
+    /// <summary>
+    /// A map between parameter locations and supported styles
+    /// </summary>
+    // ReSharper disable once MemberCanBePrivate.Global Part of public contract
+    [PublicAPI]
+    public static readonly Dictionary<string, string[]> LocationToCollectionFormatMap = new()
+    {
+        [Locations.Path] = [CollectionFormats.Csv, CollectionFormats.Ssv, CollectionFormats.Tsv, CollectionFormats.Pipes],
+        [Locations.Header] = [CollectionFormats.Csv, CollectionFormats.Ssv, CollectionFormats.Tsv, CollectionFormats.Pipes],
+        [Locations.Query] = [CollectionFormats.Csv, CollectionFormats.Ssv, CollectionFormats.Tsv, CollectionFormats.Pipes, CollectionFormats.Multi],
+        [Locations.FormData] = [CollectionFormats.Csv, CollectionFormats.Ssv, CollectionFormats.Tsv, CollectionFormats.Pipes, CollectionFormats.Multi],
+        [Locations.Body] = [],
+    };
+
+    /// <summary>
+    /// Supported OpenAPI parameter types
+    /// </summary>
+    [PublicAPI]
+    public static class Types
+    {
+#pragma warning disable CS1591
+        public const string String = "string";
+        public const string Number = "number";
+        public const string Integer = "integer";
+        public const string Boolean = "boolean";
+        public const string Array = "array";
+        public const string File = "file";
+        internal static readonly string[] All = [String, Number, Integer, Boolean, Array, File];
+        internal static readonly string[] Primitives = [String, Number, Integer, Boolean];
+#pragma warning restore CS1591
+    }
+    
+    /// <summary>
+    /// Relevant field names for the parameter
+    /// </summary>
+    [PublicAPI]
+    public static class FieldNames
+    {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        public const string Name = "name";
+        public const string In = "in";
+        public const string Type = "type";
+        public const string CollectionFormat = "collectionFormat";
+        public const string Items = "items";
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+    }
+
+    private Parameter(string name, string @in, string? collectionFormat = null, string? type = null, ItemsObject? items = null)
+    {
+        Name = name;
+        CollectionFormat = collectionFormat;
+        Type = type;
+        Items = items;
+        
+        InBody = type == null;
+        InPath = @in == Locations.Path;
+        InFormData = @in == Locations.FormData;
+        InQuery = @in == Locations.Query;
+        InHeader = @in == Locations.Header;
+
+        ValueIncludesKey = InQuery || InFormData;
+    }
+
+    /// <summary>
+    /// Parses an OpenAPI parameter
+    /// </summary>
+    /// <param name="name">Parameter name</param>
+    /// <param name="in">The location of the parameter</param>
+    /// <param name="type">The type (null when parameter is body)</param>
+    /// <param name="collectionFormat">Determines the format of the array if type array is used</param>
+    /// <param name="items">The item directive is type is array</param>
+    /// <returns>A parameter specification</returns>
+    /// <exception cref="InvalidOperationException">Thrown if location and styles are incompatible</exception>
+    [PublicAPI]
+    public static Parameter Parse(string name, string @in, string? type = null, string? collectionFormat = null, ItemsObject? items = null)
+    {
+        if (!LocationToCollectionFormatMap.TryGetValue(@in, out var collectionFormats))
+        {
+            throw new InvalidOperationException(
+                $"Location '{@in}' is not a valid location. Valid locations are {string.Join(", ", Locations.All)}");
+        }
+
+        return type switch
+        {
+            null when @in != Locations.Body => throw new InvalidOperationException(
+                $"Type cannot be null when location is '{@in}'. It must be one of {string.Join(", ", Types.All)}'"),
+            Types.Array when items == null => throw new InvalidOperationException(
+                $"Items object cannot be null when type is '{type}'"),
+            Types.Array when !collectionFormats.Contains(collectionFormat) => throw new InvalidOperationException(
+                $"Location '{@in}' does not support collection format '{collectionFormat}'. Supported formats are {string.Join(", ", collectionFormats)}"),
+            not null when !Types.All.Contains(type) => throw new InvalidOperationException(
+                $"Unknown type '{type}', expected one of {string.Join(", ", Types.All)}"),
+            _ => new Parameter(name, collectionFormat: collectionFormat, @in: @in, type: type, items: items)
+        };
+    }
+
+    /// <summary>
+    /// Create a parameter from an OpenAPI 2.0 parameter specification
+    /// <see href="https://spec.openapis.org/oas/v2.0#parameter-object"/>
+    /// </summary>
+    /// <param name="parameterSpecificationAsJson">Specification of the parameter</param>
+    /// <returns>Parameter, or null if In = Body</returns>
+    /// <exception cref="InvalidOperationException">The provided json object doesn't correspond to the specification</exception>
+    [PublicAPI]
+    public static Parameter FromOpenApi20ParameterSpecification(string parameterSpecificationAsJson)
+    {
+        var json = JsonNode.Parse(parameterSpecificationAsJson)?.AsObject() ??
+                   throw new InvalidOperationException("Parameter specification is not a json object");
+        return FromOpenApi20ParameterSpecification(json);
+    }
+    
+    /// <summary>
+    /// Create a parameter from an OpenAPI 2.0 parameter specification
+    /// <see href="https://spec.openapis.org/oas/v2.0#parameter-object"/>
+    /// </summary>
+    /// <param name="parameterSpecification">Specification of the parameter</param>
+    /// <returns>The parsed parameter</returns>
+    /// <exception cref="InvalidOperationException">The provided json object doesn't correspond to the specification</exception>
+    [PublicAPI]
+    public static Parameter FromOpenApi20ParameterSpecification(JsonObject parameterSpecification)
+    {
+        var name = parameterSpecification.GetRequiredPropertyValue<string>(FieldNames.Name);
+        if (name == string.Empty)
+            throw new InvalidOperationException($"Property '{FieldNames.Name}' is empty string");
+
+        var @in = parameterSpecification.GetRequiredPropertyValue<string>(FieldNames.In);
+        if (!Locations.All.Contains(@in))
+        {
+            throw new InvalidOperationException(
+                $"Property '{FieldNames.In}' has an invalid value '{@in}'. Expected any of {string.Join(", ", Locations.All)}");
+        }
+
+        if (@in == Locations.Body)
+        {
+            return new Parameter(name, @in);
+        }
+        
+        parameterSpecification.TryGetPropertyValue(FieldNames.CollectionFormat, out var collectionFormatJson);
+        var collectionFormat = collectionFormatJson?.GetValue<string>() switch
+        {
+            null => CollectionFormats.Csv,
+            var value when CollectionFormats.All.Contains(value) => value!,
+            var value => throw new InvalidOperationException(
+                $"Property '{FieldNames.CollectionFormat}' has an invalid value '{value}'. Expected any of {string.Join(", ", CollectionFormats.All)}")
+        };
+
+        var type = parameterSpecification.GetRequiredPropertyValue<string>(FieldNames.Type);
+        if (!Types.All.Contains(type))
+        {
+            throw new InvalidOperationException(
+                $"Property '{FieldNames.Type}' has an invalid value '{type}'. Expected any of {string.Join(", ", Types.All)}");
+        }
+
+        ItemsObject? items = null;
+        if (type == Types.Array)
+        {
+            if (parameterSpecification.GetRequiredPropertyValue(FieldNames.Items) is not JsonObject itemType)
+            {
+                throw new InvalidOperationException(
+                    $"Property '{FieldNames.Items}' has no value or is not an object");
+            }
+
+            items = ItemsObject.FromOpenApi20ItemsObjectSpecification(itemType);
+        }
+        
+        return Parse(
+            name, 
+            @in, 
+            type: type,
+            collectionFormat: collectionFormat,
+            items: items);
+    }
+    
+    /// <summary>
+    /// The name of the parameter
+    /// </summary>
+    public string Name { get; private init; }
+    /// <summary>
+    /// The style of the parameter
+    /// </summary>
+    public string? CollectionFormat { get; private init; }
+    /// <summary>
+    /// Is the parameter the body directive?
+    /// </summary>
+    [MemberNotNullWhen(false, nameof(Type))] 
+    public bool InBody { get; private init; }
+    /// <summary>
+    /// The type of the parameter
+    /// </summary>
+    public string? Type { get; }
+
+    /// <summary>
+    /// Is it an array type parameter?
+    /// </summary>
+    [MemberNotNullWhen(true, nameof(Items))]
+    public bool IsArray => Type == Types.Array;
+    
+    /// <summary>
+    /// Required if type is “array”. Describes the type of items in the array
+    /// </summary>
+    public ItemsObject? Items { get; private init; }
+    
+    /// <summary>
+    /// Is the parameter located in the header?
+    /// </summary>
+    public bool InHeader { get; }
+    /// <summary>
+    /// Is the parameter located in the path?
+    /// </summary>
+    public bool InPath { get; }
+    /// <summary>
+    /// Is the parameter located in the query?
+    /// </summary>
+    public bool InQuery { get; }
+    /// <summary>
+    /// Is the parameter located in the form data?
+    /// </summary>
+    public bool InFormData { get; }
+    
+    /// <summary>
+    /// Does the parameter value include keys, i.e. key=value
+    /// </summary>
+    public bool ValueIncludesKey { get; }
+
+    /// <inheritdoc cref="GetSchema(JsonObject)" />
+    [PublicAPI]
+    public static JsonNode? GetSchema(string parameterSpecification)
+    {
+        var json = JsonNode.Parse(parameterSpecification) ??
+                   throw new InvalidOperationException("Parameter specification did not represent an object");
+        return GetSchema(json.AsObject());
+    }
+
+    /// <summary>
+    /// Resolve the schema representing the parameter from a parameter specification.
+    /// This will generate a schema based on the properties unless it's a body type parameter,
+    /// then it will return the schema property.
+    /// </summary>
+    /// <param name="parameterSpecification">Parameter specification defining the schema</param>
+    /// <returns>Schema representing the parameter</returns>
+    [PublicAPI]
+    public static JsonNode? GetSchema(JsonObject parameterSpecification)
+    {
+        var @in = parameterSpecification.GetRequiredPropertyValue<string>(FieldNames.In);
+        if (@in == Locations.Body)
+        {
+            return parameterSpecification.GetRequiredPropertyValue("schema");
+        }
+        
+        var type = parameterSpecification.GetRequiredPropertyValue<string>(FieldNames.Type);
+        if (type == Types.File)
+        {
+            return null;
+        }
+
+        return new JsonObject()
+            .CopyFrom(parameterSpecification)
+            .Property("description")
+            .Property("type")
+            .Property("format")
+            .Property("items", CopyItems)
+            .Property("default")
+            .Property("maximum")
+            .Property("exclusiveMaximum")
+            .Property("minimum")
+            .Property("exclusiveMinimum")
+            .Property("maxLength")
+            .Property("minLength")
+            .Property("pattern")
+            .Property("maxItems")
+            .Property("minItems")
+            .Property("uniqueItems")
+            .Property("enum")
+            .Property("multipleOf")
+            .PropertiesStartingWith("x-");
+    }
+
+    private static JsonObject CopyItems(JsonObject source)
+    {
+        return new JsonObject()
+            .CopyFrom(source)
+            .Property("type")
+            .Property("format")
+            .Property("items", CopyItems)
+            .Property("default")
+            .Property("maximum")
+            .Property("exclusiveMaximum")
+            .Property("minimum")
+            .Property("exclusiveMinimum")
+            .Property("maxLength")
+            .Property("minLength")
+            .Property("pattern")
+            .Property("maxItems")
+            .Property("minItems")
+            .Property("uniqueItems")
+            .Property("enum")
+            .Property("multipleOf")
+            .PropertiesStartingWith("x-");
+    }
+}

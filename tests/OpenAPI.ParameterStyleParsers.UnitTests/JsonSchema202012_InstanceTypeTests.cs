@@ -1,9 +1,6 @@
 ﻿using System.Text.Json.Nodes;
-using System.Text.RegularExpressions;
-using FluentAssertions;
 using OpenAPI.ParameterStyleParsers.Json;
 using OpenAPI.ParameterStyleParsers.JsonSchema;
-using OpenAPI.ParameterStyleParsers.ParameterParsers;
 
 namespace OpenAPI.ParameterStyleParsers.UnitTests;
 
