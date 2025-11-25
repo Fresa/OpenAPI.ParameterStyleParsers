@@ -1,7 +1,7 @@
 # OpenAPI.ParameterStyleParsers
-[Parameter style](https://spec.openapis.org/oas/v3.1.0#style-values) parsers for OpenAPI 3.1.
+Parameter style parsers for OpenAPI.
 
-The examples in the OpenAPI specification doesn't match [RFC6570](https://www.rfc-editor.org/rfc/rfc6570) fully, in those cases [the examples](https://spec.openapis.org/oas/v3.1.0#style-examples) in the specification are followed.
+The examples in the OpenAPI specification doesn't match [RFC6570](https://www.rfc-editor.org/rfc/rfc6570) fully, in those cases [the examples](https://spec.openapis.org/oas/v3.1.0#style-examples) in the specifications are followed.
 
 [![Continuous Delivery](https://github.com/Fresa/OpenAPI.ParameterStyleParsers/actions/workflows/cd.yml/badge.svg)](https://github.com/Fresa/OpenAPI.ParameterStyleParsers/actions/workflows/cd.yml)
 
@@ -13,10 +13,12 @@ dotnet add package ParameterStyleParsers.OpenAPI
 https://www.nuget.org/packages/ParameterStyleParsers.OpenAPI/
 
 ## Getting Started
-Create the parser by providing the OpenAPI 3.1 parameter specification.
+Create a parser by providing the OpenAPI parameter specification.
+
+### [OpenAPI 3.1](https://spec.openapis.org/oas/v3.1.0.html#parameter-object)
 ```dotnet
-var parser = OpenAPI.ParameterStyleParsers.ParameterParsers.ParameterValueParser.FromOpenApi31ParameterSpecification(
-    JsonNode.Parse("""
+var parser = OpenAPI.ParameterStyleParsers.ParameterValueParserFactory.OpenApi31(
+    """
     {
         "name": "color",
         "in": "query",
@@ -29,25 +31,25 @@ var parser = OpenAPI.ParameterStyleParsers.ParameterParsers.ParameterValueParser
         "style": "form",
         "explode": true
     }
-    """)!.AsObject());
+    """);
 ```
-It's also possible to manually construct the parser.
+### [OpenAPI 2.0](https://spec.openapis.org/oas/v2.0.html#parameter-object)
 ```dotnet
-var parameter = OpenAPI.ParameterStyleParsers.Parameter.Parse(
-    name: "color",
-    style: "form",
-    location: "query",
-    explode: true,
-    new JsonSchema202012(JsonNode.Parse("""
+var parser = OpenAPI.ParameterStyleParsers.ParameterValueParserFactory.OpenApi20(
+    """
     {
+        "name": "color",
+        "in": "query",
+        "required": false,
         "type": "array",
         "items": {
             "type": "string"
-        }
+        },
+        "collectionFormat": "multi"
     }
-    """)));
-var parser = OpenAPI.ParameterStyleParsers.ParameterParsers.ParameterValueParser.Create(parameter);
+    """);
 ```
+
 
 ### Parse a style serialized parameter
 ```dotnet
