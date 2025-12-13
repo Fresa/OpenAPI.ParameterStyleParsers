@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using OpenAPI.ParameterStyleParsers.JsonSchema;
 
@@ -22,9 +23,18 @@ internal static class PrimitiveJsonConverter
             case InstanceType.Boolean:
             case InstanceType.Integer:
             case InstanceType.Null:
-                instance = value == null ? null : JsonNode.Parse(value);
-                error = null;
-                return true;
+                try
+                {
+                    instance = value == null ? null : JsonNode.Parse(value);
+                    error = null;
+                    return true;
+                }
+                catch (JsonException)
+                {
+                    instance = null;
+                    error = $"Value {value} is not a {jsonType}";
+                    return false;
+                }
             default:
                 error = $"Json type {Enum.GetName(jsonType)} is not a primitive type";
                 instance = null;
