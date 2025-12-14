@@ -12,7 +12,8 @@ internal static class PrimitiveJsonConverter
     /// <param name="value">Parameter styled value</param>
     /// <param name="jsonType">The expected json schema type</param>
     /// <param name="instance">The converted value.
-    /// Note: The converted value might not correspond to <param name="jsonType"></param> if <param name="value"></param>isn't</param>
+    /// Note: The converted value might not correspond to <paramref name="jsonType"/>
+    /// if <paramref name="value" /> isn't</param>
     /// <param name="error">An error if the value isn't convertable</param>
     /// <returns>True if the value was converted</returns>
     internal static bool TryConvert(
