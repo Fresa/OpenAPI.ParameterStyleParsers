@@ -6,37 +6,46 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Primitive;
 
 internal static class PrimitiveJsonConverter
 {
+    /// <summary>
+    /// Converts a style parameter value to json
+    /// </summary>
+    /// <param name="value">Parameter styled value</param>
+    /// <param name="jsonType">The expected json schema type</param>
+    /// <param name="instance">The converted value.
+    /// Note: The converted value might not correspond to <param name="jsonType"></param> if <param name="value"></param>isn't</param>
+    /// <param name="error">An error if the value isn't convertable</param>
+    /// <returns>True if the value was converted</returns>
     internal static bool TryConvert(
         string value,
         string jsonType,
         out JsonNode? instance,
         [NotNullWhen(false)] out string? error)
     {
-        switch (jsonType)
+        instance = jsonType switch
         {
-            case Parameter.Types.String:
-                instance = JsonValue.Create(value);
-                error = null;
-                return true;
-            case Parameter.Types.Number:
-            case Parameter.Types.Boolean:
-            case Parameter.Types.Integer:
-                try
-                {
-                    instance = JsonNode.Parse(value);
-                    error = null;
-                    return true;
-                }
-                catch (JsonException)
-                {
-                    instance = null;
-                    error = $"Value {value} is not a {jsonType}";
-                    return false;
-                }
-            default:
-                error = $"Json type {jsonType} is not a primitive type, expected one of {string.Join(", ", Parameter.Types.Primitives)}";
-                instance = null;
-                return false;
+            // Use string as-is if it is declared as a string.
+            // "1.2" can be both a number and a string, but it's formatted differently in json format,
+            // i.e. 1.2 or "1.2". We always want the latter if it is a string.
+            Parameter.Types.String => JsonValue.Create(value),
+            _ => Parse()
+        };
+        error = null;
+        return true;
+
+        JsonNode? Parse()
+        {
+            try
+            {
+                // The purpose of the converter is to convert parameter styled values
+                // to json values not to validate that the value is of a specific type
+                // or valid according to a schema, so we let it parse as-is
+                return JsonNode.Parse(value);
+            }
+            // Value is not json formatted, so it will be treated as a string
+            catch (JsonException)
+            {
+                return JsonValue.Create(value);
+            }
         }
     }
 }
