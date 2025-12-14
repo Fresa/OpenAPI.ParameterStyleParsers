@@ -260,91 +260,41 @@ public class SchemaParameterValueConverterTests
 
     public static readonly TheoryData<string, string?[], bool, string?> String =
         new TheoryData<string, string?[], bool, string?>()
-            .AddRange(CreateString(AllParameterLocations));
-
-    private static (string, string?[], bool, string?)[] CreateString(params string[] ins) =>
-        ins.Select<string, (string, string?[], bool, string?)>(@in =>
-        {
-            var hasKey = LocationToHasKeyMap[@in];
-            var key = hasKey ? "color=" : "";
-            return (
-                $$"""
-                  {
-                      "name": "color",
-                      "in": "{{@in}}",
-                      "type": "string"
-                  }
-                  """,
-                [$"{key}test"],
-                true,
-                "\"test\""
-            );
-        }).ToArray();
+            .AddRange(
+                CreateTestScenarios("string", AllParameterLocations, ["\"1.2\"", "\"test\""]));
 
     public static readonly TheoryData<string, string?[], bool, string?> Number =
         new TheoryData<string, string?[], bool, string?>()
-            .AddRange(CreateNumber(AllParameterLocations));
-    private static (string, string?[], bool, string?)[] CreateNumber(params string[] ins) =>
-        ins.Select<string, (string, string?[], bool, string?)>(@in =>
-        {
-            var hasKey = LocationToHasKeyMap[@in];
-            var key = hasKey ? "color=" : "";
-            return (
-                $$"""
-                  {
-                      "name": "color",
-                      "in": "{{@in}}",
-                      "type": "number"
-                  }
-                  """,
-                [$"{key}1.2"],
-                true,
-                "1.2"
-            );
-        }).ToArray();
+            .AddRange(
+                CreateTestScenarios("number", AllParameterLocations, ["1.2", "\"foo\""]));
 
     public static readonly TheoryData<string, string?[], bool, string?> Integer =
         new TheoryData<string, string?[], bool, string?>()
-            .AddRange(CreateInteger(AllParameterLocations));
-
-    private static (string, string?[], bool, string?)[] CreateInteger(params string[] ins) =>
-        ins.Select<string, (string, string?[], bool, string?)>(@in =>
-        {
-            var hasKey = LocationToHasKeyMap[@in];
-            var key = hasKey ? "color=" : "";
-            return (
-                $$"""
-                  {
-                      "name": "color",
-                      "in": "{{@in}}",
-                      "type": "integer"
-                  }
-                  """,
-                [$"{key}1"],
-                true,
-                "1"
-            );
-        }).ToArray();
+            .AddRange(
+                CreateTestScenarios("integer", AllParameterLocations, ["1", "false", "\"foo\""]));
 
     public static readonly TheoryData<string, string?[], bool, string?> Boolean =
         new TheoryData<string, string?[], bool, string?>()
-            .AddRange(CreateBoolean(AllParameterLocations));
-    private static (string, string?[], bool, string?)[] CreateBoolean(params string[] ins) =>
-        ins.Select<string, (string, string?[], bool, string?)>(@in =>
-        {
-            var hasKey = LocationToHasKeyMap[@in];
-            var key = hasKey ? "color=" : "";
-            return (
-                $$"""
+            .AddRange(
+                CreateTestScenarios("boolean", AllParameterLocations, ["true", "\"foo\""]));
+    
+    private static (string, string?[], bool, string?)[] CreateTestScenarios(string type, string[] ins,
+        string[] jsonValues) =>
+        ins.SelectMany(@in =>
+                jsonValues.Select(val =>
+                    CreateValue(@in, type, val)))
+            .ToArray();
+
+    private static (string, string?[], bool, string?) CreateValue(string @in, string type, string jsonValue)
+    {
+        var hasKey = LocationToHasKeyMap[@in];
+        var key = hasKey ? "color=" : "";
+        return ($$"""
                   {
                       "name": "color",
                       "in": "{{@in}}",
-                      "type": "boolean"
+                      "type": "{{type}}"
                   }
-                  """,
-                [$"{key}true"],
-                true,
-                "true"
-            );
-        }).ToArray();
+                  """, [$"{key}{jsonValue.Trim('"')}"], true, jsonValue);
+    }
 }
