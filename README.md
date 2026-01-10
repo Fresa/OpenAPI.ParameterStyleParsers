@@ -15,6 +15,25 @@ https://www.nuget.org/packages/ParameterStyleParsers.OpenAPI/
 ## Getting Started
 Create a parser by providing the OpenAPI parameter specification.
 
+### [OpenAPI 3.2](https://spec.openapis.org/oas/v3.2.0.html#parameter-object)
+```dotnet
+var parser = OpenAPI.ParameterStyleParsers.ParameterValueParserFactory.OpenApi32(
+    """
+    {
+        "name": "color",
+        "in": "query",
+        "schema": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "style": "form",
+        "explode": true
+    }
+    """);
+```
+
 ### [OpenAPI 3.1](https://spec.openapis.org/oas/v3.1.0.html#parameter-object)
 ```dotnet
 var parser = OpenAPI.ParameterStyleParsers.ParameterValueParserFactory.OpenApi31(
@@ -33,6 +52,7 @@ var parser = OpenAPI.ParameterStyleParsers.ParameterValueParserFactory.OpenApi31
     }
     """);
 ```
+
 ### [OpenAPI 2.0](https://spec.openapis.org/oas/v2.0.html#parameter-object)
 ```dotnet
 var parser = OpenAPI.ParameterStyleParsers.ParameterValueParserFactory.OpenApi20(

@@ -9,9 +9,9 @@ using OpenAPI.ParameterStyleParsers.ParameterParsers;
 namespace OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers;
 
 /// <summary>
-/// Represents a parameter value parser for OpenAPI styles
+/// Represents a parameter value parser for OpenAPI 2.0 styles
 /// </summary>
-public sealed class ParameterValueParser
+public sealed class ParameterValueParser : IParameterValueParser
 {
     private readonly IValueParser _valueParser;
 
