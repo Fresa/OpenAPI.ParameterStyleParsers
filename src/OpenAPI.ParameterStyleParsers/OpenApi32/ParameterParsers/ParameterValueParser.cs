@@ -6,9 +6,6 @@ using OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers.Array;
 using OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers.Object;
 using OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers.Primitive;
 using OpenAPI.ParameterStyleParsers.ParameterParsers;
-using OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
-using OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
-using OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers;
 
@@ -39,21 +36,27 @@ public sealed class ParameterValueParser : IParameterValueParser
 
     private static IValueParser CreateValueParser(Parameter parameter)
     {
-        // Handle cookie style (new in 3.2) directly
+        // Cookie style: no percent-encoding (RFC6265)
         if (parameter.Style == Parameter.Styles.Cookie)
         {
             return CreateCookieStyleParser(parameter);
         }
 
-        // For other styles, delegate to shared parsers via shared Parameter
-        var sharedParameter = ParameterStyleParsers.Parameter.Parse(
+        // Header location: no percent-encoding per 3.2 spec
+        if (parameter.Location == Parameter.Locations.Header)
+        {
+            return CreateHeaderParser(parameter);
+        }
+
+        // For other styles/locations, delegate to 3.1 parsers
+        var openApi31Parameter = ParameterStyleParsers.Parameter.Parse(
             parameter.Name,
             parameter.Style,
             parameter.Location,
             parameter.Explode,
             parameter.JsonSchema);
 
-        return CreateSharedValueParser(sharedParameter);
+        return CreateOpenApi31ValueParser(openApi31Parameter);
     }
 
     private static IValueParser CreateCookieStyleParser(Parameter parameter)
@@ -74,7 +77,25 @@ public sealed class ParameterValueParser : IParameterValueParser
         };
     }
 
-    private static IValueParser CreateSharedValueParser(ParameterStyleParsers.Parameter parameter)
+    private static IValueParser CreateHeaderParser(Parameter parameter)
+    {
+        var jsonType = parameter.JsonSchema.GetInstanceType();
+
+        return jsonType switch
+        {
+            null or
+                InstanceType.String or
+                InstanceType.Boolean or
+                InstanceType.Integer or
+                InstanceType.Number or
+                InstanceType.Null => new HeaderPrimitiveValueParser(parameter),
+            InstanceType.Array => new HeaderArrayValueParser(parameter),
+            InstanceType.Object => new HeaderObjectValueParser(parameter),
+            _ => throw new NotSupportedException($"Json type {Enum.GetName(jsonType.Value)} is not supported")
+        };
+    }
+
+    private static IValueParser CreateOpenApi31ValueParser(ParameterStyleParsers.Parameter parameter)
     {
         var jsonSchema = parameter.JsonSchema;
         var jsonType = jsonSchema.GetInstanceType();
@@ -86,9 +107,9 @@ public sealed class ParameterValueParser : IParameterValueParser
                 InstanceType.Boolean or
                 InstanceType.Integer or
                 InstanceType.Number or
-                InstanceType.Null => PrimitiveValueParser.Create(parameter),
-            InstanceType.Array => ArrayValueParser.Create(parameter),
-            InstanceType.Object => ObjectValueParser.Create(parameter),
+                InstanceType.Null => ParameterStyleParsers.ParameterParsers.Primitive.PrimitiveValueParser.Create(parameter),
+            InstanceType.Array => ParameterStyleParsers.ParameterParsers.Array.ArrayValueParser.Create(parameter),
+            InstanceType.Object => ParameterStyleParsers.ParameterParsers.Object.ObjectValueParser.Create(parameter),
             _ => throw new NotSupportedException($"Json type {Enum.GetName(jsonType.Value)} is not supported")
         };
     }

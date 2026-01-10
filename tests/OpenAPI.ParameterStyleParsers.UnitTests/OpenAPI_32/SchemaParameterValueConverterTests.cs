@@ -6,6 +6,80 @@ namespace OpenAPI.ParameterStyleParsers.UnitTests.OpenAPI_32;
 public class SchemaParameterValueConverterTests
 {
     [Theory]
+    [MemberData(nameof(HeaderPrimitiveString))]
+    [MemberData(nameof(HeaderPrimitiveNumber))]
+    [MemberData(nameof(HeaderPrimitiveInteger))]
+    [MemberData(nameof(HeaderPrimitiveBoolean))]
+    public void Given_a_header_primitive_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
+        string parameterJson,
+        string?[] values,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+    }
+
+    [Theory]
+    [MemberData(nameof(HeaderPrimitiveString))]
+    [MemberData(nameof(HeaderPrimitiveNumber))]
+    [MemberData(nameof(HeaderPrimitiveInteger))]
+    [MemberData(nameof(HeaderPrimitiveBoolean))]
+    public void Given_a_header_primitive_parameter_with_schema_When_serializing_It_should_serialize_the_json_instance(
+        string parameterJson,
+        string?[] values,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
+    }
+
+    [Theory]
+    [MemberData(nameof(HeaderArray))]
+    public void Given_a_header_array_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
+        string parameterJson,
+        string?[] values,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+    }
+
+    [Theory]
+    [MemberData(nameof(HeaderArray))]
+    public void Given_a_header_array_parameter_with_schema_When_serializing_It_should_serialize_the_json_instance(
+        string parameterJson,
+        string?[] values,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
+    }
+
+    [Theory]
+    [MemberData(nameof(HeaderObjectExploded))]
+    [MemberData(nameof(HeaderObjectNonExploded))]
+    public void Given_a_header_object_parameter_with_schema_When_mapping_values_It_should_map_the_value_to_proper_json(
+        string parameterJson,
+        string?[] values,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+    }
+
+    [Theory]
+    [MemberData(nameof(HeaderObjectExploded))]
+    [MemberData(nameof(HeaderObjectNonExploded))]
+    public void Given_a_header_object_parameter_with_schema_When_serializing_It_should_serialize_the_json_instance(
+        string parameterJson,
+        string?[] values,
+        bool shouldMap,
+        string? jsonInstance)
+    {
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
+    }
+
+    [Theory]
     [MemberData(nameof(CookiePrimitiveString))]
     [MemberData(nameof(CookiePrimitiveNumber))]
     [MemberData(nameof(CookiePrimitiveInteger))]
@@ -135,6 +209,226 @@ public class SchemaParameterValueConverterTests
         parameter.Should().NotBeNull();
         return ParameterValueParser.Create(parameter);
     }
+
+    #region Header Primitives
+    public static readonly TheoryData<string, string?[], bool, string?> HeaderPrimitiveString = new()
+    {
+        {
+            """
+            {
+                "name": "X-Token",
+                "in": "header",
+                "schema": { "type": "string" }
+            }
+            """,
+            ["abc123"],
+            true,
+            "\"abc123\""
+        },
+        // Percent-encoding must NOT be decoded for headers in 3.2
+        {
+            """
+            {
+                "name": "X-Token",
+                "in": "header",
+                "schema": { "type": "string" }
+            }
+            """,
+            ["hello%20world"],
+            true,
+            "\"hello%20world\""
+        }
+    };
+
+    public static readonly TheoryData<string, string?[], bool, string?> HeaderPrimitiveNumber = new()
+    {
+        {
+            """
+            {
+                "name": "X-Rate",
+                "in": "header",
+                "schema": { "type": "number" }
+            }
+            """,
+            ["3.14"],
+            true,
+            "3.14"
+        }
+    };
+
+    public static readonly TheoryData<string, string?[], bool, string?> HeaderPrimitiveInteger = new()
+    {
+        {
+            """
+            {
+                "name": "X-Count",
+                "in": "header",
+                "schema": { "type": "integer" }
+            }
+            """,
+            ["42"],
+            true,
+            "42"
+        }
+    };
+
+    public static readonly TheoryData<string, string?[], bool, string?> HeaderPrimitiveBoolean = new()
+    {
+        {
+            """
+            {
+                "name": "X-Enabled",
+                "in": "header",
+                "schema": { "type": "boolean" }
+            }
+            """,
+            ["true"],
+            true,
+            "true"
+        },
+        {
+            """
+            {
+                "name": "X-Disabled",
+                "in": "header",
+                "schema": { "type": "boolean" }
+            }
+            """,
+            ["false"],
+            true,
+            "false"
+        }
+    };
+    #endregion
+
+    #region Header Arrays
+    public static readonly TheoryData<string, string?[], bool, string?> HeaderArray = new()
+    {
+        {
+            """
+            {
+                "name": "X-Ids",
+                "in": "header",
+                "schema": { "type": "array", "items": { "type": "string" } }
+            }
+            """,
+            ["a,b,c"],
+            true,
+            """["a","b","c"]"""
+        },
+        {
+            """
+            {
+                "name": "X-Nums",
+                "in": "header",
+                "schema": { "type": "array", "items": { "type": "integer" } }
+            }
+            """,
+            ["1,2,3"],
+            true,
+            "[1,2,3]"
+        },
+        // Percent-encoding must NOT be decoded for headers in 3.2
+        {
+            """
+            {
+                "name": "X-Values",
+                "in": "header",
+                "schema": { "type": "array", "items": { "type": "string" } }
+            }
+            """,
+            ["hello%20world,foo%2Cbar"],
+            true,
+            """["hello%20world","foo%2Cbar"]"""
+        }
+    };
+    #endregion
+
+    #region Header Objects
+    public static readonly TheoryData<string, string?[], bool, string?> HeaderObjectExploded = new()
+    {
+        {
+            """
+            {
+                "name": "X-User",
+                "in": "header",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "name": { "type": "string" },
+                        "age": { "type": "integer" }
+                    }
+                },
+                "explode": true
+            }
+            """,
+            ["name=John,age=30"],
+            true,
+            """{"name":"John","age":30}"""
+        },
+        // Percent-encoding must NOT be decoded for headers in 3.2
+        {
+            """
+            {
+                "name": "X-Data",
+                "in": "header",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "key": { "type": "string" }
+                    }
+                },
+                "explode": true
+            }
+            """,
+            ["key=hello%20world"],
+            true,
+            """{"key":"hello%20world"}"""
+        }
+    };
+
+    public static readonly TheoryData<string, string?[], bool, string?> HeaderObjectNonExploded = new()
+    {
+        {
+            """
+            {
+                "name": "X-User",
+                "in": "header",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "name": { "type": "string" },
+                        "age": { "type": "integer" }
+                    }
+                },
+                "explode": false
+            }
+            """,
+            ["name,John,age,30"],
+            true,
+            """{"name":"John","age":30}"""
+        },
+        // Percent-encoding must NOT be decoded for headers in 3.2
+        {
+            """
+            {
+                "name": "X-Data",
+                "in": "header",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "key": { "type": "string" }
+                    }
+                },
+                "explode": false
+            }
+            """,
+            ["key,hello%20world"],
+            true,
+            """{"key":"hello%20world"}"""
+        }
+    };
+    #endregion
 
     #region Cookie Primitives
     public static readonly TheoryData<string, string?[], bool, string?> CookiePrimitiveString = new()
