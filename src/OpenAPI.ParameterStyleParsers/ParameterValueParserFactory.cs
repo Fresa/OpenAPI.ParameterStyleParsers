@@ -29,7 +29,7 @@ public static class ParameterValueParserFactory
     /// <returns>Parameter value parser</returns>
     /// <exception cref="NotSupportedException">The specified version is not supported</exception>
     [PublicAPI]
-    public static IParameterValueParser Create(string version, JsonObject parameterSpecification)
+    public static IParameterValueParser OpenApi(string version, JsonObject parameterSpecification)
     {
         if (!Factories.TryGetValue(version, out var factory))
         {
@@ -49,11 +49,11 @@ public static class ParameterValueParserFactory
     /// <returns>Parameter value parser</returns>
     /// <exception cref="NotSupportedException">The specified version is not supported</exception>
     [PublicAPI]
-    public static IParameterValueParser Create(string version, string parameterSpecificationAsJson)
+    public static IParameterValueParser OpenApi(string version, string parameterSpecificationAsJson)
     {
         var json = JsonNode.Parse(parameterSpecificationAsJson)?.AsObject() ??
                    throw new InvalidOperationException("Parameter specification is not a json object");
-        return Create(version, json);
+        return OpenApi(version, json);
     }
 
     /// <summary>
