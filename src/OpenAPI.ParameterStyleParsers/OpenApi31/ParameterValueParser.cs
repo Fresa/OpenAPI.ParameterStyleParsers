@@ -92,13 +92,13 @@ public sealed class ParameterValueParser : IParameterValueParser
         return jsonType switch
         {
             null => MissingSchemaTypeValueParser.Create(parameter),
-            InstanceType.String or
-                InstanceType.Boolean or
-                InstanceType.Integer or
-                InstanceType.Number or
-                InstanceType.Null => PrimitiveValueParser.Create(parameter),
-            InstanceType.Array => ArrayValueParser.Create(parameter),
-            InstanceType.Object => ObjectValueParser.Create(parameter),
+            { } t when t.HasFlag(InstanceType.String) ||
+                       t.HasFlag(InstanceType.Boolean) ||
+                       t.HasFlag(InstanceType.Integer) ||
+                       t.HasFlag(InstanceType.Number) ||
+                       t == InstanceType.Null => PrimitiveValueParser.Create(parameter),
+            { } t when t.HasFlag(InstanceType.Array) => ArrayValueParser.Create(parameter),
+            { } t when t.HasFlag(InstanceType.Object) => ObjectValueParser.Create(parameter),
             _ => throw new NotSupportedException($"Json type {Enum.GetName(jsonType.Value)} is not supported")
         };
     }

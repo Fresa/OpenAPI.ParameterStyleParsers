@@ -318,6 +318,29 @@ public class SchemaParameterValueConverterTests
             new []{ "color[R]=100", "color[G]=200", "color[B]="}.GenerateAllPermutations('&'),
             true,
             """{"R":"100","G":"200","B":""}"""
+        },
+        // nullable: true allows null on object types (OpenAPI 3.0 extension)
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "style": "deepObject",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
         }
     };
     public static readonly TheoryData<string, string?[], bool, string?> ObjectLabel = new()
@@ -1009,6 +1032,29 @@ public class SchemaParameterValueConverterTests
             new []{ "R=100", "G=200", "B=150"}.GenerateAllPermutations("%20"),
             false,
             null
+        },
+        // nullable: true allows null on object types (OpenAPI 3.0 extension)
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "style": "spaceDelimited",
+                "explode": false
+            }
+            """,
+            [null],
+            true,
+            null
         }
     };
 
@@ -1145,6 +1191,29 @@ public class SchemaParameterValueConverterTests
             """,
             new []{"R|100","G|200","B|150"}.GenerateAllPermutations('|'),
             false,
+            null
+        },
+        // nullable: true allows null on object types (OpenAPI 3.0 extension)
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "style": "pipeDelimited",
+                "explode": false
+            }
+            """,
+            [null],
+            true,
             null
         }
     };
@@ -1473,6 +1542,27 @@ public class SchemaParameterValueConverterTests
             ["color=test%20"],
             true,
             "[\"test\",\"\"]"
+        },
+        // nullable: true allows null on array types (OpenAPI 3.0 extension)
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "style": "spaceDelimited",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
         }
     };
 
@@ -1553,6 +1643,27 @@ public class SchemaParameterValueConverterTests
             ["color=test|"],
             true,
             "[\"test\",\"\"]"
+        },
+        // nullable: true allows null on array types (OpenAPI 3.0 extension)
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "style": "pipeDelimited",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
         }
     };
     #endregion
@@ -1648,6 +1759,117 @@ public class SchemaParameterValueConverterTests
                 },
                 "style": "form",
                 "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        // nullable: true allows null on other types (OpenAPI 3.0 extension)
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": "string",
+                    "nullable": true
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": "number",
+                    "nullable": true
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": "integer",
+                    "nullable": true
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": "boolean",
+                    "nullable": true
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "style": "form",
+                "explode": false
             }
             """,
             [null],
@@ -1760,6 +1982,117 @@ public class SchemaParameterValueConverterTests
                 "in": "path",
                 "schema": {
                     "type": "null"
+                },
+                "style": "label",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        // nullable: true allows null on other types (OpenAPI 3.0 extension)
+        {
+            """
+            {
+                "name": "color",
+                "in": "path",
+                "schema": {
+                    "type": "string",
+                    "nullable": true
+                },
+                "style": "label",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "path",
+                "schema": {
+                    "type": "number",
+                    "nullable": true
+                },
+                "style": "label",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "path",
+                "schema": {
+                    "type": "integer",
+                    "nullable": true
+                },
+                "style": "label",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "path",
+                "schema": {
+                    "type": "boolean",
+                    "nullable": true
+                },
+                "style": "label",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "path",
+                "schema": {
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "style": "label",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "path",
+                "schema": {
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        }
+                    }
                 },
                 "style": "label",
                 "explode": true
@@ -1948,6 +2281,117 @@ public class SchemaParameterValueConverterTests
             [null],
             true,
             null
+        },
+        // nullable: true allows null on other types (OpenAPI 3.0 extension)
+        {
+            """
+            {
+                "name": "foo",
+                "in": "path",
+                "schema": {
+                    "type": "string",
+                    "nullable": true
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "foo",
+                "in": "path",
+                "schema": {
+                    "type": "number",
+                    "nullable": true
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "foo",
+                "in": "path",
+                "schema": {
+                    "type": "integer",
+                    "nullable": true
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "foo",
+                "in": "path",
+                "schema": {
+                    "type": "boolean",
+                    "nullable": true
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "foo",
+                "in": "path",
+                "schema": {
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "foo",
+                "in": "path",
+                "schema": {
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "style": "matrix",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
         }
     };
 
@@ -2120,6 +2564,117 @@ public class SchemaParameterValueConverterTests
                 "in": "path",
                 "schema": {
                     "type": "null"
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        // nullable: true allows null on other types (OpenAPI 3.0 extension)
+        {
+            """
+            {
+                "name": "color",
+                "in": "path",
+                "schema": {
+                    "type": "string",
+                    "nullable": true
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "path",
+                "schema": {
+                    "type": "number",
+                    "nullable": true
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "path",
+                "schema": {
+                    "type": "integer",
+                    "nullable": true
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "path",
+                "schema": {
+                    "type": "boolean",
+                    "nullable": true
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "path",
+                "schema": {
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "style": "simple",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        {
+            """
+            {
+                "name": "color",
+                "in": "path",
+                "schema": {
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        }
+                    }
                 },
                 "style": "simple",
                 "explode": true
