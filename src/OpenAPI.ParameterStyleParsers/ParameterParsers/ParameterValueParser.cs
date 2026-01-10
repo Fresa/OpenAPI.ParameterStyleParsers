@@ -23,7 +23,7 @@ public sealed class ParameterValueParser : IParameterValueParser
     /// <returns>Parameter value parser</returns>
     public static ParameterValueParser Create(Parameter parameter)
     {
-        var innerParser = OpenApi31.ParameterValueParser.Create(parameter);
+        var innerParser = OpenApi31.ParameterValueParser.Create(parameter.Inner);
         return new ParameterValueParser(innerParser);
     }
 

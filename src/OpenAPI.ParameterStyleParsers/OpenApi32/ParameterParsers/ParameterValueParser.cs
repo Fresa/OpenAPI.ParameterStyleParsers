@@ -50,7 +50,7 @@ public sealed class ParameterValueParser : IParameterValueParser
         }
 
         // For other styles/locations, delegate to 3.1 parsers
-        var openApi31Parameter = ParameterStyleParsers.Parameter.Parse(
+        var openApi31Parameter = OpenApi31.Parameter.Parse(
             parameter.Name,
             parameter.Style,
             parameter.Location,
@@ -96,7 +96,7 @@ public sealed class ParameterValueParser : IParameterValueParser
         };
     }
 
-    private static IValueParser CreateOpenApi31ValueParser(ParameterStyleParsers.Parameter parameter)
+    private static IValueParser CreateOpenApi31ValueParser(OpenApi31.Parameter parameter)
     {
         var jsonSchema = parameter.JsonSchema;
         var jsonType = jsonSchema.GetInstanceType();

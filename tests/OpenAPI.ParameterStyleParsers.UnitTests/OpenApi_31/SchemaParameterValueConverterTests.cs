@@ -232,7 +232,7 @@ public class SchemaParameterValueConverterTests
         var reader = new JsonNodeReader(parameterJsonNode);
         var schema = new JsonSchema202012(parameterJsonNode["schema"]);
         var parameter =
-            Parameter.Parse(
+            OpenApi31.Parameter.Parse(
                 reader.Read("name").GetValue<string>(),
                 reader.Read("style").GetValue<string>(),
                 reader.Read("in").GetValue<string>(),
