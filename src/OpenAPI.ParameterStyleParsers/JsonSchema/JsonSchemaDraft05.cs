@@ -36,13 +36,8 @@ public sealed class JsonSchemaDraft05 : IJsonSchema
             var type = schemaObject?["type"] switch
             {
                 null => null,
-                JsonArray array => array
-                    .Select(type =>
-                        ParseType(type?.GetValue<string>()))
-                    .Aggregate((jsonValueTypes, jsonValueType) =>
-                        jsonValueTypes | jsonValueType),
                 JsonValue jsonValue => ParseType(jsonValue.GetValue<string>()),
-                _ => throw new InvalidOperationException("Expected 'type' to be an array or string")
+                _ => throw new InvalidOperationException("Expected 'type' to be a string")
             };
 
             // Handle nullable: true (OpenAPI 3.0 extension)
