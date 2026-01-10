@@ -23,8 +23,8 @@ internal sealed class JsonNodeReader
     /// </summary>
     internal JsonPointer RootPath { get; }
 
-    internal JsonNodeReader Read(params PointerSegment[] pointerSegments) =>
-        Read(JsonPointer.Create(pointerSegments));
+    internal JsonNodeReader Read(params string[] pointerSegments) =>
+        Read(JsonPointer.Parse("/" + string.Join('/', pointerSegments)));
 
     internal JsonNodeReader Read(JsonPointer pointer)
     {
@@ -36,8 +36,8 @@ internal sealed class JsonNodeReader
         return reader;
     }
 
-    internal bool TryRead(PointerSegment segment, [NotNullWhen(true)] out JsonNodeReader? reader)
-        => TryRead(JsonPointer.Create(segment), out reader);
+    internal bool TryRead(string segment, [NotNullWhen(true)] out JsonNodeReader? reader)
+        => TryRead(JsonPointer.Parse("/" + segment), out reader);
     internal bool TryRead(JsonPointer pointer, [NotNullWhen(true)] out JsonNodeReader? reader)
     {
         reader = _nodeCache.GetOrAdd(pointer, TryRead(pointer));
