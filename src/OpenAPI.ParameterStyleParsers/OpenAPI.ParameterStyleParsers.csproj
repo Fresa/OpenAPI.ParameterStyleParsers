@@ -20,11 +20,17 @@
 		<Copyright>Copyright © 2024 Fredrik Arvidsson</Copyright>
 		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<ApiCompatValidateAssemblies>true</ApiCompatValidateAssemblies>
+		<ApiCompatContractAssembly>LastMajorVersionBinary/lib/$(TargetFramework)/$(AssemblyName).dll</ApiCompatContractAssembly>
+		<!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/apicompat/diagnostic-ids -->
+		<ApiCompatGenerateSuppressionFile>false</ApiCompatGenerateSuppressionFile>
+		<_ApiCompatCaptureGroupPattern>.+%5C$([System.IO.Path]::DirectorySeparatorChar)(.+)%5C$([System.IO.Path]::DirectorySeparatorChar)(.+)</_ApiCompatCaptureGroupPattern>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.DotNet.ApiCompat.Task" Version="8.0.303" PrivateAssets="all" IsImplicitlyDefined="true" />
 		<PackageReference Include="JetBrains.Annotations" Version="2024.3.0" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
 			<PrivateAssets>all</PrivateAssets>
@@ -41,5 +47,17 @@
 	<ItemGroup>
 		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
 		<None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<Target Name="DownloadLastMajorVersion" BeforeTargets="PreBuildEvent">
+		<DownloadFile SourceUrl="https://www.nuget.org/api/v2/package/$(PackageId)/1.0.0" DestinationFolder="LastMajorVersionBinary">
+			<Output TaskParameter="DownloadedFile" PropertyName="LastMajorVersionNugetPackage" />
+		</DownloadFile>
+		<Unzip SourceFiles="$(LastMajorVersionNugetPackage)" DestinationFolder="LastMajorVersionBinary" />
+	</Target>
+
+	<ItemGroup>
+		<!-- Make sure the Right suppression directive is OS-agnostic and disregards configuration -->
+		<ApiCompatRightAssembliesTransformationPattern Include="$(_ApiCompatCaptureGroupPattern)" ReplacementString="obj/$1/$2" />
 	</ItemGroup>
 </Project>
