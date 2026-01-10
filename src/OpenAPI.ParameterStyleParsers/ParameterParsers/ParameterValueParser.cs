@@ -2,9 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using OpenAPI.ParameterStyleParsers.Json;
 using OpenAPI.ParameterStyleParsers.JsonSchema;
-using OpenAPI.ParameterStyleParsers.ParameterParsers.Array;
-using OpenAPI.ParameterStyleParsers.ParameterParsers.Object;
-using OpenAPI.ParameterStyleParsers.ParameterParsers.Primitive;
+using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Array;
+using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
+using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Primitive;
+using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers;
 
 namespace OpenAPI.ParameterStyleParsers.ParameterParsers;
 

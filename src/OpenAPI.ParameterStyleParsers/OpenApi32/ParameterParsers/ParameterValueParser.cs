@@ -6,6 +6,7 @@ using OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers.Array;
 using OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers.Object;
 using OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers.Primitive;
 using OpenAPI.ParameterStyleParsers.ParameterParsers;
+using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers;
 
@@ -107,9 +108,9 @@ public sealed class ParameterValueParser : IParameterValueParser
                 InstanceType.Boolean or
                 InstanceType.Integer or
                 InstanceType.Number or
-                InstanceType.Null => ParameterStyleParsers.ParameterParsers.Primitive.PrimitiveValueParser.Create(parameter),
-            InstanceType.Array => ParameterStyleParsers.ParameterParsers.Array.ArrayValueParser.Create(parameter),
-            InstanceType.Object => ParameterStyleParsers.ParameterParsers.Object.ObjectValueParser.Create(parameter),
+                InstanceType.Null => OpenApi31.ParameterParsers.Primitive.PrimitiveValueParser.Create(parameter),
+            InstanceType.Array => OpenApi31.ParameterParsers.Array.ArrayValueParser.Create(parameter),
+            InstanceType.Object => OpenApi31.ParameterParsers.Object.ObjectValueParser.Create(parameter),
             _ => throw new NotSupportedException($"Json type {Enum.GetName(jsonType.Value)} is not supported")
         };
     }

@@ -1,40 +1,37 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
-using OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Primitive;
-using OpenAPI.ParameterStyleParsers.ParameterParsers;
-using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers;
+using OpenAPI.ParameterStyleParsers.JsonSchema;
+using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Primitive;
 
-namespace OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Array;
+namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Array;
 
 internal abstract class ArrayValueParser : IValueParser
 {
-    private readonly string _itemType;
+    private readonly InstanceType _jsonType;
 
+    protected bool Explode { get; }
     protected string ParameterName { get; }
-    protected bool ValueIncludesKey { get; }
-
     protected ArrayValueParser(Parameter parameter)
     {
-        if (!parameter.IsArray)
-        {
-            throw new InvalidOperationException($"The parameter is not an array type but '{parameter.Type}'");
-        }
-
+        Explode = parameter.Explode;
         ParameterName = parameter.Name;
-        _itemType = parameter.Items.Type;
-        ValueIncludesKey = parameter.ValueIncludesKey;
+        var itemsSchema = parameter.JsonSchema.GetItems();
+        var jsonType = itemsSchema?.GetInstanceType();
+        
+        _jsonType = jsonType ?? InstanceType.String;
     }
-
+    
     internal static ArrayValueParser Create(Parameter parameter) =>
-        parameter.CollectionFormat switch
+        parameter.Style switch
         {
-            Parameter.CollectionFormats.Csv => new CsvArrayValueParser(parameter),
-            Parameter.CollectionFormats.Pipes => new PipesArrayValueParser(parameter),
-            Parameter.CollectionFormats.Multi => new MultiArrayValueParser(parameter),
-            Parameter.CollectionFormats.Ssv => new SsvArrayValueParser(parameter),
-            Parameter.CollectionFormats.Tsv => new TsvArrayValueParser(parameter),
-            _ => throw new ArgumentException(nameof(parameter.CollectionFormat),
-                $"Unknown collection format '{parameter.CollectionFormat}'")
+            Parameter.Styles.Matrix => new MatrixArrayValueParser(parameter),
+            Parameter.Styles.Label => new LabelArrayValueParser(parameter),
+            Parameter.Styles.Form => new FormArrayValueParser(parameter),
+            Parameter.Styles.Simple => new SimpleArrayValueParser(parameter),
+            Parameter.Styles.SpaceDelimited => new SpaceDelimitedArrayValueParser(parameter),
+            Parameter.Styles.PipeDelimited => new PipeDelimitedArrayValueParser(parameter),
+            _ => throw new ArgumentException(nameof(parameter.Style),
+                $"Style '{parameter.Style}' does not support arrays")
         };
 
     public abstract bool TryParse(
@@ -75,7 +72,7 @@ internal abstract class ArrayValueParser : IValueParser
         {
             var arrayValue = values[index];
 
-            if (!PrimitiveJsonConverter.TryConvert(arrayValue, _itemType, out var item, out error))
+            if (!PrimitiveJsonConverter.TryConvert(arrayValue, _jsonType, out var item, out error))
             {
                 array = null;
                 return false;

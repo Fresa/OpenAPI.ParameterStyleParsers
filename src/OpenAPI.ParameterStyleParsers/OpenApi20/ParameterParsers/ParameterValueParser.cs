@@ -5,6 +5,7 @@ using OpenAPI.ParameterStyleParsers.Json;
 using OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Array;
 using OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Primitive;
 using OpenAPI.ParameterStyleParsers.ParameterParsers;
+using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers;
 
