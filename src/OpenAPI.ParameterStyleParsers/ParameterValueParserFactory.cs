@@ -61,20 +61,24 @@ public static class ParameterValueParserFactory
     /// </summary>
     /// <param name="parameterSpecification">Parameter specification as JSON</param>
     /// <returns>Parameter value parser</returns>
+#pragma warning disable CS0618 // Will be replaced by OpenAPI.ParameterStyleParsers.OpenApi31.ParameterValueParser
     public static ParameterParsers.ParameterValueParser OpenApi31(JsonObject parameterSpecification) => 
         ParameterParsers.ParameterValueParser.FromOpenApi31ParameterSpecification(parameterSpecification);
+#pragma warning restore CS0618 
 
     /// <summary>
     /// Create a parameter value parser for OpenAPI 3.1
     /// </summary>
     /// <param name="parameterSpecificationAsJson">Parameter specification as JSON</param>
     /// <returns>Parameter value parser</returns>
+#pragma warning disable CS0618 // Will be replaced by OpenAPI.ParameterStyleParsers.OpenApi31.ParameterValueParser
     public static ParameterParsers.ParameterValueParser OpenApi31(string parameterSpecificationAsJson)
     {
         var json = JsonNode.Parse(parameterSpecificationAsJson)?.AsObject() ??
                    throw new InvalidOperationException("Parameter specification is not a json object");
         return ParameterParsers.ParameterValueParser.FromOpenApi31ParameterSpecification(json);
     }
+#pragma warning restore CS0618 
 
     /// <summary>
     /// Create a parameter value parser for OpenAPI 3.2

@@ -238,7 +238,7 @@ public class SchemaParameterValueConverterTests
                 reader.Read("in").GetValue<string>(),
                 reader.Read("explode").GetValue<bool>(),
                 schema);
-        var parser = ParameterValueParser.Create(parameter);
+        var parser = OpenApi31.ParameterValueParser.Create(parameter);
         parser.TryParse(value, out var instance, out var mappingError).Should().Be(shouldMap, mappingError);
         if (!shouldMap)
         {
@@ -271,11 +271,11 @@ public class SchemaParameterValueConverterTests
         expectedValues.Should().Contain(serialized);
     }
 
-    private static ParameterValueParser CreateParameterValueParser(
+    private static OpenApi31.ParameterValueParser CreateParameterValueParser(
         string parameterJson)
     {
         var parameterJsonNode = JsonNode.Parse(parameterJson)!.AsObject();
-        return ParameterValueParser.FromOpenApi31ParameterSpecification(parameterJsonNode);
+        return OpenApi31.ParameterValueParser.FromOpenApi31ParameterSpecification(parameterJsonNode);
     }
 
     #region Object
