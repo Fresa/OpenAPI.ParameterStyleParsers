@@ -16,7 +16,7 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers;
 /// Represents a parameter value parser for OpenAPI 3.2 styles
 /// </summary>
 [PublicAPI]
-public sealed class ParameterValueParser
+public sealed class ParameterValueParser : IParameterValueParser
 {
     private readonly IValueParser _valueParser;
 
