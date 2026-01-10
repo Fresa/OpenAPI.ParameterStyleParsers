@@ -30,6 +30,22 @@ public static class ParameterValueParserFactory
     }
 
     /// <summary>
+    /// Create a parameter value parser for OpenAPI 3.2
+    /// </summary>
+    /// <param name="parameterSpecification">Parameter specification as JSON</param>
+    /// <returns>Parameter value parser</returns>
+    public static ParameterStyleParsers.OpenApi32.ParameterParsers.ParameterValueParser OpenApi32(JsonObject parameterSpecification) =>
+        ParameterStyleParsers.OpenApi32.ParameterParsers.ParameterValueParser.Create(ParameterStyleParsers.OpenApi32.Parameter.FromOpenApi32ParameterSpecification(parameterSpecification));
+
+    /// <summary>
+    /// Create a parameter value parser for OpenAPI 3.2
+    /// </summary>
+    /// <param name="parameterSpecificationAsJson">Parameter specification as JSON</param>
+    /// <returns>Parameter value parser</returns>
+    public static ParameterStyleParsers.OpenApi32.ParameterParsers.ParameterValueParser OpenApi32(string parameterSpecificationAsJson) =>
+        ParameterStyleParsers.OpenApi32.ParameterParsers.ParameterValueParser.Create(ParameterStyleParsers.OpenApi32.Parameter.FromOpenApi32ParameterSpecification(parameterSpecificationAsJson));
+
+    /// <summary>
     /// Create a parameter value parser for OpenAPI 2.0
     /// </summary>
     /// <param name="parameterSpecification">Parameter specification as JSON</param>
