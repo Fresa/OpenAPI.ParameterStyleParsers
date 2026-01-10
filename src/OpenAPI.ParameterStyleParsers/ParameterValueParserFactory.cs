@@ -19,9 +19,11 @@ public static class ParameterValueParserFactory
         ["3.0.1"] = OpenApi30,
         ["3.0.2"] = OpenApi30,
         ["3.0.3"] = OpenApi30,
+        ["3.0.4"] = OpenApi30,
         ["3.1"] = OpenApi31,
         ["3.1.0"] = OpenApi31,
         ["3.1.1"] = OpenApi31,
+        ["3.1.2"] = OpenApi31,
         ["3.2"] = OpenApi32,
         ["3.2.0"] = OpenApi32
     };
@@ -90,7 +92,7 @@ public static class ParameterValueParserFactory
     /// </summary>
     /// <param name="parameterSpecification">Parameter specification as JSON</param>
     /// <returns>Parameter value parser</returns>
-    public static ParameterStyleParsers.OpenApi30.ParameterValueParser OpenApi30(JsonObject parameterSpecification) =>
+    public static OpenApi30.ParameterValueParser OpenApi30(JsonObject parameterSpecification) =>
         ParameterStyleParsers.OpenApi30.ParameterValueParser.Create(ParameterStyleParsers.OpenApi30.Parameter.FromOpenApi30ParameterSpecification(parameterSpecification));
 
     /// <summary>
@@ -98,7 +100,7 @@ public static class ParameterValueParserFactory
     /// </summary>
     /// <param name="parameterSpecificationAsJson">Parameter specification as JSON</param>
     /// <returns>Parameter value parser</returns>
-    public static ParameterStyleParsers.OpenApi30.ParameterValueParser OpenApi30(string parameterSpecificationAsJson) =>
+    public static OpenApi30.ParameterValueParser OpenApi30(string parameterSpecificationAsJson) =>
         ParameterStyleParsers.OpenApi30.ParameterValueParser.Create(ParameterStyleParsers.OpenApi30.Parameter.FromOpenApi30ParameterSpecification(parameterSpecificationAsJson));
 
     /// <summary>
@@ -106,7 +108,7 @@ public static class ParameterValueParserFactory
     /// </summary>
     /// <param name="parameterSpecification">Parameter specification as JSON</param>
     /// <returns>Parameter value parser</returns>
-    public static ParameterStyleParsers.OpenApi32.ParameterParsers.ParameterValueParser OpenApi32(JsonObject parameterSpecification) =>
+    public static OpenApi32.ParameterParsers.ParameterValueParser OpenApi32(JsonObject parameterSpecification) =>
         ParameterStyleParsers.OpenApi32.ParameterParsers.ParameterValueParser.Create(ParameterStyleParsers.OpenApi32.Parameter.FromOpenApi32ParameterSpecification(parameterSpecification));
 
     /// <summary>
@@ -114,7 +116,7 @@ public static class ParameterValueParserFactory
     /// </summary>
     /// <param name="parameterSpecificationAsJson">Parameter specification as JSON</param>
     /// <returns>Parameter value parser</returns>
-    public static ParameterStyleParsers.OpenApi32.ParameterParsers.ParameterValueParser OpenApi32(string parameterSpecificationAsJson) =>
+    public static OpenApi32.ParameterParsers.ParameterValueParser OpenApi32(string parameterSpecificationAsJson) =>
         ParameterStyleParsers.OpenApi32.ParameterParsers.ParameterValueParser.Create(ParameterStyleParsers.OpenApi32.Parameter.FromOpenApi32ParameterSpecification(parameterSpecificationAsJson));
 
     /// <summary>
