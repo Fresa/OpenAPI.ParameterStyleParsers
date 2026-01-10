@@ -53,6 +53,25 @@ var parser = OpenAPI.ParameterStyleParsers.ParameterValueParserFactory.OpenApi31
     """);
 ```
 
+### [OpenAPI 3.0](https://spec.openapis.org/oas/v3.0.4.html#parameter-object)
+```dotnet
+var parser = OpenAPI.ParameterStyleParsers.ParameterValueParserFactory.OpenApi30(
+    """
+    {
+        "name": "color",
+        "in": "query",
+        "schema": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "style": "form",
+        "explode": true
+    }
+    """);
+```
+
 ### [OpenAPI 2.0](https://spec.openapis.org/oas/v2.0.html#parameter-object)
 ```dotnet
 var parser = OpenAPI.ParameterStyleParsers.ParameterValueParserFactory.OpenApi20(

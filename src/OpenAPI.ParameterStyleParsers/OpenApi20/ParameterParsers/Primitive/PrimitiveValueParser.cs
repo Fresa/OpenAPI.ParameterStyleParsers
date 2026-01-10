@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using OpenAPI.ParameterStyleParsers.ParameterParsers;
+using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Primitive;
 

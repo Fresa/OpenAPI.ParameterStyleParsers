@@ -1,24 +1,21 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using JetBrains.Annotations;
-using OpenAPI.ParameterStyleParsers.Json;
-using OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Array;
-using OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Primitive;
 using OpenAPI.ParameterStyleParsers.ParameterParsers;
-using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers;
 
-namespace OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers;
+namespace OpenAPI.ParameterStyleParsers.OpenApi30;
 
 /// <summary>
-/// Represents a parameter value parser for OpenAPI 2.0 styles
+/// Represents a parameter value parser for OpenAPI 3.0 styles
 /// </summary>
+[PublicAPI]
 public sealed class ParameterValueParser : IParameterValueParser
 {
-    private readonly IValueParser _valueParser;
+    private readonly OpenApi31.ParameterValueParser _innerParser;
 
-    private ParameterValueParser(IValueParser valueParser)
+    private ParameterValueParser(OpenApi31.ParameterValueParser innerParser)
     {
-        _valueParser = valueParser;
+        _innerParser = innerParser;
     }
 
     /// <summary>
@@ -29,23 +26,17 @@ public sealed class ParameterValueParser : IParameterValueParser
     [PublicAPI]
     public static ParameterValueParser Create(Parameter parameter)
     {
-        var valueParser = CreateValueParser(parameter);
-        return new ParameterValueParser(valueParser);
-    }
+        // OpenAPI 3.0 and 3.1 have identical parameter serialization rules,
+        // so we delegate to the 3.1 parser
+        var openApi31Parameter = OpenApi31.Parameter.Parse(
+            parameter.Name,
+            parameter.Style,
+            parameter.Location,
+            parameter.Explode,
+            parameter.JsonSchema);
 
-    private static IValueParser CreateValueParser(Parameter parameter)
-    {
-        var jsonType = parameter.Type;
-
-        return jsonType switch
-        {
-            Parameter.Types.String or
-                Parameter.Types.Boolean or
-                Parameter.Types.Integer or
-                Parameter.Types.Number => PrimitiveValueParser.Create(parameter),
-            Parameter.Types.Array => ArrayValueParser.Create(parameter),
-            _ => throw new NotSupportedException($"Json type {jsonType} is not supported")
-        };
+        var innerParser = OpenApi31.ParameterValueParser.Create(openApi31Parameter);
+        return new ParameterValueParser(innerParser);
     }
 
     /// <summary>
@@ -56,9 +47,10 @@ public sealed class ParameterValueParser : IParameterValueParser
     /// <param name="instance">The parsed json if this method returns true</param>
     /// <param name="error">Parsing error if this method returns false</param>
     /// <returns>true if an instance could be constructed, false if there are errors</returns>
+    [PublicAPI]
     public bool TryParse(string? value, out JsonNode? instance,
         [NotNullWhen(false)] out string? error) =>
-        _valueParser.TryParse(value, out instance, out error);
+        _innerParser.TryParse(value, out instance, out error);
 
     /// <summary>
     /// Serializes a json node according to the specified parameter.
@@ -66,6 +58,7 @@ public sealed class ParameterValueParser : IParameterValueParser
     /// </summary>
     /// <param name="instance">Json instance</param>
     /// <returns>Style formatted instance</returns>
-    public string? Serialize(JsonNode? instance) => 
-        _valueParser.Serialize(instance);
+    [PublicAPI]
+    public string? Serialize(JsonNode? instance) =>
+        _innerParser.Serialize(instance);
 }

@@ -73,14 +73,14 @@ public class ParameterParserTests
     public void Given_invalid_array_parameter_input_When_parsing_The_parameter_should_fail_parsing(
         string @in,
         string collectionFormat,
-        string itemsObjectType)
+        string? itemsObjectType)
     {
         Action parse = () => OpenApi20.Parameter.Parse(
             name: "test",
             @in: @in,
             type: OpenApi20.Parameter.Types.Array,
             collectionFormat: collectionFormat,
-            items: ItemsObject.Parse(itemsObjectType));
+            items: itemsObjectType == null ? null : ItemsObject.Parse(itemsObjectType));
         
         parse.Should().Throw<InvalidOperationException>();
     }

@@ -5,6 +5,7 @@ namespace OpenAPI.ParameterStyleParsers;
 /// <summary>
 /// An OpenAPI parameter specification
 /// </summary>
+[Obsolete("Use OpenAPI.ParameterStyleParsers.OpenApi31.Parameter instead")]
 public record Parameter
 {
     /// <summary>
@@ -13,14 +14,14 @@ public record Parameter
     public static class Styles
     {
 #pragma warning disable CS1591
-        public const string Matrix = "matrix";
-        public const string Label = "label";
-        public const string Simple = "simple";
-        public const string Form = "form";
-        public const string SpaceDelimited = "spaceDelimited";
-        public const string PipeDelimited = "pipeDelimited";
-        public const string DeepObject = "deepObject";
-        public static readonly string[] All = [Matrix, Label, Simple, Form, SpaceDelimited, PipeDelimited, DeepObject];
+        public const string Matrix = OpenApi31.Parameter.Styles.Matrix;
+        public const string Label = OpenApi31.Parameter.Styles.Label;
+        public const string Simple = OpenApi31.Parameter.Styles.Simple;
+        public const string Form = OpenApi31.Parameter.Styles.Form;
+        public const string SpaceDelimited = OpenApi31.Parameter.Styles.SpaceDelimited;
+        public const string PipeDelimited = OpenApi31.Parameter.Styles.PipeDelimited;
+        public const string DeepObject = OpenApi31.Parameter.Styles.DeepObject;
+        public static readonly string[] All = OpenApi31.Parameter.Styles.All;
 #pragma warning restore CS1591
     }
 
@@ -31,11 +32,11 @@ public record Parameter
     public static class Locations
     {
 #pragma warning disable CS1591
-        public const string Path = "path";
-        public const string Header = "header";
-        public const string Query = "query";
-        public const string Cookie = "cookie";
-        public static readonly string[] All = [Path, Header, Query, Cookie];
+        public const string Path = OpenApi31.Parameter.Locations.Path;
+        public const string Header = OpenApi31.Parameter.Locations.Header;
+        public const string Query = OpenApi31.Parameter.Locations.Query;
+        public const string Cookie = OpenApi31.Parameter.Locations.Cookie;
+        public static readonly string[] All = OpenApi31.Parameter.Locations.All;
 #pragma warning restore CS1591
     }
 
@@ -43,13 +44,8 @@ public record Parameter
     /// A map between parameter locations and supported styles
     /// </summary>
     // ReSharper disable once MemberCanBePrivate.Global Part of public contract
-    public static readonly Dictionary<string, string[]> LocationToStylesMap = new()
-    {
-        [Locations.Path] = [Styles.Matrix, Styles.Label, Styles.Simple],
-        [Locations.Header] = [Styles.Simple],
-        [Locations.Query] = [Styles.Form, Styles.SpaceDelimited, Styles.PipeDelimited, Styles.DeepObject],
-        [Locations.Cookie] = [Styles.Form],
-    };
+    public static readonly Dictionary<string, string[]> LocationToStylesMap =
+        OpenApi31.Parameter.LocationToStylesMap;
 
     /// <summary>
     /// Relevant field names for the parameter
@@ -57,21 +53,20 @@ public record Parameter
     public static class FieldNames
     {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        public const string Name = "name";
-        public const string In = "in";
-        public const string Style = "style";
-        public const string Explode = "explode";
-        public const string Schema = "schema";
+        public const string Name = OpenApi31.Parameter.FieldNames.Name;
+        public const string In = OpenApi31.Parameter.FieldNames.In;
+        public const string Style = OpenApi31.Parameter.FieldNames.Style;
+        public const string Explode = OpenApi31.Parameter.FieldNames.Explode;
+        public const string Schema = OpenApi31.Parameter.FieldNames.Schema;
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     }
 
-    private Parameter(string name, string style, bool explode, IJsonSchema jsonSchema)
+    private Parameter(OpenApi31.Parameter inner)
     {
-        Name = name;
-        Style = style;
-        Explode = explode;
-        JsonSchema = jsonSchema;
+        Inner = inner;
     }
+
+    internal OpenApi31.Parameter Inner { get; }
 
     /// <summary>
     /// Parses an OpenAPI parameter
@@ -83,37 +78,23 @@ public record Parameter
     /// <param name="jsonSchema">The parameters json schema</param>
     /// <returns>A parameter specification</returns>
     /// <exception cref="InvalidOperationException">Thrown if location and styles are incompatible</exception>
-    public static Parameter Parse(string name, string style, string location, bool explode, IJsonSchema jsonSchema)
-    {
-        if (!LocationToStylesMap.TryGetValue(location, out var styles))
-        {
-            throw new InvalidOperationException(
-                $"location '{location}' is not a valid location. Valid locations are {Locations.Cookie}, {Locations.Header}, {Locations.Query} and {Locations.Path}");
-        }
-
-        if (!styles.Contains(style))
-        {
-            throw new InvalidOperationException(
-                $"location '{location}' does not support style '{style}'. Supported styles are {string.Join(", ", styles)}");
-        }
-
-        return new Parameter(name, style, explode, jsonSchema);
-    }
+    public static Parameter Parse(string name, string style, string location, bool explode, IJsonSchema jsonSchema) =>
+        new(OpenApi31.Parameter.Parse(name, style, location, explode, jsonSchema));
 
     /// <summary>
     /// The name of the parameter
     /// </summary>
-    public string Name { get; private init; }
+    public string Name => Inner.Name;
     /// <summary>
     /// The style of the parameter
     /// </summary>
-    public string Style { get; private init; }
+    public string Style => Inner.Style;
     /// <summary>
     /// If the parameter apply explosion of the serialized format
     /// </summary>
-    public bool Explode { get; private init; }
+    public bool Explode => Inner.Explode;
     /// <summary>
     /// The parameter's json schema
     /// </summary>
-    public IJsonSchema JsonSchema { get; private init; }
+    public IJsonSchema JsonSchema => Inner.JsonSchema;
 }
