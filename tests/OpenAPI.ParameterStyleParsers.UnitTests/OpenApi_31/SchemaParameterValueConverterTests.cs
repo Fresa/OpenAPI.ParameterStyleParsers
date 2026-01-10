@@ -1652,7 +1652,7 @@ public class SchemaParameterValueConverterTests
                 "name": "color",
                 "in": "query",
                 "schema": {
-                    "type": "null" 
+                    "type": "null"
                 },
                 "style": "form",
                 "explode": true
@@ -1661,6 +1661,228 @@ public class SchemaParameterValueConverterTests
             [null],
             true,
             null
+        },
+        // type: ["string", "null"] - can parse null
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": ["string", "null"]
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        // type: ["string", "null"] - can parse string
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": ["string", "null"]
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            ["color=test"],
+            true,
+            "\"test\""
+        },
+        // type: ["number", "null"] - can parse null
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": ["number", "null"]
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        // type: ["number", "null"] - can parse number
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": ["number", "null"]
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            ["color=1.5"],
+            true,
+            "1.5"
+        },
+        // type: ["integer", "null"] - can parse null
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": ["integer", "null"]
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        // type: ["integer", "null"] - can parse integer
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": ["integer", "null"]
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            ["color=42"],
+            true,
+            "42"
+        },
+        // type: ["boolean", "null"] - can parse null
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": ["boolean", "null"]
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        // type: ["boolean", "null"] - can parse boolean
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": ["boolean", "null"]
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            ["color=true"],
+            true,
+            "true"
+        },
+        // type: ["array", "null"] - can parse null
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": ["array", "null"],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        // type: ["array", "null"] - can parse array
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": ["array", "null"],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "style": "form",
+                "explode": true
+            }
+            """,
+            ["color=blue&color=black"],
+            true,
+            """["blue","black"]"""
+        },
+        // type: ["object", "null"] - can parse null
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": ["object", "null"],
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "style": "form",
+                "explode": false
+            }
+            """,
+            [null],
+            true,
+            null
+        },
+        // type: ["object", "null"] - can parse object
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": ["object", "null"],
+                    "properties": {
+                        "R": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "style": "form",
+                "explode": false
+            }
+            """,
+            new []{ "R,100" }.GenerateAllPermutations(',')
+                .Select(str => $";color={str}")
+                .ToArray(),
+            true,
+            """{"R":100}"""
         }
     };
 
