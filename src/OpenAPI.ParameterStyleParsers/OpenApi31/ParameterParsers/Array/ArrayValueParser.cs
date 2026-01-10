@@ -70,7 +70,7 @@ internal abstract class ArrayValueParser : IValueParser
         var items = new JsonNode?[values.Count];
         for (var index = 0; index < values.Count; index++)
         {
-            var arrayValue = values[index];
+            var arrayValue = Uri.UnescapeDataString(values[index]);
 
             if (!PrimitiveJsonConverter.TryConvert(arrayValue, _jsonType, out var item, out error))
             {

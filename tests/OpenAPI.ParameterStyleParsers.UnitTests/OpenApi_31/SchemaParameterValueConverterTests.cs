@@ -1259,6 +1259,26 @@ public class SchemaParameterValueConverterTests
             ["color=test,test2"],
             true,
             "[\"test\",\"test2\"]"
+        },
+        // Percent-encoded values should be decoded
+        {
+            """
+            {
+                "name": "color",
+                "in": "query",
+                "schema": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "style": "form",
+                "explode": false
+            }
+            """,
+            ["color=hello%20world,foo%2Cbar"],
+            true,
+            "[\"hello world\",\"foo,bar\"]"
         }
     };
 
