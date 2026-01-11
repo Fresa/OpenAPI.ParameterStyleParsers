@@ -23,7 +23,7 @@ internal sealed class PipeDelimitedArrayValueParser(Parameter parameter) : Array
         return TryGetArrayItems(arrayValues, out array, out error);
     }
 
-    public override bool ValueIncludesParameterName => !Explode;
+    public override bool ValueIncludesParameterName => true;
 
     protected override string Serialize(string?[] values)
     {

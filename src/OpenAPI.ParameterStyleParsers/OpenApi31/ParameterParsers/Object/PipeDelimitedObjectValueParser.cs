@@ -5,8 +5,6 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 
 internal sealed class PipeDelimitedObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
-    public override bool ValueIncludesParameterName => false;
-
     public override bool TryParse(
         string? value,
         [NotNullWhen(true)] out JsonNode? obj,
@@ -26,6 +24,8 @@ internal sealed class PipeDelimitedObjectValueParser(Parameter parameter) : Obje
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 
+    public override bool ValueIncludesParameterName => true;
+
     protected override string Serialize(IDictionary<string, string?> properties) =>
-        string.Join('|', properties.Select(property => $"{property.Key}|{property.Value}"));
+        $"{ParameterName}={string.Join('|', properties.Select(property => $"{property.Key}|{property.Value}"))}";
 }

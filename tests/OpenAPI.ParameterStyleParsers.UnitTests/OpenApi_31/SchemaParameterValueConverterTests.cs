@@ -1048,7 +1048,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new []{"R|100","G|200","B|150"}.GenerateAllPermutations('|'),
+            new []{"R|100","G|200","B|150"}.GenerateAllPermutations('|').Select(p => $"color={p}").ToArray(),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -1068,14 +1068,14 @@ public class SchemaParameterValueConverterTests
                         },
                         "B": {
                             "type": "string"
-                        }                        
+                        }
                     }
                 },
                 "style": "pipeDelimited",
                 "explode": false
             }
             """,
-            new []{"R|100","G|200","B|"}.GenerateAllPermutations('|'),
+            new []{"R|100","G|200","B|"}.GenerateAllPermutations('|').Select(p => $"color={p}").ToArray(),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -1086,15 +1086,15 @@ public class SchemaParameterValueConverterTests
                 "in": "query",
                 "schema": {
                     "type": "object",
-                    "additionalProperties": { 
-                        "type": "string" 
+                    "additionalProperties": {
+                        "type": "string"
                     }
                 },
                 "style": "pipeDelimited",
                 "explode": false
             }
             """,
-            new []{"R|100","G|200","B|"}.GenerateAllPermutations('|'),
+            new []{"R|100","G|200","B|"}.GenerateAllPermutations('|').Select(p => $"color={p}").ToArray(),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -1121,7 +1121,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new []{"R|100","G|200","B|"}.GenerateAllPermutations('|'),
+            new []{"R|100","G|200","B|"}.GenerateAllPermutations('|').Select(p => $"color={p}").ToArray(),
             true,
             """{"R":100,"G":200,"B":""}"""
         },
@@ -1144,14 +1144,14 @@ public class SchemaParameterValueConverterTests
                         },
                         "B": {
                             "type": "number"
-                        }                        
+                        }
                     }
                 },
                 "style": "pipeDelimited",
                 "explode": true
             }
             """,
-            new []{"R|100","G|200","B|150"}.GenerateAllPermutations('|'),
+            new []{"R|100","G|200","B|150"}.GenerateAllPermutations('|').Select(p => $"color={p}").ToArray(),
             false,
             null
         }
