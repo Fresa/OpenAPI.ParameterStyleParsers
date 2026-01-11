@@ -21,7 +21,11 @@ public sealed class ParameterValueParser : IParameterValueParser
     private ParameterValueParser(IValueParser valueParser)
     {
         _valueParser = valueParser;
+        ValueIncludesParameterName = valueParser.ValueIncludesParameterName;
     }
+
+    /// <inheritdoc />
+    public bool ValueIncludesParameterName { get; }
 
     /// <summary>
     /// Creates a parameter value parser corresponding to the specified parameter

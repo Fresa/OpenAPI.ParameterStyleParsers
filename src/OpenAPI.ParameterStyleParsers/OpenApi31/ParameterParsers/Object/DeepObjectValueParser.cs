@@ -5,7 +5,7 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 
 internal sealed class DeepObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
-    public override bool ValueIncludesParameterName => false;
+    public override bool ValueIncludesParameterName => true;
 
     public override bool TryParse(
         string? value,

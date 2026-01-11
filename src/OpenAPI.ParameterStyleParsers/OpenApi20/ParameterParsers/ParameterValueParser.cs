@@ -16,6 +16,7 @@ public sealed class ParameterValueParser : IParameterValueParser
     private ParameterValueParser(IValueParser valueParser)
     {
         _valueParser = valueParser;
+        ValueIncludesParameterName = valueParser.ValueIncludesParameterName;
     }
 
     /// <summary>
@@ -45,24 +46,15 @@ public sealed class ParameterValueParser : IParameterValueParser
         };
     }
 
-    /// <summary>
-    /// Parses a style formatted parameter value to a json node.
-    /// It's assumed that the input is valid according to the style format.
-    /// </summary>
-    /// <param name="value">Style formatted input</param>
-    /// <param name="instance">The parsed json if this method returns true</param>
-    /// <param name="error">Parsing error if this method returns false</param>
-    /// <returns>true if an instance could be constructed, false if there are errors</returns>
+    /// <inheritdoc />
     public bool TryParse(string? value, out JsonNode? instance,
         [NotNullWhen(false)] out string? error) =>
         _valueParser.TryParse(value, out instance, out error);
 
-    /// <summary>
-    /// Serializes a json node according to the specified parameter.
-    /// It's assumed that the instance is valid according to the parameter's schema.
-    /// </summary>
-    /// <param name="instance">Json instance</param>
-    /// <returns>Style formatted instance</returns>
+    /// <inheritdoc />
     public string? Serialize(JsonNode? instance) => 
         _valueParser.Serialize(instance);
+
+    /// <inheritdoc />
+    public bool ValueIncludesParameterName { get; }
 }

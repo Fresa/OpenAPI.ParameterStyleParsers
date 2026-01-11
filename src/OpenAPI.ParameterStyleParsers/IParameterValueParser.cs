@@ -27,4 +27,9 @@ public interface IParameterValueParser
     /// <param name="instance">Json instance</param>
     /// <returns>Style formatted instance</returns>
     string? Serialize(JsonNode? instance);
+    
+    /// <summary>
+    /// Parameter name is included in the value, i.e. [parameter name]=[value] vs [value], see style examples in OAS.
+    /// </summary>
+    bool ValueIncludesParameterName { get; }
 }
