@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using OpenAPI.ParameterStyleParsers.JsonSchema;
 
-namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers;
+namespace OpenAPI.ParameterStyleParsers.ParameterParsers;
 
 internal sealed class PropertySchemaResolver
 {

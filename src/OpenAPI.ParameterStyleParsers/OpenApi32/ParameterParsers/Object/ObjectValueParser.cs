@@ -1,33 +1,17 @@
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using OpenAPI.ParameterStyleParsers.JsonSchema;
 using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Primitive;
 using OpenAPI.ParameterStyleParsers.ParameterParsers;
 
-namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
+namespace OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers.Object;
 
 internal abstract class ObjectValueParser(Parameter parameter) : IValueParser
 {
     private readonly PropertySchemaResolver _propertySchemaResolver = new(parameter.JsonSchema);
 
     protected bool Explode { get; } = parameter.Explode;
-    internal abstract bool ValueIncludesParameterName { get; }
     protected string ParameterName { get; } = parameter.Name;
-
-    internal static ObjectValueParser Create(Parameter parameter) =>
-        parameter.Style switch
-        {
-            Parameter.Styles.Matrix => new MatrixObjectValueParser(parameter),
-            Parameter.Styles.Label => new LabelObjectValueParser(parameter),
-            Parameter.Styles.Form => new FormObjectValueParser(parameter),
-            Parameter.Styles.Simple => new SimpleObjectValueParser(parameter),
-            Parameter.Styles.DeepObject => new DeepObjectValueParser(parameter),
-            Parameter.Styles.PipeDelimited => new PipeDelimitedObjectValueParser(parameter),
-            Parameter.Styles.SpaceDelimited => new SpaceDelimitedObjectValueParser(parameter),
-            _ => throw new ArgumentException(nameof(parameter.Style),
-                $"Style '{parameter.Style}' not supported for object")
-        };
 
     public abstract bool TryParse(
         string? value,
@@ -43,10 +27,9 @@ internal abstract class ObjectValueParser(Parameter parameter) : IValueParser
 
         var properties = instance
             .AsObject()
-            .ToImmutableDictionary(
+            .ToDictionary(
                 property => property.Key,
-                property =>
-                    property.Value == null ? null : Uri.EscapeDataString(property.Value.ToString()));
+                property => property.Value?.ToString());
         return Serialize(properties);
     }
 
@@ -68,7 +51,7 @@ internal abstract class ObjectValueParser(Parameter parameter) : IValueParser
         for (var i = 0; i < keyAndValues.Count; i += 2)
         {
             var propertyName = keyAndValues[i];
-            var propertyValue = Uri.UnescapeDataString(keyAndValues.Count == i + 1 ? string.Empty : keyAndValues[i + 1]);
+            var propertyValue = keyAndValues.Count == i + 1 ? string.Empty : keyAndValues[i + 1];
             _propertySchemaResolver.TryGetSchemaForProperty(propertyName, out var propertySchema);
             // Undefined type? Use string as default as any value should be valid
             var jsonType = propertySchema?.GetInstanceType() ?? InstanceType.String;
