@@ -5,6 +5,8 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 
 internal sealed class LabelObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
+    internal override bool ValueIncludesParameterName => false;
+
     public override bool TryParse(
         string? value,
         out JsonNode? obj,

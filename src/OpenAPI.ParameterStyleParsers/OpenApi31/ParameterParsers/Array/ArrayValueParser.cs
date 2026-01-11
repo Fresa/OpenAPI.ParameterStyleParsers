@@ -5,21 +5,14 @@ using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Primitive;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Array;
 
-internal abstract class ArrayValueParser : IValueParser
+internal abstract class ArrayValueParser(Parameter parameter) : IValueParser
 {
-    private readonly InstanceType _jsonType;
+    private readonly InstanceType _jsonType = 
+        parameter.JsonSchema.GetItems()?.GetInstanceType() ?? 
+        InstanceType.String;
 
-    protected bool Explode { get; }
-    protected string ParameterName { get; }
-    protected ArrayValueParser(Parameter parameter)
-    {
-        Explode = parameter.Explode;
-        ParameterName = parameter.Name;
-        var itemsSchema = parameter.JsonSchema.GetItems();
-        var jsonType = itemsSchema?.GetInstanceType();
-        
-        _jsonType = jsonType ?? InstanceType.String;
-    }
+    protected bool Explode { get; } = parameter.Explode;
+    protected string ParameterName { get; } = parameter.Name;
     
     internal static ArrayValueParser Create(Parameter parameter) =>
         parameter.Style switch

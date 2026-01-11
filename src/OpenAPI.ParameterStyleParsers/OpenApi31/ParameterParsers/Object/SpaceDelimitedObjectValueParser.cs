@@ -5,6 +5,8 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 
 internal sealed class SpaceDelimitedObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
+    internal override bool ValueIncludesParameterName => false;
+
     public override bool TryParse(
         string? value,
         out JsonNode? obj,
@@ -25,7 +27,5 @@ internal sealed class SpaceDelimitedObjectValueParser(Parameter parameter) : Obj
     }
 
     protected override string Serialize(IDictionary<string, string?> properties) =>
-        $"{(Explode ? $"{ParameterName}=" : "")}{string.Join(Explode ? "&" : "%20",
-            properties.Select(property =>
-                $"{property.Key}{(Explode ? "=" : "%20")}{property.Value}"))}";
+        string.Join("%20", properties.Select(property => $"{property.Key}%20{property.Value}"));
 }

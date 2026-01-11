@@ -5,6 +5,8 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 
 internal sealed class FormObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
+    internal override bool ValueIncludesParameterName => true;
+
     public override bool TryParse(
         string? value,
         out JsonNode? obj,
@@ -25,7 +27,5 @@ internal sealed class FormObjectValueParser(Parameter parameter) : ObjectValuePa
     }
 
     protected override string Serialize(IDictionary<string, string?> properties) =>
-        $";{(Explode ? "" : $"{ParameterName}=")}{string.Join(Explode ? '&' : ',',
-            properties.Select(pair =>
-                $"{pair.Key}{(Explode ? "=" : ",")}{pair.Value}"))}";
+        $";{ParameterName}={string.Join(',', properties.Select(pair => $"{pair.Key},{pair.Value}"))}";
 }

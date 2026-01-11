@@ -1,7 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 
-namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers;
+namespace OpenAPI.ParameterStyleParsers;
 
 internal interface IValueParser
 {
