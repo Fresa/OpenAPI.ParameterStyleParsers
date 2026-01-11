@@ -9,12 +9,11 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi30;
 /// An OpenAPI 3.0 parameter specification
 /// </summary>
 [PublicAPI]
-public record Parameter
+public record Parameter : IParameter
 {
     /// <summary>
     /// Supported OpenAPI 3.0 parameter styles
     /// </summary>
-    [PublicAPI]
     public static class Styles
     {
 #pragma warning disable CS1591
@@ -33,7 +32,6 @@ public record Parameter
     /// Supported OpenAPI 3.0 parameter locations
     /// </summary>
     // ReSharper disable once MemberCanBePrivate.Global Part of public contract
-    [PublicAPI]
     public static class Locations
     {
 #pragma warning disable CS1591
@@ -49,7 +47,6 @@ public record Parameter
     /// A map between parameter locations and supported styles
     /// </summary>
     // ReSharper disable once MemberCanBePrivate.Global Part of public contract
-    [PublicAPI]
     public static readonly Dictionary<string, string[]> LocationToStylesMap = new()
     {
         [Locations.Path] = [Styles.Matrix, Styles.Label, Styles.Simple],
@@ -61,7 +58,6 @@ public record Parameter
     /// <summary>
     /// Relevant field names for the parameter
     /// </summary>
-    [PublicAPI]
     public static class FieldNames
     {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -80,6 +76,11 @@ public record Parameter
         Style = style;
         Explode = explode;
         JsonSchema = jsonSchema;
+        
+        InPath = location == Locations.Path;
+        InQuery = location == Locations.Query;
+        InHeader = location == Locations.Header;
+        InCookie = location == Locations.Cookie;
     }
 
     /// <summary>
@@ -92,7 +93,6 @@ public record Parameter
     /// <param name="jsonSchema">The parameters json schema</param>
     /// <returns>A parameter specification</returns>
     /// <exception cref="InvalidOperationException">Thrown if location and styles are incompatible</exception>
-    [PublicAPI]
     public static Parameter Parse(string name, string style, string location, bool explode, IJsonSchema jsonSchema)
     {
         if (!LocationToStylesMap.TryGetValue(location, out var styles))
@@ -117,7 +117,6 @@ public record Parameter
     /// <param name="parameterSpecificationAsJson">Specification of the parameter</param>
     /// <returns>Parameter</returns>
     /// <exception cref="InvalidOperationException">The provided json object doesn't correspond to the specification</exception>
-    [PublicAPI]
     public static Parameter FromOpenApi30ParameterSpecification(string parameterSpecificationAsJson)
     {
         var json = JsonNode.Parse(parameterSpecificationAsJson)?.AsObject() ??
@@ -132,7 +131,6 @@ public record Parameter
     /// <param name="parameterSpecification">Specification of the parameter</param>
     /// <returns>The parsed parameter</returns>
     /// <exception cref="InvalidOperationException">The provided json object doesn't correspond to the specification</exception>
-    [PublicAPI]
     public static Parameter FromOpenApi30ParameterSpecification(JsonObject parameterSpecification)
     {
         var name = parameterSpecification.GetRequiredPropertyValue<string>(FieldNames.Name);
@@ -180,26 +178,43 @@ public record Parameter
     /// <summary>
     /// The name of the parameter
     /// </summary>
-    [PublicAPI]
-    public string Name { get; private init; }
+    public string Name { get; }
+
+    /// <inheritdoc />
+    public bool InBody => false;
+
+    /// <inheritdoc />
+    public bool InHeader { get; }
+
+    /// <inheritdoc />
+    public bool InPath { get; }
+
+    /// <inheritdoc />
+    public bool InQuery { get; }
+
+    /// <inheritdoc />
+    public bool InFormData => false;
+
+    /// <inheritdoc />
+    public bool InCookie { get; }
+
     /// <summary>
     /// The location of the parameter
     /// </summary>
-    [PublicAPI]
-    public string Location { get; private init; }
+    public string Location { get; }
+    
     /// <summary>
     /// The style of the parameter
     /// </summary>
-    [PublicAPI]
-    public string Style { get; private init; }
+    public string Style { get; }
+    
     /// <summary>
     /// If the parameter apply explosion of the serialized format
     /// </summary>
-    [PublicAPI]
-    public bool Explode { get; private init; }
+    public bool Explode { get; }
+
     /// <summary>
     /// The parameter's json schema
     /// </summary>
-    [PublicAPI]
-    public IJsonSchema JsonSchema { get; private init; }
+    public IJsonSchema JsonSchema { get; }
 }

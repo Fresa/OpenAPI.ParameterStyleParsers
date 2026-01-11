@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using JetBrains.Annotations;
 using OpenAPI.ParameterStyleParsers.Json;
-using OpenAPI.ParameterStyleParsers.JsonSchema;
 using OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Array;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi20;
@@ -10,7 +9,7 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi20;
 /// <summary>
 /// An OpenAPI parameter specification
 /// </summary>
-public record Parameter
+public record Parameter : IParameter
 {
     /// <summary>
     /// Supported OpenAPI parameter collection formats
@@ -221,16 +220,16 @@ public record Parameter
     /// <summary>
     /// The name of the parameter
     /// </summary>
-    public string Name { get; private init; }
+    public string Name { get; }
     /// <summary>
     /// The style of the parameter
     /// </summary>
-    public string? CollectionFormat { get; private init; }
+    public string? CollectionFormat { get; }
     /// <summary>
     /// Is the parameter the body directive?
     /// </summary>
     [MemberNotNullWhen(false, nameof(Type))] 
-    public bool InBody { get; private init; }
+    public bool InBody { get; }
     /// <summary>
     /// The type of the parameter
     /// </summary>
@@ -245,7 +244,7 @@ public record Parameter
     /// <summary>
     /// Required if type is “array”. Describes the type of items in the array
     /// </summary>
-    public ItemsObject? Items { get; private init; }
+    public ItemsObject? Items { get; }
     
     /// <summary>
     /// Is the parameter located in the header?
@@ -263,7 +262,10 @@ public record Parameter
     /// Is the parameter located in the form data?
     /// </summary>
     public bool InFormData { get; }
-    
+
+    /// <inheritdoc />
+    public bool InCookie => false;
+
     /// <summary>
     /// Does the parameter value include keys, i.e. key=value
     /// </summary>

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using OpenAPI.ParameterStyleParsers.JsonSchema;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi31;
@@ -5,7 +6,8 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31;
 /// <summary>
 /// An OpenAPI 3.1 parameter specification
 /// </summary>
-public record Parameter
+[PublicAPI]
+public record Parameter : IParameter
 {
     /// <summary>
     /// Supported OpenAPI parameter styles
@@ -65,12 +67,17 @@ public record Parameter
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     }
 
-    private Parameter(string name, string style, bool explode, IJsonSchema jsonSchema)
+    private Parameter(string name, string location, string style, bool explode, IJsonSchema jsonSchema)
     {
         Name = name;
         Style = style;
         Explode = explode;
         JsonSchema = jsonSchema;
+        
+        InPath = location == Locations.Path;
+        InQuery = location == Locations.Query;
+        InHeader = location == Locations.Header;
+        InCookie = location == Locations.Cookie;
     }
 
     /// <summary>
@@ -97,13 +104,30 @@ public record Parameter
                 $"location '{location}' does not support style '{style}'. Supported styles are {string.Join(", ", styles)}");
         }
 
-        return new Parameter(name, style, explode, jsonSchema);
+        return new Parameter(name, location, style, explode, jsonSchema);
     }
 
-    /// <summary>
-    /// The name of the parameter
-    /// </summary>
+    /// <inheritdoc />
     public string Name { get; private init; }
+
+    /// <inheritdoc />
+    public bool InBody => false;
+    
+    /// <inheritdoc />
+    public bool InHeader { get; private init; }
+    
+    /// <inheritdoc />
+    public bool InPath { get; private init; }
+    
+    /// <inheritdoc />
+    public bool InQuery { get; private init; }
+
+    /// <inheritdoc />
+    public bool InFormData => false;
+    
+    /// <inheritdoc />
+    public bool InCookie { get; private init; }
+    
     /// <summary>
     /// The style of the parameter
     /// </summary>
