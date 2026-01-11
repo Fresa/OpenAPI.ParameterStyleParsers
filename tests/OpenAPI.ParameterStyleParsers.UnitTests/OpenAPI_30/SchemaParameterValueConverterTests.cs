@@ -15,9 +15,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -30,9 +31,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -45,9 +47,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -60,9 +63,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -75,9 +79,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -90,9 +95,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -105,9 +111,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -120,9 +127,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] value,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestSerializing(parameterJson, value, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, value, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
 
@@ -132,9 +140,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -143,9 +152,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] value,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestSerializing(parameterJson, value, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, value, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -159,9 +169,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -175,9 +186,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] value,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestSerializing(parameterJson, value, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, value, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -192,9 +204,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -209,23 +222,26 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] value,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestSerializing(parameterJson, value, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, value, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     private static void TestParsing(string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values.First(), shouldMap, jsonInstance);
+        TestParsing(parameterJson, values.First(), shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     private static void TestParsing(string parameterJson,
         string? value,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
         var parameter = OpenApi30.Parameter.FromOpenApi30ParameterSpecification(parameterJson);
         parameter.Should().NotBeNull();
@@ -246,12 +262,15 @@ public class SchemaParameterValueConverterTests
             jsonInstance.Should().NotBeNull();
             instance.ToJsonString().Should().BeEquivalentTo(jsonInstance);
         }
+
+        parser.ValueIncludesParameterName.Should().Be(expectedValueIncludesParameterName);
     }
 
     private static void TestSerializing(string parameterJson,
         string?[] expectedValues,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
         if (!shouldMap)
             return;
@@ -260,6 +279,7 @@ public class SchemaParameterValueConverterTests
         var serialized = parser.Serialize(jsonInstance == null ? null : JsonNode.Parse(jsonInstance));
 
         expectedValues.Should().Contain(serialized);
+        parser.ValueIncludesParameterName.Should().Be(expectedValueIncludesParameterName);
     }
 
     private static OpenApi30.ParameterValueParser CreateParameterValueParser(
@@ -271,7 +291,7 @@ public class SchemaParameterValueConverterTests
     }
 
     #region Object
-    public static readonly TheoryData<string, string?[], bool, string?> DeepObject = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> DeepObject = new()
     {
         {
             """
@@ -298,7 +318,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{ "color[R]=100", "color[G]=200", "color[B]=150"}.GenerateAllPermutations('&'),
             true,
-            """{"R":100,"G":200,"B":150}"""
+            """{"R":100,"G":200,"B":150}""",
+            true
         },
         {
             """
@@ -317,7 +338,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{ "color[R]=100", "color[G]=200", "color[B]="}.GenerateAllPermutations('&'),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            true
         },
         // nullable: true allows null on object types (OpenAPI 3.0 extension)
         {
@@ -340,10 +362,11 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         }
     };
-    public static readonly TheoryData<string, string?[], bool, string?> ObjectLabel = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> ObjectLabel = new()
     {
         {
             """
@@ -372,7 +395,8 @@ public class SchemaParameterValueConverterTests
                 .Select(str => $".{str}")
                 .ToArray(),
             true,
-            """{"R":100,"G":200,"B":150}"""
+            """{"R":100,"G":200,"B":150}""",
+            false
         },
         {
             """
@@ -393,7 +417,8 @@ public class SchemaParameterValueConverterTests
                 .Select(str => $".{str}")
                 .ToArray(),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            false
         },
         {
             """
@@ -422,7 +447,8 @@ public class SchemaParameterValueConverterTests
                 .Select(str => $".{str}")
                 .ToArray(),
             true,
-            """{"R":100,"G":200,"B":150}"""
+            """{"R":100,"G":200,"B":150}""",
+            false
         },
         {
         """
@@ -443,7 +469,8 @@ public class SchemaParameterValueConverterTests
                 .Select(str => $".{str}")
                 .ToArray(),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            false
         },
         {
             """
@@ -459,10 +486,11 @@ public class SchemaParameterValueConverterTests
             """,
             [""],
             true,
-            "{}"
+            "{}",
+            false
         }
     };
-    public static readonly TheoryData<string, string?[], bool, string?> ObjectMatrix = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> ObjectMatrix = new()
     {
         {
             """
@@ -491,7 +519,8 @@ public class SchemaParameterValueConverterTests
                 .Select(str => $";{str}")
                 .ToArray(),
             true,
-            """{"R":100,"G":200,"B":150}"""
+            """{"R":100,"G":200,"B":150}""",
+            false
         },
         {
             """
@@ -512,7 +541,8 @@ public class SchemaParameterValueConverterTests
                 .Select(str => $";{str}")
                 .ToArray(),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            false
         },
         {
             """
@@ -541,7 +571,8 @@ public class SchemaParameterValueConverterTests
                 .Select(str => $";color={str}")
                 .ToArray(),
             true,
-            """{"R":100,"G":200,"B":150}"""
+            """{"R":100,"G":200,"B":150}""",
+            true
         },
         {
             """
@@ -570,10 +601,11 @@ public class SchemaParameterValueConverterTests
                 .Select(str => $";keys={str}")
                 .ToArray(),
             true,
-            """{"comma":",","dot":".","semi":";"}"""
+            """{"comma":",","dot":".","semi":";"}""",
+            true
         }
     };
-    public static readonly TheoryData<string, string?[], bool, string?> ObjectForm = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> ObjectForm = new()
     {
         {
             """
@@ -605,7 +637,8 @@ public class SchemaParameterValueConverterTests
                 .Select(str => $";color={str}")
                 .ToArray(),
             true,
-            """{"R":100,"G":200,"B":150}"""
+            """{"R":100,"G":200,"B":150}""",
+            true
         },
         {
             """
@@ -634,7 +667,8 @@ public class SchemaParameterValueConverterTests
                 .Select(str => $";color={str}")
                 .ToArray(),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            true
         },
         {
             """
@@ -655,7 +689,8 @@ public class SchemaParameterValueConverterTests
                 .Select(str => $";color={str}")
                 .ToArray(),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            true
         },
         {
             """
@@ -684,11 +719,12 @@ public class SchemaParameterValueConverterTests
                 .Select(str => $";color={str}")
                 .ToArray(),
             true,
-            """{"R":100,"G":200,"B":""}"""
+            """{"R":100,"G":200,"B":""}""",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> ObjectSimple = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> ObjectSimple = new()
     {
         {
             """
@@ -718,7 +754,8 @@ public class SchemaParameterValueConverterTests
             """,
             new [] {"R,100","G,200","B,150"}.GenerateAllPermutations(','),
             true,
-            """{"R":100,"G":200,"B":150}"""
+            """{"R":100,"G":200,"B":150}""",
+            false
         },
         {
             """
@@ -745,7 +782,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{"R,100","G,200","B,"}.GenerateAllPermutations(','),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            false
         },
         {
             """
@@ -764,7 +802,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{"R,100","G,200","B,"}.GenerateAllPermutations(','),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            false
         },
         {
             """
@@ -791,7 +830,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{"R,100","G,200","B,"}.GenerateAllPermutations(','),
             true,
-            """{"R":100,"G":200,"B":""}"""
+            """{"R":100,"G":200,"B":""}""",
+            false
         },
         {
             """
@@ -821,7 +861,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{"R=100","G=200","B=150"}.GenerateAllPermutations(','),
             true,
-            """{"R":100,"G":200,"B":150}"""
+            """{"R":100,"G":200,"B":150}""",
+            false
         },
         {
             """
@@ -848,7 +889,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{"R=100","G=200","B="}.GenerateAllPermutations(','),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            false
         },
         {
             """
@@ -867,7 +909,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{"R=100","G=200","B="}.GenerateAllPermutations(','),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            false
         },
         {
             """
@@ -894,11 +937,12 @@ public class SchemaParameterValueConverterTests
             """,
             new []{"R=100","G=200","B="}.GenerateAllPermutations(','),
             true,
-            """{"R":100,"G":200,"B":""}"""
+            """{"R":100,"G":200,"B":""}""",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> ObjectSpaceDelimited = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> ObjectSpaceDelimited = new()
     {
         {
             """
@@ -928,7 +972,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{ "R%20100", "G%20200", "B%20150"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             true,
-            """{"R":100,"G":200,"B":150}"""
+            """{"R":100,"G":200,"B":150}""",
+            true
         },
         {
             """
@@ -955,7 +1000,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            true
         },
         {
             """
@@ -974,7 +1020,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            true
         },
         {
             """
@@ -1001,7 +1048,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             true,
-            """{"R":100,"G":200,"B":""}"""
+            """{"R":100,"G":200,"B":""}""",
+            true
         },
         {
             """
@@ -1031,7 +1079,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{ "R=100", "G=200", "B=150"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             false,
-            null
+            null,
+            true
         },
         // nullable: true allows null on object types (OpenAPI 3.0 extension)
         {
@@ -1054,11 +1103,12 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> ObjectPipeDelimited = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> ObjectPipeDelimited = new()
     {
         {
             """
@@ -1088,7 +1138,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{"R|100","G|200","B|150"}.GenerateAllPermutations('|').Select(p => $"color={p}").ToArray(),
             true,
-            """{"R":100,"G":200,"B":150}"""
+            """{"R":100,"G":200,"B":150}""",
+            true
         },
         {
             """
@@ -1115,7 +1166,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{"R|100","G|200","B|"}.GenerateAllPermutations('|').Select(p => $"color={p}").ToArray(),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            true
         },
         {
             """
@@ -1134,7 +1186,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{"R|100","G|200","B|"}.GenerateAllPermutations('|').Select(p => $"color={p}").ToArray(),
             true,
-            """{"R":"100","G":"200","B":""}"""
+            """{"R":"100","G":"200","B":""}""",
+            true
         },
         {
             """
@@ -1161,7 +1214,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{"R|100","G|200","B|"}.GenerateAllPermutations('|').Select(p => $"color={p}").ToArray(),
             true,
-            """{"R":100,"G":200,"B":""}"""
+            """{"R":100,"G":200,"B":""}""",
+            true
         },
         {
             """
@@ -1191,7 +1245,8 @@ public class SchemaParameterValueConverterTests
             """,
             new []{"R|100","G|200","B|150"}.GenerateAllPermutations('|').Select(p => $"color={p}").ToArray(),
             false,
-            null
+            null,
+            true
         },
         // nullable: true allows null on object types (OpenAPI 3.0 extension)
         {
@@ -1214,13 +1269,14 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         }
     };
     #endregion
 
     #region Array
-    public static readonly TheoryData<string, string?[], bool, string?> ArrayLabel = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> ArrayLabel = new()
     {
         {
             """
@@ -1239,7 +1295,8 @@ public class SchemaParameterValueConverterTests
             """,
             [".test.test2"],
             true,
-            "[\"test\",\"test2\"]"
+            "[\"test\",\"test2\"]",
+            false
         },
         {
             """
@@ -1258,7 +1315,8 @@ public class SchemaParameterValueConverterTests
             """,
             [".test.test2"],
             true,
-            "[\"test\",\"test2\"]"
+            "[\"test\",\"test2\"]",
+            false
         },
         {
             """
@@ -1277,11 +1335,12 @@ public class SchemaParameterValueConverterTests
             """,
             [".test."],
             true,
-            "[\"test\",\"\"]"
+            "[\"test\",\"\"]",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> ArrayForm = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> ArrayForm = new()
     {
         {
             """
@@ -1300,7 +1359,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=test&color=test2"],
             true,
-            "[\"test\",\"test2\"]"
+            "[\"test\",\"test2\"]",
+            true
         },
         {
             """
@@ -1319,7 +1379,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=test,test2"],
             true,
-            "[\"test\",\"test2\"]"
+            "[\"test\",\"test2\"]",
+            true
         },
         // Percent-encoded values should be decoded
         {
@@ -1339,11 +1400,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=hello%20world,foo%2Cbar"],
             true,
-            "[\"hello world\",\"foo,bar\"]"
+            "[\"hello world\",\"foo,bar\"]",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> ArrayMatrix = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> ArrayMatrix = new()
     {
         {
             """
@@ -1362,7 +1424,8 @@ public class SchemaParameterValueConverterTests
             """,
             [";test=test;test=test2"],
             true,
-            "[\"test\",\"test2\"]"
+            "[\"test\",\"test2\"]",
+            true
         },
         {
             """
@@ -1381,7 +1444,8 @@ public class SchemaParameterValueConverterTests
             """,
             [";test=test;test"],
             true,
-            "[\"test\",\"\"]"
+            "[\"test\",\"\"]",
+            true
         },
         {
             """
@@ -1400,11 +1464,12 @@ public class SchemaParameterValueConverterTests
             """,
             [";test=test,test2"],
             true,
-            "[\"test\",\"test2\"]"
+            "[\"test\",\"test2\"]",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> ArraySimple = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> ArraySimple = new()
     {
         {
             """
@@ -1423,7 +1488,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["test,test2"],
             true,
-            "[\"test\",\"test2\"]"
+            "[\"test\",\"test2\"]",
+            false
         },
         {
             """
@@ -1442,7 +1508,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["test,"],
             true,
-            "[\"test\",\"\"]"
+            "[\"test\",\"\"]",
+            false
         },
         {
             """
@@ -1461,11 +1528,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["test,test2"],
             true,
-            "[\"test\",\"test2\"]"
+            "[\"test\",\"test2\"]",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> ArraySpaceDelimited = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> ArraySpaceDelimited = new()
     {
         {
             """
@@ -1484,7 +1552,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=test&color=test2"],
             true,
-            "[\"test\",\"test2\"]"
+            "[\"test\",\"test2\"]",
+            true
         },
         {
             """
@@ -1503,7 +1572,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=test&color="],
             true,
-            "[\"test\",\"\"]"
+            "[\"test\",\"\"]",
+            true
         },
         {
             """
@@ -1522,7 +1592,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=test%20test2"],
             true,
-            "[\"test\",\"test2\"]"
+            "[\"test\",\"test2\"]",
+            true
         },
         {
             """
@@ -1541,7 +1612,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=test%20"],
             true,
-            "[\"test\",\"\"]"
+            "[\"test\",\"\"]",
+            true
         },
         // nullable: true allows null on array types (OpenAPI 3.0 extension)
         {
@@ -1562,11 +1634,12 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> ArrayPipeDelimited = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> ArrayPipeDelimited = new()
     {
         {
             """
@@ -1585,7 +1658,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=test&color=test2"],
             true,
-            "[\"test\",\"test2\"]"
+            "[\"test\",\"test2\"]",
+            true
         },
         {
             """
@@ -1604,7 +1678,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=test&color="],
             true,
-            "[\"test\",\"\"]"
+            "[\"test\",\"\"]",
+            true
         },
         {
             """
@@ -1623,7 +1698,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=test|test2"],
             true,
-            "[\"test\",\"test2\"]"
+            "[\"test\",\"test2\"]",
+            true
         },
         {
             """
@@ -1642,7 +1718,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=test|"],
             true,
-            "[\"test\",\"\"]"
+            "[\"test\",\"\"]",
+            true
         },
         // nullable: true allows null on array types (OpenAPI 3.0 extension)
         {
@@ -1663,12 +1740,13 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         }
     };
     #endregion
 
-    public static readonly TheoryData<string, string?[], bool, string?> StringForm = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> StringForm = new()
     {
         {
             """
@@ -1684,11 +1762,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=test"],
             true,
-            "\"test\""
+            "\"test\"",
+            true
         }
     };
 
-    public static TheoryData<string, string?[], bool, string?> NumberForm = new()
+    public static TheoryData<string, string?[], bool, string?, bool> NumberForm = new()
     {
         {
             """
@@ -1704,11 +1783,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=1.2"],
             true,
-            "1.2"
+            "1.2",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> IntegerForm = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> IntegerForm = new()
     {
         {
             """
@@ -1724,11 +1804,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=1"],
             true,
-            "1"
+            "1",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> BooleanForm = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> BooleanForm = new()
     {
         {
             """
@@ -1743,11 +1824,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=true"],
             true,
-            "true"
+            "true",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> NullForm = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> NullForm = new()
     {
         {
             """
@@ -1763,7 +1845,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         },
         // nullable: true allows null on other types (OpenAPI 3.0 extension)
         {
@@ -1781,7 +1864,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         },
         {
             """
@@ -1798,7 +1882,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         },
         {
             """
@@ -1815,7 +1900,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         },
         {
             """
@@ -1832,7 +1918,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         },
         {
             """
@@ -1852,7 +1939,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         },
         {
             """
@@ -1874,11 +1962,12 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> StringLabel = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> StringLabel = new()
     {
         {
             """
@@ -1894,11 +1983,12 @@ public class SchemaParameterValueConverterTests
             """,
             [".test"],
             true,
-            "\"test\""
+            "\"test\"",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> NumberLabel = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> NumberLabel = new()
     {
         {
             """
@@ -1914,11 +2004,12 @@ public class SchemaParameterValueConverterTests
             """,
             [".1.2"],
             true,
-            "1.2"
+            "1.2",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> IntegerLabel = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> IntegerLabel = new()
     {
         {
             """
@@ -1934,11 +2025,12 @@ public class SchemaParameterValueConverterTests
             """,
             [".1"],
             true,
-            "1"
+            "1",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> BooleanLabel = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> BooleanLabel = new()
     {
         {
             """
@@ -1953,11 +2045,12 @@ public class SchemaParameterValueConverterTests
             """,
             [".true"],
             true,
-            "true"
+            "true",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> NullLabel = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> NullLabel = new()
     {
         {
             """
@@ -1973,7 +2066,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         {
             """
@@ -1989,7 +2083,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         // nullable: true allows null on other types (OpenAPI 3.0 extension)
         {
@@ -2007,7 +2102,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         {
             """
@@ -2024,7 +2120,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         {
             """
@@ -2041,7 +2138,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         {
             """
@@ -2058,7 +2156,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         {
             """
@@ -2078,7 +2177,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         {
             """
@@ -2100,11 +2200,12 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> StringMatrix = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> StringMatrix = new()
     {
         {
             """
@@ -2120,7 +2221,8 @@ public class SchemaParameterValueConverterTests
             """,
             [";foo=test"],
             true,
-            "\"test\""
+            "\"test\"",
+            true
         },
         {
             """
@@ -2136,11 +2238,12 @@ public class SchemaParameterValueConverterTests
             """,
             [";foo=test"],
             true,
-            "\"test\""
+            "\"test\"",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> NumberMatrix = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> NumberMatrix = new()
     {
         {
             """
@@ -2156,7 +2259,8 @@ public class SchemaParameterValueConverterTests
             """,
             [";foo=1.2"],
             true,
-            "1.2"
+            "1.2",
+            true
         },
         {
             """
@@ -2172,11 +2276,12 @@ public class SchemaParameterValueConverterTests
             """,
             [";foo=1.2"],
             true,
-            "1.2"
+            "1.2",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> IntegerMatrix = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> IntegerMatrix = new()
     {
         {
             """
@@ -2192,7 +2297,8 @@ public class SchemaParameterValueConverterTests
             """,
             [";foo=1"],
             true,
-            "1"
+            "1",
+            true
         },
         {
             """
@@ -2208,11 +2314,12 @@ public class SchemaParameterValueConverterTests
             """,
             [";foo=1"],
             true,
-            "1"
+            "1",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> BooleanMatrix = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> BooleanMatrix = new()
     {
         {
             """
@@ -2228,7 +2335,8 @@ public class SchemaParameterValueConverterTests
             """,
             [";foo=true"],
             true,
-            "true"
+            "true",
+            true
         },
         {
             """
@@ -2244,11 +2352,12 @@ public class SchemaParameterValueConverterTests
             """,
             [";foo=true"],
             true,
-            "true"
+            "true",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> NullMatrix = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> NullMatrix = new()
     {
         {
             """
@@ -2264,7 +2373,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         },
         {
             """
@@ -2280,7 +2390,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         },
         // nullable: true allows null on other types (OpenAPI 3.0 extension)
         {
@@ -2298,7 +2409,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         },
         {
             """
@@ -2315,7 +2427,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         },
         {
             """
@@ -2332,7 +2445,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         },
         {
             """
@@ -2349,7 +2463,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         },
         {
             """
@@ -2369,7 +2484,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            true
         },
         {
             """
@@ -2391,11 +2507,12 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> StringSimple = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> StringSimple = new()
     {
         {
             """
@@ -2411,7 +2528,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["test"],
             true,
-            "\"test\""
+            "\"test\"",
+            false
         },
         {
             """
@@ -2427,11 +2545,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["test"],
             true,
-            "\"test\""
+            "\"test\"",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> NumberSimple = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> NumberSimple = new()
     {
         {
             """
@@ -2447,7 +2566,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["1.2"],
             true,
-            "1.2"
+            "1.2",
+            false
         },
         {
             """
@@ -2463,11 +2583,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["1.2"],
             true,
-            "1.2"
+            "1.2",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> IntegerSimple = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> IntegerSimple = new()
     {
         {
             """
@@ -2483,7 +2604,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["1"],
             true,
-            "1"
+            "1",
+            false
         },
         {
             """
@@ -2499,11 +2621,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["1"],
             true,
-            "1"
+            "1",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> BooleanSimple = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> BooleanSimple = new()
     {
         {
             """
@@ -2519,7 +2642,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["true"],
             true,
-            "true"
+            "true",
+            false
         },
         {
             """
@@ -2535,11 +2659,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["true"],
             true,
-            "true"
+            "true",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> NullSimple = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> NullSimple = new()
     {
         {
             """
@@ -2555,7 +2680,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         {
             """
@@ -2571,7 +2697,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         // nullable: true allows null on other types (OpenAPI 3.0 extension)
         {
@@ -2589,7 +2716,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         {
             """
@@ -2606,7 +2734,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         {
             """
@@ -2623,7 +2752,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         {
             """
@@ -2640,7 +2770,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         {
             """
@@ -2660,7 +2791,8 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         },
         {
             """
@@ -2682,11 +2814,12 @@ public class SchemaParameterValueConverterTests
             """,
             [null],
             true,
-            null
+            null,
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> EmptySchema = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> EmptySchema = new()
     {
         {
             """
@@ -2701,7 +2834,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=test"],
             true,
-            """["test"]"""
+            """["test"]""",
+            true
         },
         {
             """
@@ -2716,7 +2850,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["color=test&color=test2"],
             true,
-            """["test","test2"]"""
+            """["test","test2"]""",
+            true
         },
         {
             """
@@ -2731,7 +2866,8 @@ public class SchemaParameterValueConverterTests
             """,
             [""],
             true,
-            """[""]"""
+            """[""]""",
+            false
         },
         {
             """
@@ -2746,7 +2882,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["."],
             true,
-            """[""]"""
+            """[""]""",
+            false
         }
     };
 }

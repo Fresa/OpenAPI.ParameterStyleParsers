@@ -14,9 +14,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -28,9 +29,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -39,9 +41,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -50,9 +53,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -62,9 +66,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -74,9 +79,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -88,9 +94,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -102,9 +109,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -114,9 +122,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -126,9 +135,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -138,9 +148,10 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values, shouldMap, jsonInstance);
+        TestParsing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     [Theory]
@@ -150,27 +161,31 @@ public class SchemaParameterValueConverterTests
         string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestSerializing(parameterJson, values, shouldMap, jsonInstance);
+        TestSerializing(parameterJson, values, shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     private static void TestParsing(string parameterJson,
         string?[] values,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
-        TestParsing(parameterJson, values.First(), shouldMap, jsonInstance);
+        TestParsing(parameterJson, values.First(), shouldMap, jsonInstance, expectedValueIncludesParameterName);
     }
 
     private static void TestParsing(string parameterJson,
         string? value,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
         var parameter = OpenApi32.Parameter.FromOpenApi32ParameterSpecification(parameterJson);
         parameter.Should().NotBeNull();
         var parser = ParameterValueParser.Create(parameter);
+        parser.ValueIncludesParameterName.Should().Be(expectedValueIncludesParameterName);
         parser.TryParse(value, out var instance, out var mappingError).Should().Be(shouldMap, mappingError);
         if (!shouldMap)
         {
@@ -192,12 +207,14 @@ public class SchemaParameterValueConverterTests
     private static void TestSerializing(string parameterJson,
         string?[] expectedValues,
         bool shouldMap,
-        string? jsonInstance)
+        string? jsonInstance,
+        bool expectedValueIncludesParameterName)
     {
         if (!shouldMap)
             return;
 
         var parser = CreateParameterValueParser(parameterJson);
+        parser.ValueIncludesParameterName.Should().Be(expectedValueIncludesParameterName);
         var serialized = parser.Serialize(jsonInstance == null ? null : JsonNode.Parse(jsonInstance));
 
         expectedValues.Should().Contain(serialized);
@@ -211,7 +228,7 @@ public class SchemaParameterValueConverterTests
     }
 
     #region Header Primitives
-    public static readonly TheoryData<string, string?[], bool, string?> HeaderPrimitiveString = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> HeaderPrimitiveString = new()
     {
         {
             """
@@ -223,7 +240,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["abc123"],
             true,
-            "\"abc123\""
+            "\"abc123\"",
+            false
         },
         // Percent-encoding must NOT be decoded for headers in 3.2
         {
@@ -236,11 +254,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["hello%20world"],
             true,
-            "\"hello%20world\""
+            "\"hello%20world\"",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> HeaderPrimitiveNumber = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> HeaderPrimitiveNumber = new()
     {
         {
             """
@@ -252,11 +271,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["3.14"],
             true,
-            "3.14"
+            "3.14",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> HeaderPrimitiveInteger = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> HeaderPrimitiveInteger = new()
     {
         {
             """
@@ -268,11 +288,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["42"],
             true,
-            "42"
+            "42",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> HeaderPrimitiveBoolean = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> HeaderPrimitiveBoolean = new()
     {
         {
             """
@@ -284,7 +305,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["true"],
             true,
-            "true"
+            "true",
+            false
         },
         {
             """
@@ -296,13 +318,14 @@ public class SchemaParameterValueConverterTests
             """,
             ["false"],
             true,
-            "false"
+            "false",
+            false
         }
     };
     #endregion
 
     #region Header Arrays
-    public static readonly TheoryData<string, string?[], bool, string?> HeaderArray = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> HeaderArray = new()
     {
         {
             """
@@ -314,7 +337,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["a,b,c"],
             true,
-            """["a","b","c"]"""
+            """["a","b","c"]""",
+            false
         },
         {
             """
@@ -326,7 +350,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["1,2,3"],
             true,
-            "[1,2,3]"
+            "[1,2,3]",
+            false
         },
         // Percent-encoding must NOT be decoded for headers in 3.2
         {
@@ -339,13 +364,14 @@ public class SchemaParameterValueConverterTests
             """,
             ["hello%20world,foo%2Cbar"],
             true,
-            """["hello%20world","foo%2Cbar"]"""
+            """["hello%20world","foo%2Cbar"]""",
+            false
         }
     };
     #endregion
 
     #region Header Objects
-    public static readonly TheoryData<string, string?[], bool, string?> HeaderObjectExploded = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> HeaderObjectExploded = new()
     {
         {
             """
@@ -364,7 +390,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["name=John,age=30"],
             true,
-            """{"name":"John","age":30}"""
+            """{"name":"John","age":30}""",
+            false
         },
         // Percent-encoding must NOT be decoded for headers in 3.2
         {
@@ -383,11 +410,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["key=hello%20world"],
             true,
-            """{"key":"hello%20world"}"""
+            """{"key":"hello%20world"}""",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> HeaderObjectNonExploded = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> HeaderObjectNonExploded = new()
     {
         {
             """
@@ -406,7 +434,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["name,John,age,30"],
             true,
-            """{"name":"John","age":30}"""
+            """{"name":"John","age":30}""",
+            false
         },
         // Percent-encoding must NOT be decoded for headers in 3.2
         {
@@ -425,13 +454,14 @@ public class SchemaParameterValueConverterTests
             """,
             ["key,hello%20world"],
             true,
-            """{"key":"hello%20world"}"""
+            """{"key":"hello%20world"}""",
+            false
         }
     };
     #endregion
 
     #region Cookie Primitives
-    public static readonly TheoryData<string, string?[], bool, string?> CookiePrimitiveString = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> CookiePrimitiveString = new()
     {
         {
             """
@@ -445,7 +475,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["session=abc123"],
             true,
-            "\"abc123\""
+            "\"abc123\"",
+            true
         },
         {
             """
@@ -459,11 +490,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["token=xyz"],
             true,
-            "\"xyz\""
+            "\"xyz\"",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> CookiePrimitiveNumber = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> CookiePrimitiveNumber = new()
     {
         {
             """
@@ -477,11 +509,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["rate=3.14"],
             true,
-            "3.14"
+            "3.14",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> CookiePrimitiveInteger = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> CookiePrimitiveInteger = new()
     {
         {
             """
@@ -495,11 +528,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["count=42"],
             true,
-            "42"
+            "42",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> CookiePrimitiveBoolean = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> CookiePrimitiveBoolean = new()
     {
         {
             """
@@ -513,7 +547,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["enabled=true"],
             true,
-            "true"
+            "true",
+            true
         },
         {
             """
@@ -527,13 +562,14 @@ public class SchemaParameterValueConverterTests
             """,
             ["disabled=false"],
             true,
-            "false"
+            "false",
+            true
         }
     };
     #endregion
 
     #region Cookie Arrays
-    public static readonly TheoryData<string, string?[], bool, string?> CookieArrayExploded = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> CookieArrayExploded = new()
     {
         {
             """
@@ -547,7 +583,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["ids=a; ids=b; ids=c"],
             true,
-            """["a","b","c"]"""
+            """["a","b","c"]""",
+            true
         },
         {
             """
@@ -561,11 +598,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["nums=1; nums=2; nums=3"],
             true,
-            "[1,2,3]"
+            "[1,2,3]",
+            true
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> CookieArrayNonExploded = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> CookieArrayNonExploded = new()
     {
         {
             """
@@ -579,7 +617,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["ids=a,b,c"],
             true,
-            """["a","b","c"]"""
+            """["a","b","c"]""",
+            true
         },
         {
             """
@@ -593,13 +632,14 @@ public class SchemaParameterValueConverterTests
             """,
             ["nums=1,2,3"],
             true,
-            "[1,2,3]"
+            "[1,2,3]",
+            true
         }
     };
     #endregion
 
     #region Cookie Objects
-    public static readonly TheoryData<string, string?[], bool, string?> CookieObjectExploded = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> CookieObjectExploded = new()
     {
         {
             """
@@ -619,7 +659,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["name=John; age=30"],
             true,
-            """{"name":"John","age":30}"""
+            """{"name":"John","age":30}""",
+            false
         },
         {
             """
@@ -639,11 +680,12 @@ public class SchemaParameterValueConverterTests
             """,
             ["x=1.5; y=2.5"],
             true,
-            """{"x":1.5,"y":2.5}"""
+            """{"x":1.5,"y":2.5}""",
+            false
         }
     };
 
-    public static readonly TheoryData<string, string?[], bool, string?> CookieObjectNonExploded = new()
+    public static readonly TheoryData<string, string?[], bool, string?, bool> CookieObjectNonExploded = new()
     {
         {
             """
@@ -663,7 +705,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["user=name,John,age,30"],
             true,
-            """{"name":"John","age":30}"""
+            """{"name":"John","age":30}""",
+            true
         },
         {
             """
@@ -683,7 +726,8 @@ public class SchemaParameterValueConverterTests
             """,
             ["point=x,1.5,y,2.5"],
             true,
-            """{"x":1.5,"y":2.5}"""
+            """{"x":1.5,"y":2.5}""",
+            true
         }
     };
     #endregion
