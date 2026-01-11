@@ -904,14 +904,14 @@ public class SchemaParameterValueConverterTests
                         },
                         "B": {
                             "type": "number"
-                        }                        
+                        }
                     }
                 },
                 "style": "spaceDelimited",
                 "explode": false
             }
             """,
-            new []{ "R%20100", "G%20200", "B%20150"}.GenerateAllPermutations("%20"),
+            new []{ "R%20100", "G%20200", "B%20150"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -931,14 +931,14 @@ public class SchemaParameterValueConverterTests
                         },
                         "B": {
                             "type": "string"
-                        }                        
+                        }
                     }
                 },
                 "style": "spaceDelimited",
                 "explode": false
             }
             """,
-            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20"),
+            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -949,15 +949,15 @@ public class SchemaParameterValueConverterTests
                 "in": "query",
                 "schema": {
                     "type": "object",
-                    "additionalProperties": { 
-                        "type": "string" 
+                    "additionalProperties": {
+                        "type": "string"
                     }
                 },
                 "style": "spaceDelimited",
                 "explode": false
             }
             """,
-            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20"),
+            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -969,22 +969,22 @@ public class SchemaParameterValueConverterTests
                 "schema": {
                     "type": "object",
                     "patternProperties": {
-                        "^R": { 
-                            "type": "number" 
+                        "^R": {
+                            "type": "number"
                         },
                         "^G": {
-                            "type": "integer" 
+                            "type": "integer"
                         }
-                    },            
-                    "additionalProperties": { 
-                        "type": "string" 
+                    },
+                    "additionalProperties": {
+                        "type": "string"
                     }
                 },
                 "style": "spaceDelimited",
                 "explode": false
             }
             """,
-            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20"),
+            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             true,
             """{"R":100,"G":200,"B":""}"""
         },
@@ -1007,14 +1007,14 @@ public class SchemaParameterValueConverterTests
                         },
                         "B": {
                             "type": "number"
-                        }                        
+                        }
                     }
                 },
                 "style": "spaceDelimited",
                 "explode": true
             }
             """,
-            new []{ "R=100", "G=200", "B=150"}.GenerateAllPermutations("%20"),
+            new []{ "R=100", "G=200", "B=150"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             false,
             null
         }

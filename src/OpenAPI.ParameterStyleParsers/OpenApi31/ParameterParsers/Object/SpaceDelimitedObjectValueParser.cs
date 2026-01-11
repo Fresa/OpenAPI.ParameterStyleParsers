@@ -5,7 +5,7 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 
 internal sealed class SpaceDelimitedObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
-    public override bool ValueIncludesParameterName => false;
+    public override bool ValueIncludesParameterName => true;
 
     public override bool TryParse(
         string? value,
@@ -27,5 +27,5 @@ internal sealed class SpaceDelimitedObjectValueParser(Parameter parameter) : Obj
     }
 
     protected override string Serialize(IDictionary<string, string?> properties) =>
-        string.Join("%20", properties.Select(property => $"{property.Key}%20{property.Value}"));
+        $"{ParameterName}={string.Join("%20", properties.Select(property => $"{property.Key}%20{property.Value}"))}";
 }

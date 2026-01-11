@@ -926,7 +926,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new []{ "R%20100", "G%20200", "B%20150"}.GenerateAllPermutations("%20"),
+            new []{ "R%20100", "G%20200", "B%20150"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             true,
             """{"R":100,"G":200,"B":150}"""
         },
@@ -953,7 +953,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20"),
+            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -972,7 +972,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20"),
+            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             true,
             """{"R":"100","G":"200","B":""}"""
         },
@@ -999,7 +999,7 @@ public class SchemaParameterValueConverterTests
                 "explode": false
             }
             """,
-            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20"),
+            new []{ "R%20100", "G%20200", "B%20"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             true,
             """{"R":100,"G":200,"B":""}"""
         },
@@ -1029,7 +1029,7 @@ public class SchemaParameterValueConverterTests
                 "explode": true
             }
             """,
-            new []{ "R=100", "G=200", "B=150"}.GenerateAllPermutations("%20"),
+            new []{ "R=100", "G=200", "B=150"}.GenerateAllPermutations("%20").Select(p => $"color={p}").ToArray(),
             false,
             null
         },
