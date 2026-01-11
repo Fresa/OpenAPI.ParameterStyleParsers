@@ -20,6 +20,8 @@ internal sealed class SimpleObjectValueParser(Parameter parameter) : ObjectValue
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 
+    public override bool ValueIncludesParameterName => false;
+
     protected override string Serialize(IDictionary<string, string?> properties) =>
         string.Join(',', properties.Select(pair => $"{pair.Key}{(Explode ? "=" : ",")}{pair.Value}"));
 }

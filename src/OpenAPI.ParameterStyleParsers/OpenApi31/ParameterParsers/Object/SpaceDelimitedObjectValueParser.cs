@@ -5,7 +5,7 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 
 internal sealed class SpaceDelimitedObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
-    internal override bool ValueIncludesParameterName => false;
+    public override bool ValueIncludesParameterName => false;
 
     public override bool TryParse(
         string? value,

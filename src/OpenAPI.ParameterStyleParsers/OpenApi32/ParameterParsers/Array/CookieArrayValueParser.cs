@@ -39,6 +39,8 @@ internal sealed class CookieArrayValueParser(Parameter parameter) : ArrayValuePa
         return TryGetArrayItems(arrayValues, out array, out error);
     }
 
+    public override bool ValueIncludesParameterName => true;
+
     protected override string Serialize(string?[] values) =>
         Explode
             ? string.Join("; ", values.Select(v => $"{ParameterName}={v}"))

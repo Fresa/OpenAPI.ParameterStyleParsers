@@ -24,5 +24,6 @@ internal sealed class CookiePrimitiveValueParser(Parameter parameter) : Primitiv
         return true;
     }
 
+    public override bool ValueIncludesParameterName => true;
     protected override string Serialize(string value) => $"{ParameterName}={value}";
 }

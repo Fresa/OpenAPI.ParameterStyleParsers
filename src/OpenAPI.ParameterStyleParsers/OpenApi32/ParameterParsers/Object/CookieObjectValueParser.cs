@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using OpenAPI.ParameterStyleParsers.JsonSchema;
-using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers;
 using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Primitive;
 using OpenAPI.ParameterStyleParsers.ParameterParsers;
 
@@ -63,6 +62,8 @@ internal sealed class CookieObjectValueParser(Parameter parameter) : ObjectValue
         var keyAndValues = nameValue[1].Split(',');
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
+
+    public override bool ValueIncludesParameterName => !Explode;
 
     protected override string Serialize(IDictionary<string, string?> properties) => Explode
         ? string.Join("; ", properties.Select(p => $"{p.Key}={p.Value}"))

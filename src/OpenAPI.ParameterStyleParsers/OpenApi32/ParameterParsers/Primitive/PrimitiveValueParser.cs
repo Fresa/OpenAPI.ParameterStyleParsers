@@ -48,5 +48,7 @@ internal abstract class PrimitiveValueParser(Parameter parameter) : IValueParser
     public string? Serialize(JsonNode? instance) =>
         instance == null ? null : Serialize(instance.ToString());
 
+    public abstract bool ValueIncludesParameterName { get; }
+
     protected abstract string Serialize(string value);
 }

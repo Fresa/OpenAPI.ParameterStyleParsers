@@ -14,6 +14,8 @@ internal sealed class SimplePrimitiveValueParser(Parameter parameter) : Primitiv
         return true;
     }
 
+    public override bool ValueIncludesParameterName => false;
+
     protected override string Serialize(string value) =>
         value;
 }

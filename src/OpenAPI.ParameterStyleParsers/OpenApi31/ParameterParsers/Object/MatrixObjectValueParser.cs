@@ -5,7 +5,7 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 
 internal sealed class MatrixObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
-    internal override bool ValueIncludesParameterName => !Explode;
+    public override bool ValueIncludesParameterName => !Explode;
 
     public override bool TryParse(
         string? value,

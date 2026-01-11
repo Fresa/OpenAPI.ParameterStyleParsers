@@ -14,6 +14,8 @@ internal sealed class LabelPrimitiveValueParser(Parameter parameter) : Primitive
         return true;
     }
 
+    public override bool ValueIncludesParameterName => false;
+
     protected override string Serialize(string value) =>
         $".{value}";
 }

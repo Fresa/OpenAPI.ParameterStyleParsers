@@ -5,7 +5,7 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 
 internal sealed class FormObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
-    internal override bool ValueIncludesParameterName => true;
+    public override bool ValueIncludesParameterName => true;
 
     public override bool TryParse(
         string? value,

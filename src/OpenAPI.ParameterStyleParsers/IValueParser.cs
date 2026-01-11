@@ -11,4 +11,6 @@ internal interface IValueParser
         [NotNullWhen(false)] out string? error);
 
     string? Serialize(JsonNode? instance);
+    
+    bool ValueIncludesParameterName { get; }
 }

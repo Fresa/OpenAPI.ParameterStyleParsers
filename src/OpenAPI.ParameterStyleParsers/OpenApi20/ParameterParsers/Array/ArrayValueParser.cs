@@ -1,8 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Primitive;
-using OpenAPI.ParameterStyleParsers.ParameterParsers;
-using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Array;
 
@@ -11,7 +9,7 @@ internal abstract class ArrayValueParser : IValueParser
     private readonly string _itemType;
 
     protected string ParameterName { get; }
-    protected bool ValueIncludesKey { get; }
+    public bool ValueIncludesParameterName { get; }
 
     protected ArrayValueParser(Parameter parameter)
     {
@@ -22,7 +20,7 @@ internal abstract class ArrayValueParser : IValueParser
 
         ParameterName = parameter.Name;
         _itemType = parameter.Items.Type;
-        ValueIncludesKey = parameter.ValueIncludesKey;
+        ValueIncludesParameterName = parameter.ValueIncludesKey;
     }
 
     internal static ArrayValueParser Create(Parameter parameter) =>

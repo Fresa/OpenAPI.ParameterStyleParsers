@@ -15,6 +15,8 @@ internal sealed class LabelArrayValueParser(Parameter parameter) : ArrayValuePar
         return TryGetArrayItems(arrayValues, out array, out error);
     }
 
+    public override bool ValueIncludesParameterName => false;
+
     protected override string Serialize(string?[] values) => 
         $".{string.Join('.', values)}";
 }

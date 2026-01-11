@@ -33,6 +33,8 @@ internal abstract class ObjectValueParser(Parameter parameter) : IValueParser
         return Serialize(properties);
     }
 
+    public abstract bool ValueIncludesParameterName { get; }
+
     protected abstract string Serialize(IDictionary<string, string?> properties);
 
     protected bool TryGetObjectProperties(

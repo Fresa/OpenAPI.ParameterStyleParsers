@@ -14,6 +14,8 @@ internal sealed class SimpleArrayValueParser(Parameter parameter) : ArrayValuePa
         return TryGetArrayItems(arrayValues, out array, out error);
     }
 
+    public override bool ValueIncludesParameterName => false;
+
     protected override string Serialize(string?[] values) =>
         string.Join(',', values);
 }

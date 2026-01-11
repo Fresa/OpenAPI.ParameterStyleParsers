@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using OpenAPI.ParameterStyleParsers.JsonSchema;
 using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Primitive;
-using OpenAPI.ParameterStyleParsers.ParameterParsers;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers.Array;
 
@@ -34,6 +33,8 @@ internal abstract class ArrayValueParser(Parameter parameter) : IValueParser
             .ToArray();
         return Serialize(values);
     }
+
+    public abstract bool ValueIncludesParameterName { get; }
 
     protected abstract string Serialize(string?[] values);
 

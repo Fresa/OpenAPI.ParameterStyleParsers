@@ -23,6 +23,8 @@ internal sealed class FormArrayValueParser(Parameter parameter) : ArrayValuePars
         return TryGetArrayItems(arrayValues, out array, out error);
     }
 
+    public override bool ValueIncludesParameterName => true;
+
     protected override string Serialize(string?[] values)
     {
         var serialized = string.Join(Explode ? '&' : ',',

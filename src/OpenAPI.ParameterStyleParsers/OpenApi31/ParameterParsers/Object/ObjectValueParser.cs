@@ -12,7 +12,7 @@ internal abstract class ObjectValueParser(Parameter parameter) : IValueParser
     private readonly PropertySchemaResolver _propertySchemaResolver = new(parameter.JsonSchema);
 
     protected bool Explode { get; } = parameter.Explode;
-    internal abstract bool ValueIncludesParameterName { get; }
+    public abstract bool ValueIncludesParameterName { get; }
     protected string ParameterName { get; } = parameter.Name;
 
     internal static ObjectValueParser Create(Parameter parameter) =>
