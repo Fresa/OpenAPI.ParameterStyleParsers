@@ -5,6 +5,8 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 
 internal sealed class MatrixObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
+    public override bool ValueIncludesParameterName => !Explode;
+
     public override bool TryParse(
         string? value,
         out JsonNode? obj,
@@ -25,7 +27,7 @@ internal sealed class MatrixObjectValueParser(Parameter parameter) : ObjectValue
     }
 
     protected override string Serialize(IDictionary<string, string?> properties) =>
-        $";{(Explode ? "" : $"{ParameterName}=")}{string.Join(Explode ? ';' : ',',
-            properties.Select(property => 
-                $"{property.Key}{(Explode ? string.IsNullOrEmpty(property.Value) ? "" : "=" : ",")}{property.Value}"))}";
+        $";{(ValueIncludesParameterName ? $"{ParameterName}=" : "")}{string.Join(ValueIncludesParameterName ? ',' : ';',
+            properties.Select(property =>
+                $"{property.Key}{(ValueIncludesParameterName ? "," : string.IsNullOrEmpty(property.Value) ? "" : "=")}{property.Value}"))}";
 }

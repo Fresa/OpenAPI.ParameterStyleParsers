@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Array;
@@ -24,9 +23,11 @@ internal sealed class FormArrayValueParser(Parameter parameter) : ArrayValuePars
         return TryGetArrayItems(arrayValues, out array, out error);
     }
 
+    public override bool ValueIncludesParameterName => true;
+
     protected override string Serialize(string?[] values)
     {
-        var serialized = string.Join((Explode ? '&' : ','),
+        var serialized = string.Join(Explode ? '&' : ',',
             values.Select(value => Explode ? $"{ParameterName}={value}" : value));
         return Explode ? serialized : $"{ParameterName}={serialized}";
     }

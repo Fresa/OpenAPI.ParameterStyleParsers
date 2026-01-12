@@ -28,4 +28,6 @@ internal sealed class MissingSchemaTypeValueParser : IValueParser
 
     public string? Serialize(JsonNode? instance) => 
         _valueParser.Serialize(instance);
+
+    public bool ValueIncludesParameterName => _valueParser.ValueIncludesParameterName;
 }

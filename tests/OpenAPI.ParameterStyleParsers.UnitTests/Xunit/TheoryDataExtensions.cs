@@ -22,4 +22,14 @@ internal static class TheoryDataExtensions
 
         return theory;
     }
+    public static TheoryData<T1, T2, T3, T4, T5> AddRange<T1, T2, T3, T4, T5>(this TheoryData<T1, T2, T3, T4, T5> theory,
+        IEnumerable<(T1, T2, T3, T4, T5)> data)
+    {
+        foreach (var item in data)
+        {
+            theory.Add(item.Item1, item.Item2, item.Item3, item.Item4, item.Item5);
+        }
+
+        return theory;
+    }
 }

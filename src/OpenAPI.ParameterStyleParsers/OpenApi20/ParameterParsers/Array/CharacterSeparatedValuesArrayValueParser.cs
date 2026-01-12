@@ -13,7 +13,7 @@ internal abstract class CharacterSeparatedValuesArrayValueParser(Parameter param
         [NotNullWhen(false)] out string? error)
     {
         var value = input;
-        if (ValueIncludesKey)
+        if (ValueIncludesParameterName)
         {
             var valueAndKey = input?.Split('=');
             value = valueAndKey?.Length == 1 ? string.Empty : valueAndKey?.Last();            
@@ -28,6 +28,6 @@ internal abstract class CharacterSeparatedValuesArrayValueParser(Parameter param
     {
         var serialized = string.Join(Separator,
             values.Select(value => value));
-        return ValueIncludesKey ? $"{ParameterName}={serialized}" : serialized;
+        return ValueIncludesParameterName ? $"{ParameterName}={serialized}" : serialized;
     }
 }

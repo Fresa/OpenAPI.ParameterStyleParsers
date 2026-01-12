@@ -22,6 +22,8 @@ internal sealed class MatrixArrayValueParser(Parameter parameter) : ArrayValuePa
         return TryGetArrayItems(arrayValues, out array, out error);
     }
 
+    public override bool ValueIncludesParameterName => true;
+
     protected override string Serialize(string?[] values)
     {
         var serialized = string.Join(Explode ? ';' : ',',

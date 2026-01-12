@@ -21,7 +21,11 @@ public sealed class ParameterValueParser : IParameterValueParser
     private ParameterValueParser(IValueParser valueParser)
     {
         _valueParser = valueParser;
+        ValueIncludesParameterName = valueParser.ValueIncludesParameterName;
     }
+
+    /// <inheritdoc />
+    public bool ValueIncludesParameterName { get; }
 
     /// <summary>
     /// Creates a parameter value parser corresponding to the specified parameter
@@ -37,16 +41,16 @@ public sealed class ParameterValueParser : IParameterValueParser
 
     private static IValueParser CreateValueParser(Parameter parameter)
     {
-        // Cookie style: no percent-encoding (RFC6265)
+        // Cookie: no percent-encoding per 3.2 spec
         if (parameter.Style == Parameter.Styles.Cookie)
         {
             return CreateCookieStyleParser(parameter);
         }
 
-        // Header location: no percent-encoding per 3.2 spec
+        // Header: no percent-encoding per 3.2 spec
         if (parameter.Location == Parameter.Locations.Header)
         {
-            return CreateHeaderParser(parameter);
+            return CreateSimpleStyleParser(parameter);
         }
 
         // For other styles/locations, delegate to 3.1 parsers
@@ -78,7 +82,7 @@ public sealed class ParameterValueParser : IParameterValueParser
         };
     }
 
-    private static IValueParser CreateHeaderParser(Parameter parameter)
+    private static IValueParser CreateSimpleStyleParser(Parameter parameter)
     {
         var jsonType = parameter.JsonSchema.GetInstanceType();
 
@@ -89,9 +93,9 @@ public sealed class ParameterValueParser : IParameterValueParser
                 InstanceType.Boolean or
                 InstanceType.Integer or
                 InstanceType.Number or
-                InstanceType.Null => new HeaderPrimitiveValueParser(parameter),
-            InstanceType.Array => new HeaderArrayValueParser(parameter),
-            InstanceType.Object => new HeaderObjectValueParser(parameter),
+                InstanceType.Null => new SimplePrimitiveValueParser(parameter),
+            InstanceType.Array => new SimpleArrayValueParser(parameter),
+            InstanceType.Object => new SimpleObjectValueParser(parameter),
             _ => throw new NotSupportedException($"Json type {Enum.GetName(jsonType.Value)} is not supported")
         };
     }

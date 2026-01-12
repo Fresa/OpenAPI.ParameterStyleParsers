@@ -1,7 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 
-namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers;
+namespace OpenAPI.ParameterStyleParsers;
 
 internal interface IValueParser
 {
@@ -11,4 +11,6 @@ internal interface IValueParser
         [NotNullWhen(false)] out string? error);
 
     string? Serialize(JsonNode? instance);
+    
+    bool ValueIncludesParameterName { get; }
 }

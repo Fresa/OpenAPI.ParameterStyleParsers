@@ -1,7 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
-using OpenAPI.ParameterStyleParsers.ParameterParsers;
-using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Primitive;
 
@@ -21,6 +19,7 @@ internal abstract class PrimitiveValueParser : IValueParser
 
         ParameterName = parameter.Name;
         Type = parameter.Type;
+        ValueIncludesParameterName = parameter.ValueIncludesKey;
     }
 
     internal static PrimitiveValueParser Create(Parameter parameter)
@@ -61,6 +60,8 @@ internal abstract class PrimitiveValueParser : IValueParser
 
     public string? Serialize(JsonNode? instance) =>
         instance == null ? null : Serialize(Uri.EscapeDataString(instance.ToString()));
+
+    public bool ValueIncludesParameterName { get; } 
 
     protected abstract string Serialize(string value);
 }
