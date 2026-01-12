@@ -13,7 +13,9 @@ dotnet add package ParameterStyleParsers.OpenAPI
 https://www.nuget.org/packages/ParameterStyleParsers.OpenAPI/
 
 ## Getting Started
-Create a parser by providing the OpenAPI parameter specification.
+Create a parser by providing the OpenAPI parameter specification using `OpenAPI.ParameterStyleParsers.ParameterValueParserFactory`.
+
+It's also possible to go via the respective parameter using `OpenAPI.ParameterStyleParsers.ParameterFactory` and from there use the extension method `CreateParameterValueParser`.
 
 ### [OpenAPI 3.2](https://spec.openapis.org/oas/v3.2.0.html#parameter-object)
 ```dotnet

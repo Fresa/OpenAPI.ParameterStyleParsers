@@ -1,4 +1,6 @@
+using System.Text.Json.Nodes;
 using JetBrains.Annotations;
+using OpenAPI.ParameterStyleParsers.Json;
 using OpenAPI.ParameterStyleParsers.JsonSchema;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi31;
@@ -107,6 +109,71 @@ public record Parameter : IParameter
         return new Parameter(name, location, style, explode, jsonSchema);
     }
 
+    /// <summary>
+    /// Create a parameter from an OpenAPI 3.1 parameter specification
+    /// <see href="https://spec.openapis.org/oas/v3.1.0#parameter-object"/>
+    /// </summary>
+    /// <param name="parameterSpecificationAsJson">Specification of the parameter</param>
+    /// <returns>Parameter</returns>
+    /// <exception cref="InvalidOperationException">The provided json object doesn't correspond to the specification</exception>
+    public static Parameter FromOpenApi31ParameterSpecification(string parameterSpecificationAsJson)
+    {
+        var json = JsonNode.Parse(parameterSpecificationAsJson)?.AsObject() ??
+                   throw new InvalidOperationException("Parameter specification is not a json object");
+        return FromOpenApi31ParameterSpecification(json);
+    }
+
+    /// <summary>
+    /// Create a parameter from an OpenAPI 3.1 parameter specification
+    /// <see href="https://spec.openapis.org/oas/v3.1.0#parameter-object"/>
+    /// </summary>
+    /// <param name="parameterSpecification">Specification of the parameter</param>
+    /// <returns>The parsed parameter</returns>
+    /// <exception cref="InvalidOperationException">The provided json object doesn't correspond to the specification</exception>
+    public static Parameter FromOpenApi31ParameterSpecification(JsonObject parameterSpecification)
+    {
+        var name = parameterSpecification.GetRequiredPropertyValue<string>(FieldNames.Name);
+        if (name == string.Empty)
+            throw new InvalidOperationException($"Property '{FieldNames.Name}' is empty string");
+
+        var location = parameterSpecification.GetRequiredPropertyValue<string>(FieldNames.In);
+        if (!Locations.All.Contains(location))
+        {
+            throw new InvalidOperationException(
+                $"Property '{FieldNames.In}' has an invalid value '{location}'. Expected any of {string.Join(", ", Locations.All)}");
+        }
+
+        string style;
+        if (parameterSpecification.TryGetPropertyValue(FieldNames.Style, out var styleJson))
+        {
+            style = styleJson?.GetValue<string>() switch
+            {
+                var value when Styles.All.Contains(value) => value!,
+                var value => throw new InvalidOperationException(
+                    $"Property '{FieldNames.Style}' has an invalid value '{value}'. Expected any of {string.Join(", ", Styles.All)}")
+            };
+        }
+        else
+        {
+            style = location switch
+            {
+                Locations.Path => Styles.Simple,
+                Locations.Cookie => Styles.Form,
+                Locations.Query => Styles.Form,
+                Locations.Header => Styles.Simple,
+                _ => throw new InvalidOperationException($"Unknown location {location}")
+            };
+        }
+
+        parameterSpecification.TryGetPropertyValue(FieldNames.Explode, out var explodeJson);
+        var explode = explodeJson?.GetValue<bool>() ?? style == Styles.Form;
+
+        var schemaJson = parameterSpecification.GetRequiredPropertyValue(FieldNames.Schema);
+        var schema = new JsonSchema202012(schemaJson);
+
+        return Parse(name, style, location, explode, schema);
+    }
+
     /// <inheritdoc />
     public string Name { get; private init; }
 
@@ -132,10 +199,12 @@ public record Parameter : IParameter
     /// The style of the parameter
     /// </summary>
     public string Style { get; private init; }
+    
     /// <summary>
     /// If the parameter apply explosion of the serialized format
     /// </summary>
     public bool Explode { get; private init; }
+    
     /// <summary>
     /// The parameter's json schema
     /// </summary>

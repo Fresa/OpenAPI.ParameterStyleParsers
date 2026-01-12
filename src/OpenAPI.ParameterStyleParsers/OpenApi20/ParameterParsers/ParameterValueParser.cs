@@ -9,6 +9,7 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers;
 /// <summary>
 /// Represents a parameter value parser for OpenAPI 2.0 styles
 /// </summary>
+[PublicAPI]
 public sealed class ParameterValueParser : IParameterValueParser
 {
     private readonly IValueParser _valueParser;
@@ -24,7 +25,6 @@ public sealed class ParameterValueParser : IParameterValueParser
     /// </summary>
     /// <param name="parameter">The parameter specification</param>
     /// <returns>Parameter value parser</returns>
-    [PublicAPI]
     public static ParameterValueParser Create(Parameter parameter)
     {
         var valueParser = CreateValueParser(parameter);

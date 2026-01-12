@@ -35,7 +35,6 @@ public static class ParameterValueParserFactory
     /// <param name="parameterSpecification">Parameter specification as JSON</param>
     /// <returns>Parameter value parser</returns>
     /// <exception cref="NotSupportedException">The specified version is not supported</exception>
-    [PublicAPI]
     public static IParameterValueParser OpenApi(string version, JsonObject parameterSpecification)
     {
         if (!Factories.TryGetValue(version, out var factory))
@@ -55,7 +54,6 @@ public static class ParameterValueParserFactory
     /// <param name="parameterSpecificationAsJson">Parameter specification as JSON string</param>
     /// <returns>Parameter value parser</returns>
     /// <exception cref="NotSupportedException">The specified version is not supported</exception>
-    [PublicAPI]
     public static IParameterValueParser OpenApi(string version, string parameterSpecificationAsJson)
     {
         var json = JsonNode.Parse(parameterSpecificationAsJson)?.AsObject() ??
@@ -63,6 +61,32 @@ public static class ParameterValueParserFactory
         return OpenApi(version, json);
     }
 
+    /// <summary>
+    /// Create a parameter value parser for the specified OpenAPI parameter
+    /// </summary>
+    /// <param name="parameter">Parameter specification</param>
+    /// <returns>Parameter value parser</returns>
+    /// <exception cref="NotSupportedException">The specified parameter is not supported</exception>
+    public static IParameterValueParser OpenApi(IParameter parameter) =>
+        parameter switch
+        {
+            OpenApi20.Parameter p => p.CreateParameterValueParser(),
+            global::OpenAPI.ParameterStyleParsers.OpenApi30.Parameter p => p.CreateParameterValueParser(),
+            global::OpenAPI.ParameterStyleParsers.OpenApi31.Parameter p => p.CreateParameterValueParser(),
+            global::OpenAPI.ParameterStyleParsers.OpenApi32.Parameter p => p.CreateParameterValueParser(),
+            _ => throw new NotSupportedException(
+                $"Parameter {parameter} is not supported.")
+        };
+
+    /// <summary>
+    /// Create a parameter value parser for the specified OpenAPI parameter
+    /// </summary>
+    /// <param name="parameter">Parameter specification</param>
+    /// <returns>Parameter value parser</returns>
+    /// <exception cref="NotSupportedException">The specified parameter is not supported</exception>
+    public static IParameterValueParser CreateParameterValueParser(this IParameter parameter) =>
+        OpenApi(parameter);
+    
     /// <summary>
     /// Create a parameter value parser for OpenAPI 3.1
     /// </summary>
@@ -88,6 +112,22 @@ public static class ParameterValueParserFactory
 #pragma warning restore CS0618
 
     /// <summary>
+    /// Create a parameter value parser for OpenAPI 3.1
+    /// </summary>
+    /// <param name="parameter">Parameter specification</param>
+    /// <returns>Parameter value parser</returns>
+    public static OpenApi31.ParameterValueParser OpenApi31(OpenApi31.Parameter parameter) =>
+        ParameterStyleParsers.OpenApi31.ParameterValueParser.Create(parameter);
+    
+    /// <summary>
+    /// Create a parameter value parser for OpenAPI 3.1
+    /// </summary>
+    /// <param name="parameter">Parameter specification</param>
+    /// <returns>Parameter value parser</returns>
+    public static OpenApi31.ParameterValueParser CreateParameterValueParser(this OpenApi31.Parameter parameter) =>
+        ParameterStyleParsers.OpenApi31.ParameterValueParser.Create(parameter);
+
+    /// <summary>
     /// Create a parameter value parser for OpenAPI 3.0
     /// </summary>
     /// <param name="parameterSpecification">Parameter specification as JSON</param>
@@ -102,6 +142,22 @@ public static class ParameterValueParserFactory
     /// <returns>Parameter value parser</returns>
     public static OpenApi30.ParameterValueParser OpenApi30(string parameterSpecificationAsJson) =>
         ParameterStyleParsers.OpenApi30.ParameterValueParser.Create(ParameterStyleParsers.OpenApi30.Parameter.FromOpenApi30ParameterSpecification(parameterSpecificationAsJson));
+
+    /// <summary>
+    /// Create a parameter value parser for OpenAPI 3.0
+    /// </summary>
+    /// <param name="parameter">Parameter specification</param>
+    /// <returns>Parameter value parser</returns>
+    public static OpenApi30.ParameterValueParser OpenApi30(OpenApi30.Parameter parameter) =>
+        ParameterStyleParsers.OpenApi30.ParameterValueParser.Create(parameter);
+    
+    /// <summary>
+    /// Create a parameter value parser for OpenAPI 3.0
+    /// </summary>
+    /// <param name="parameter">Parameter specification</param>
+    /// <returns>Parameter value parser</returns>
+    public static OpenApi30.ParameterValueParser CreateParameterValueParser(this OpenApi30.Parameter parameter) =>
+        ParameterStyleParsers.OpenApi30.ParameterValueParser.Create(parameter);
 
     /// <summary>
     /// Create a parameter value parser for OpenAPI 3.2
@@ -120,6 +176,22 @@ public static class ParameterValueParserFactory
         ParameterStyleParsers.OpenApi32.ParameterParsers.ParameterValueParser.Create(ParameterStyleParsers.OpenApi32.Parameter.FromOpenApi32ParameterSpecification(parameterSpecificationAsJson));
 
     /// <summary>
+    /// Create a parameter value parser for OpenAPI 3.2
+    /// </summary>
+    /// <param name="parameter">Parameter specification</param>
+    /// <returns>Parameter value parser</returns>
+    public static OpenApi32.ParameterParsers.ParameterValueParser OpenApi32(OpenApi32.Parameter parameter) =>
+        ParameterStyleParsers.OpenApi32.ParameterParsers.ParameterValueParser.Create(parameter);
+    
+    /// <summary>
+    /// Create a parameter value parser for OpenAPI 3.2
+    /// </summary>
+    /// <param name="parameter">Parameter specification</param>
+    /// <returns>Parameter value parser</returns>
+    public static OpenApi32.ParameterParsers.ParameterValueParser CreateParameterValueParser(this OpenApi32.Parameter parameter) =>
+        ParameterStyleParsers.OpenApi32.ParameterParsers.ParameterValueParser.Create(parameter);
+
+    /// <summary>
     /// Create a parameter value parser for OpenAPI 2.0
     /// </summary>
     /// <param name="parameterSpecification">Parameter specification as JSON</param>
@@ -134,4 +206,20 @@ public static class ParameterValueParserFactory
     /// <returns>Parameter value parser</returns>
     public static OpenApi20.ParameterParsers.ParameterValueParser OpenApi20(string parameterSpecificationAsJson) => 
         ParameterStyleParsers.OpenApi20.ParameterParsers.ParameterValueParser.Create(ParameterStyleParsers.OpenApi20.Parameter.FromOpenApi20ParameterSpecification(parameterSpecificationAsJson));
+    
+    /// <summary>
+    /// Create a parameter value parser for OpenAPI 2.0
+    /// </summary>
+    /// <param name="parameter">Parameter specification</param>
+    /// <returns>Parameter value parser</returns>
+    public static OpenApi20.ParameterParsers.ParameterValueParser OpenApi20(OpenApi20.Parameter parameter) =>
+        ParameterStyleParsers.OpenApi20.ParameterParsers.ParameterValueParser.Create(parameter);
+    
+    /// <summary>
+    /// Create a parameter value parser for OpenAPI 2.0
+    /// </summary>
+    /// <param name="parameter">Parameter specification</param>
+    /// <returns>Parameter value parser</returns>
+    public static OpenApi20.ParameterParsers.ParameterValueParser CreateParameterValueParser(this OpenApi20.Parameter parameter) =>
+        ParameterStyleParsers.OpenApi20.ParameterParsers.ParameterValueParser.Create(parameter);
 }
