@@ -67,5 +67,6 @@ internal abstract class PrimitiveValueParser : IValueParser
         instance == null ? null : Serialize(Uri.EscapeDataString(instance.ToString()));
 
     public abstract bool ValueIncludesParameterName { get; }
+    public string Delimiter => string.Empty;
     protected abstract string Serialize(string value);
 }

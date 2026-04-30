@@ -6,13 +6,14 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 internal sealed class SimpleObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
     public override bool ValueIncludesParameterName => false;
+    public override string Delimiter => ",";
 
     public override bool TryParse(
         string? value,
         out JsonNode? obj,
         [NotNullWhen(false)] out string? error)
     {
-        var keyAndValues = value?.Split(',');
+        var keyAndValues = value?.Split(Delimiter);
         if (Explode)
         {
             keyAndValues = keyAndValues?
@@ -24,6 +25,6 @@ internal sealed class SimpleObjectValueParser(Parameter parameter) : ObjectValue
     }
 
     protected override string Serialize(IDictionary<string, string?> properties) => 
-        string.Join(',', 
+        string.Join(Delimiter, 
             properties.Select(pair => $"{pair.Key}{(Explode ? "=" : ",")}{pair.Value}"));
 }

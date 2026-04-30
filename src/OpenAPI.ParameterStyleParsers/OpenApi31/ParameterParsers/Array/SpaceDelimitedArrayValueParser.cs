@@ -16,7 +16,7 @@ internal sealed class SpaceDelimitedArrayValueParser(Parameter parameter) : Arra
             {
                 var valueAndKey = expression.Split('=');
                 var value = valueAndKey.Length == 1 ? string.Empty : valueAndKey.Last();
-                return Explode ? [value] : value.Split("%20");
+                return Explode ? [value] : value.Split(Delimiter);
             })
             .ToArray();
 
@@ -24,10 +24,11 @@ internal sealed class SpaceDelimitedArrayValueParser(Parameter parameter) : Arra
     }
 
     public override bool ValueIncludesParameterName => true;
+    public override string Delimiter => Explode ? "&" : "%20"; 
 
     protected override string Serialize(string?[] values)
     {
-        var serialized = string.Join(Explode ? "&" : "%20",
+        var serialized = string.Join(Delimiter,
             values.Select(value => Explode ? $"{ParameterName}={value}" : value));
         return Explode ? serialized : $"{ParameterName}={serialized}";
     }

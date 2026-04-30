@@ -6,6 +6,7 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 internal sealed class LabelObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
     public override bool ValueIncludesParameterName => false;
+    public override string Delimiter => ".";
 
     public override bool TryParse(
         string? value,
@@ -13,7 +14,7 @@ internal sealed class LabelObjectValueParser(Parameter parameter) : ObjectValueP
         [NotNullWhen(false)] out string? error)
     {
         var keyAndValues = value?
-            .Split('.')[1..];
+            .Split(Delimiter)[1..];
         if (Explode)
         {
             keyAndValues = keyAndValues?
@@ -28,7 +29,7 @@ internal sealed class LabelObjectValueParser(Parameter parameter) : ObjectValueP
     {
         if (!properties.Any())
             return string.Empty;
-        return $".{string.Join('.',
+        return $".{string.Join(Delimiter,
             properties.Select(pair => $"{pair.Key}{(Explode ? "=" : ".")}{pair.Value}"))}";
     }
 }

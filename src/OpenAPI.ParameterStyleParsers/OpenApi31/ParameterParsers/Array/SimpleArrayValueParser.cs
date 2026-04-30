@@ -11,12 +11,13 @@ internal sealed class SimpleArrayValueParser(Parameter parameter) : ArrayValuePa
         [NotNullWhen(false)] out string? error)
     {
         var arrayValues = value?
-            .Split(',');
+            .Split(Delimiter);
         return TryGetArrayItems(arrayValues, out array, out error);
     }
 
     public override bool ValueIncludesParameterName => false;
+    public override string Delimiter => ",";
 
     protected override string Serialize(string?[] values) => 
-        string.Join(',', values);
+        string.Join(Delimiter, values);
 }

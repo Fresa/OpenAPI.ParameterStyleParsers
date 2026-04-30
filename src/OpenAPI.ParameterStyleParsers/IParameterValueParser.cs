@@ -32,4 +32,9 @@ public interface IParameterValueParser
     /// Parameter name is included in the value, i.e. [parameter name]=[value] vs [value], see style examples in OAS.
     /// </summary>
     bool ValueIncludesParameterName { get; }
+    
+    /// <summary>
+    /// The delimiter between array items and object properties
+    /// </summary>
+    public string Delimiter { get; }
 }

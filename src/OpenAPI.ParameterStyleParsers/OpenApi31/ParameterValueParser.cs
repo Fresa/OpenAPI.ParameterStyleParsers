@@ -24,6 +24,10 @@ public sealed class ParameterValueParser : IParameterValueParser
     /// <inheritdoc />
     public bool ValueIncludesParameterName { get; }
 
+
+    /// <inheritdoc />
+    public string Delimiter => _valueParser.Delimiter;
+
     /// <summary>
     /// Creates a parameter value parser corresponding to the specified parameter
     /// </summary>

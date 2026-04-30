@@ -19,6 +19,9 @@ public sealed class ParameterValueParser : IParameterValueParser
     /// <inheritdoc />
     public bool ValueIncludesParameterName => _innerParser.ValueIncludesParameterName;
 
+    /// <inheritdoc />
+    public string Delimiter => _innerParser.Delimiter;
+
     /// <summary>
     /// Creates a parameter value parser corresponding to the specified parameter
     /// </summary>

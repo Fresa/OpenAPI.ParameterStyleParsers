@@ -13,4 +13,5 @@ internal interface IValueParser
     string? Serialize(JsonNode? instance);
     
     bool ValueIncludesParameterName { get; }
+    string Delimiter { get; }
 }

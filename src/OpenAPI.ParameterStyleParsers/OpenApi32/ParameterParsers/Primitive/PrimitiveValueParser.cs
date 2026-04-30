@@ -49,6 +49,7 @@ internal abstract class PrimitiveValueParser(Parameter parameter) : IValueParser
         instance == null ? null : Serialize(instance.ToString());
 
     public abstract bool ValueIncludesParameterName { get; }
+    public string Delimiter => string.Empty;
 
     protected abstract string Serialize(string value);
 }

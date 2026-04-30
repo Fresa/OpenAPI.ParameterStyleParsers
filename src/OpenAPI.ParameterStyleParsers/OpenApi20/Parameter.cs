@@ -270,7 +270,7 @@ public record Parameter : IParameter
     /// Does the parameter value include keys, i.e. key=value
     /// </summary>
     public bool ValueIncludesKey { get; }
-
+    
     /// <inheritdoc cref="GetSchema(JsonObject)" />
     [PublicAPI]
     public static JsonNode? GetSchema(string parameterSpecification)

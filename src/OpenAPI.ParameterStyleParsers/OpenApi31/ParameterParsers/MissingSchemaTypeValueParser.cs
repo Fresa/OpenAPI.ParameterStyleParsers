@@ -30,4 +30,5 @@ internal sealed class MissingSchemaTypeValueParser : IValueParser
         _valueParser.Serialize(instance);
 
     public bool ValueIncludesParameterName => _valueParser.ValueIncludesParameterName;
+    public string Delimiter => _valueParser.Delimiter;
 }

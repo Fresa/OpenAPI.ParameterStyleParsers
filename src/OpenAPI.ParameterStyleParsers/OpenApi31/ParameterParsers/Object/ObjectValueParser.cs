@@ -13,6 +13,7 @@ internal abstract class ObjectValueParser(Parameter parameter) : IValueParser
 
     protected bool Explode { get; } = parameter.Explode;
     public abstract bool ValueIncludesParameterName { get; }
+    public abstract string Delimiter { get; }
     protected string ParameterName { get; } = parameter.Name;
 
     internal static ObjectValueParser Create(Parameter parameter) =>

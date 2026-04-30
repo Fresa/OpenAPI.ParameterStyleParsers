@@ -5,13 +5,15 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Array;
 
 internal sealed class MultiArrayValueParser(Parameter parameter) : ArrayValueParser(parameter)
 {
+    public override string Delimiter => "&";
+
     public override bool TryParse(
         string? value,
         out JsonNode? array,
         [NotNullWhen(false)] out string? error)
     {
         var arrayValues = value?
-            .Split('&', StringSplitOptions.RemoveEmptyEntries)
+            .Split(Delimiter, StringSplitOptions.RemoveEmptyEntries)
             .Select(expression =>
             {
                 var valueAndKey = expression.Split('=');
@@ -22,6 +24,6 @@ internal sealed class MultiArrayValueParser(Parameter parameter) : ArrayValuePar
     }
 
     protected override string Serialize(string?[] values) =>
-        string.Join('&',
+        string.Join(Delimiter,
             values.Select(value => $"{ParameterName}={value}"));
 }

@@ -16,17 +16,18 @@ internal sealed class MatrixArrayValueParser(Parameter parameter) : ArrayValuePa
             {
                 var valueAndKey = expression.Split('=');
                 var value = valueAndKey.Length == 1 ? string.Empty : valueAndKey.Last();
-                return Explode ? [value] : value.Split(',');
+                return Explode ? [value] : value.Split(Delimiter);
             })
             .ToArray();
         return TryGetArrayItems(arrayValues, out array, out error);
     }
 
     public override bool ValueIncludesParameterName => true;
+    public override string Delimiter => Explode ? ";" : ",";
 
     protected override string Serialize(string?[] values)
     {
-        var serialized = string.Join(Explode ? ';' : ',',
+        var serialized = string.Join(Delimiter,
             values.Select(value => Explode ? $"{ParameterName}{(string.IsNullOrEmpty(value) ? "" : "=")}{value}" : value));
         return $";{(Explode ? serialized : $"{ParameterName}={serialized}")}";
     }

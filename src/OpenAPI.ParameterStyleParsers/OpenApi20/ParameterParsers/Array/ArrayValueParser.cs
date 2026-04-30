@@ -10,6 +10,7 @@ internal abstract class ArrayValueParser : IValueParser
 
     protected string ParameterName { get; }
     public bool ValueIncludesParameterName { get; }
+    public abstract string Delimiter { get; }
 
     protected ArrayValueParser(Parameter parameter)
     {

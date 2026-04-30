@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using JetBrains.Annotations;
-using OpenAPI.ParameterStyleParsers.ParameterParsers;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi30;
 
@@ -20,6 +19,9 @@ public sealed class ParameterValueParser : IParameterValueParser
 
     /// <inheritdoc />
     public bool ValueIncludesParameterName => _innerParser.ValueIncludesParameterName;
+
+    /// <inheritdoc />
+    public string Delimiter => _innerParser.Delimiter;
 
     /// <summary>
     /// Creates a parameter value parser corresponding to the specified parameter

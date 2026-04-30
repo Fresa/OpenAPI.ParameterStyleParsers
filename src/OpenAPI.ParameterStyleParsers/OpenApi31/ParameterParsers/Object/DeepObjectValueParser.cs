@@ -6,6 +6,7 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 internal sealed class DeepObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
     public override bool ValueIncludesParameterName => true;
+    public override string Delimiter => "&";
 
     public override bool TryParse(
         string? value,
@@ -20,7 +21,7 @@ internal sealed class DeepObjectValueParser(Parameter parameter) : ObjectValuePa
         }
 
         var keyAndValues = value?
-            .Split('&')
+            .Split(Delimiter)
             .SelectMany(value =>
             {
                 var keyAndValue = value
@@ -37,5 +38,5 @@ internal sealed class DeepObjectValueParser(Parameter parameter) : ObjectValuePa
     }
 
     protected override string Serialize(IDictionary<string, string?> properties) =>
-        string.Join('&', properties.Select(pair => $"{ParameterName}[{pair.Key}]={pair.Value}"));
+        string.Join(Delimiter, properties.Select(pair => $"{ParameterName}[{pair.Key}]={pair.Value}"));
 }

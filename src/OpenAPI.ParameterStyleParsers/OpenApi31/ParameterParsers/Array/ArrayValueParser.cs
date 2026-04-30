@@ -47,6 +47,7 @@ internal abstract class ArrayValueParser(Parameter parameter) : IValueParser
     }
 
     public abstract bool ValueIncludesParameterName { get; }
+    public abstract string Delimiter { get; }
 
     protected abstract string Serialize(string?[] values);
 
