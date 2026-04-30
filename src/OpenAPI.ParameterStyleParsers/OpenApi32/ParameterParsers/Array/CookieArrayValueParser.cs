@@ -21,7 +21,7 @@ internal sealed class CookieArrayValueParser(Parameter parameter) : ArrayValuePa
         if (Explode)
         {
             arrayValues = value
-                .Split("; ", StringSplitOptions.RemoveEmptyEntries)
+                .Split(Delimiter, StringSplitOptions.RemoveEmptyEntries)
                 .Select(expression =>
                 {
                     var parts = expression.Split('=', 2);
@@ -33,16 +33,17 @@ internal sealed class CookieArrayValueParser(Parameter parameter) : ArrayValuePa
         {
             var parts = value.Split('=', 2);
             var valuesStr = parts.Length > 1 ? parts[1] : string.Empty;
-            arrayValues = valuesStr.Split(',');
+            arrayValues = valuesStr.Split(Delimiter);
         }
 
         return TryGetArrayItems(arrayValues, out array, out error);
     }
 
     public override bool ValueIncludesParameterName => true;
+    public override string Delimiter => Explode ? "; " : ","; 
 
     protected override string Serialize(string?[] values) =>
         Explode
-            ? string.Join("; ", values.Select(v => $"{ParameterName}={v}"))
-            : $"{ParameterName}={string.Join(',', values)}";
+            ? string.Join(Delimiter, values.Select(v => $"{ParameterName}={v}"))
+            : $"{ParameterName}={string.Join(Delimiter, values)}";
 }

@@ -6,7 +6,8 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi20.ParameterParsers.Array;
 internal abstract class CharacterSeparatedValuesArrayValueParser(Parameter parameter) : ArrayValueParser(parameter)
 {
     protected abstract char Separator { get; }
-    
+    public override string Delimiter => Separator.ToString();
+
     public override bool TryParse(
         string? input,
         out JsonNode? array,

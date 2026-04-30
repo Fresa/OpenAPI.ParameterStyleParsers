@@ -10,7 +10,7 @@ internal sealed class SimpleObjectValueParser(Parameter parameter) : ObjectValue
         out JsonNode? obj,
         [NotNullWhen(false)] out string? error)
     {
-        var keyAndValues = value?.Split(',');
+        var keyAndValues = value?.Split(Delimiter);
         if (Explode)
         {
             keyAndValues = keyAndValues?
@@ -21,7 +21,8 @@ internal sealed class SimpleObjectValueParser(Parameter parameter) : ObjectValue
     }
 
     public override bool ValueIncludesParameterName => false;
+    public override string Delimiter => ",";
 
     protected override string Serialize(IDictionary<string, string?> properties) =>
-        string.Join(',', properties.Select(pair => $"{pair.Key}{(Explode ? "=" : ",")}{pair.Value}"));
+        string.Join(Delimiter, properties.Select(pair => $"{pair.Key}{(Explode ? "=" : ",")}{pair.Value}"));
 }

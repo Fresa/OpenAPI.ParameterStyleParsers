@@ -25,7 +25,7 @@ internal sealed class CookieObjectValueParser(Parameter parameter) : ObjectValue
         if (Explode)
         {
             // Cookie style exploded: "key1=value1; key2=value2"
-            var pairs = value.Split("; ", StringSplitOptions.RemoveEmptyEntries);
+            var pairs = value.Split(Delimiter, StringSplitOptions.RemoveEmptyEntries);
             var jsonObject = new JsonObject();
 
             foreach (var pair in pairs)
@@ -59,13 +59,14 @@ internal sealed class CookieObjectValueParser(Parameter parameter) : ObjectValue
             return false;
         }
 
-        var keyAndValues = nameValue[1].Split(',');
+        var keyAndValues = nameValue[1].Split(Delimiter);
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 
     public override bool ValueIncludesParameterName => !Explode;
+    public override string Delimiter => Explode ? "; " : ",";
 
     protected override string Serialize(IDictionary<string, string?> properties) => Explode
-        ? string.Join("; ", properties.Select(p => $"{p.Key}={p.Value}"))
-        : $"{ParameterName}={string.Join(',', properties.Select(p => $"{p.Key},{p.Value}"))}";
+        ? string.Join(Delimiter, properties.Select(p => $"{p.Key}={p.Value}"))
+        : $"{ParameterName}={string.Join(Delimiter, properties.Select(p => $"{p.Key}{Delimiter}{p.Value}"))}";
 }

@@ -6,6 +6,7 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 internal sealed class FormObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
     public override bool ValueIncludesParameterName => true;
+    public override string Delimiter => ",";
 
     public override bool TryParse(
         string? value,
@@ -22,10 +23,10 @@ internal sealed class FormObjectValueParser(Parameter parameter) : ObjectValuePa
         var keyAndValues = value?
             .Split('=')
             .Last()
-            .Split(',');
+            .Split(Delimiter);
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 
     protected override string Serialize(IDictionary<string, string?> properties) =>
-        $";{ParameterName}={string.Join(',', properties.Select(pair => $"{pair.Key},{pair.Value}"))}";
+        $";{ParameterName}={string.Join(Delimiter, properties.Select(pair => $"{pair.Key}{Delimiter}{pair.Value}"))}";
 }

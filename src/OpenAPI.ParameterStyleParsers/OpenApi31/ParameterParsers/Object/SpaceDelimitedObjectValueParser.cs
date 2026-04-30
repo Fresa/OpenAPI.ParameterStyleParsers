@@ -6,6 +6,7 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 internal sealed class SpaceDelimitedObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
     public override bool ValueIncludesParameterName => true;
+    public override string Delimiter => "%20";
 
     public override bool TryParse(
         string? value,
@@ -22,10 +23,10 @@ internal sealed class SpaceDelimitedObjectValueParser(Parameter parameter) : Obj
         var keyAndValues = value?
             .Split('=')
             .Last()
-            .Split("%20");
+            .Split(Delimiter);
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 
     protected override string Serialize(IDictionary<string, string?> properties) =>
-        $"{ParameterName}={string.Join("%20", properties.Select(property => $"{property.Key}%20{property.Value}"))}";
+        $"{ParameterName}={string.Join(Delimiter, properties.Select(property => $"{property.Key}{Delimiter}{property.Value}"))}";
 }

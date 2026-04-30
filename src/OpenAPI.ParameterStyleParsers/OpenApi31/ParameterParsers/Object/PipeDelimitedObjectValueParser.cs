@@ -20,12 +20,13 @@ internal sealed class PipeDelimitedObjectValueParser(Parameter parameter) : Obje
         var keyAndValues = value?
             .Split('=')
             .Last()    
-            .Split('|');
+            .Split(Delimiter);
         return TryGetObjectProperties(keyAndValues, out obj, out error);
     }
 
     public override bool ValueIncludesParameterName => true;
+    public override string Delimiter => "|";
 
     protected override string Serialize(IDictionary<string, string?> properties) =>
-        $"{ParameterName}={string.Join('|', properties.Select(property => $"{property.Key}|{property.Value}"))}";
+        $"{ParameterName}={string.Join(Delimiter, properties.Select(property => $"{property.Key}{Delimiter}{property.Value}"))}";
 }

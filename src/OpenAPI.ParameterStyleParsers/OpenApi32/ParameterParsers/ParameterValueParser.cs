@@ -5,7 +5,6 @@ using OpenAPI.ParameterStyleParsers.JsonSchema;
 using OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers.Array;
 using OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers.Object;
 using OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers.Primitive;
-using OpenAPI.ParameterStyleParsers.ParameterParsers;
 using OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers;
 
 namespace OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers;
@@ -26,6 +25,9 @@ public sealed class ParameterValueParser : IParameterValueParser
 
     /// <inheritdoc />
     public bool ValueIncludesParameterName { get; }
+
+    /// <inheritdoc />
+    public string Delimiter => _valueParser.Delimiter;
 
     /// <summary>
     /// Creates a parameter value parser corresponding to the specified parameter

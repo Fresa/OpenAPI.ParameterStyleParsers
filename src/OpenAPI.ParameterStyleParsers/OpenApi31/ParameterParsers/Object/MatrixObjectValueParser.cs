@@ -6,6 +6,7 @@ namespace OpenAPI.ParameterStyleParsers.OpenApi31.ParameterParsers.Object;
 internal sealed class MatrixObjectValueParser(Parameter parameter) : ObjectValueParser(parameter)
 {
     public override bool ValueIncludesParameterName => !Explode;
+    public override string Delimiter => Explode ? ";" : ",";
 
     public override bool TryParse(
         string? value,
@@ -19,7 +20,7 @@ internal sealed class MatrixObjectValueParser(Parameter parameter) : ObjectValue
                 var valueAndKey = expression.Split('=');
                 var key = valueAndKey[0];
                 var value = valueAndKey.Length == 1 ? string.Empty : valueAndKey.Last();
-                return Explode ? [key, value] : value.Split(',');
+                return Explode ? [key, value] : value.Split(Delimiter);
             })
             .ToArray();
 
@@ -27,7 +28,7 @@ internal sealed class MatrixObjectValueParser(Parameter parameter) : ObjectValue
     }
 
     protected override string Serialize(IDictionary<string, string?> properties) =>
-        $";{(ValueIncludesParameterName ? $"{ParameterName}=" : "")}{string.Join(ValueIncludesParameterName ? ',' : ';',
+        $";{(ValueIncludesParameterName ? $"{ParameterName}=" : "")}{string.Join(Delimiter,
             properties.Select(property =>
                 $"{property.Key}{(ValueIncludesParameterName ? "," : string.IsNullOrEmpty(property.Value) ? "" : "=")}{property.Value}"))}";
 }
