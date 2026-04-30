@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using OpenAPI.ParameterStyleParsers.OpenApi32.ParameterParsers;
 
@@ -200,7 +201,7 @@ public class SchemaParameterValueConverterTests
         else
         {
             jsonInstance.Should().NotBeNull();
-            instance.ToJsonString().Should().BeEquivalentTo(jsonInstance);
+            instance.ToJsonString().Should().Be(JsonNode.Parse(jsonInstance)?.ToJsonString());
         }
     }
 
@@ -365,6 +366,57 @@ public class SchemaParameterValueConverterTests
             ["hello%20world,foo%2Cbar"],
             true,
             """["hello%20world","foo%2Cbar"]""",
+            false
+        },
+        {
+            """
+            {
+                "name": "X-Quotes",
+                "in": "header",
+                "schema": { "type": "array", "items": { "type": "string" } }
+            }
+            """,
+            ["""
+             "1","2"
+             """],
+            true,
+            """
+            ["\"1\"","\"2\""]
+            """,
+            false
+        },
+        {
+            """
+            {
+                "name": "QuotedCommas",
+                "in": "header",
+                "schema": { "type": "array", "items": { "type": "string" } }
+            }
+            """,
+            ["""
+             "1,","2"
+             """],
+            true,
+            """
+            ["\"1,\"","\"2\""]
+            """,
+            false
+        },
+        {
+            """
+            {
+                "name": "DoubleQuotedCommas",
+                "in": "header",
+                "schema": { "type": "array", "items": { "type": "string" } }
+            }
+            """,
+            ["""
+             "1\","
+             """],
+            true,
+            """"
+            ["\"1\\\",\""]
+            """",
             false
         }
     };

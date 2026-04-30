@@ -1,6 +1,4 @@
 ﻿using System.Text.Json.Nodes;
-using OpenAPI.ParameterStyleParsers.JsonSchema;
-using OpenAPI.ParameterStyleParsers.ParameterParsers;
 
 namespace OpenAPI.ParameterStyleParsers.UnitTests.OpenApi_31;
 
@@ -244,16 +242,8 @@ public class SchemaParameterValueConverterTests
         string? jsonInstance,
         bool expectedValueIncludesParameterName)
     {
-        var parameterJsonNode = JsonNode.Parse(parameterJson)!;
-        var reader = new JsonNodeReader(parameterJsonNode);
-        var schema = new JsonSchema202012(parameterJsonNode["schema"]);
         var parameter =
-            OpenApi31.Parameter.Parse(
-                reader.Read("name").GetValue<string>(),
-                reader.Read("style").GetValue<string>(),
-                reader.Read("in").GetValue<string>(),
-                reader.Read("explode").GetValue<bool>(),
-                schema);
+            OpenApi31.Parameter.FromOpenApi31ParameterSpecification(parameterJson);
         var parser = OpenApi31.ParameterValueParser.Create(parameter);
         parser.ValueIncludesParameterName.Should().Be(expectedValueIncludesParameterName);
         parser.TryParse(value, out var instance, out var mappingError).Should().Be(shouldMap, mappingError);
@@ -270,7 +260,7 @@ public class SchemaParameterValueConverterTests
         else
         {
             jsonInstance.Should().NotBeNull();
-            instance.ToJsonString().Should().BeEquivalentTo(jsonInstance);
+            instance.ToJsonString().Should().BeEquivalentTo(JsonNode.Parse(jsonInstance)?.ToJsonString());
         }
     }
 
@@ -1464,6 +1454,57 @@ public class SchemaParameterValueConverterTests
             ["test,test2"],
             true,
             "[\"test\",\"test2\"]",
+            false
+        },
+        {
+            """
+            {
+                "name": "X-Quotes",
+                "in": "header",
+                "schema": { "type": "array", "items": { "type": "string" } }
+            }
+            """,
+            ["""
+             %221%22,%222%22
+             """],
+            true,
+            """
+            ["\"1\"","\"2\""]
+            """,
+            false
+        },
+        {
+            """
+            {
+                "name": "QuotedCommas",
+                "in": "header",
+                "schema": { "type": "array", "items": { "type": "string" } }
+            }
+            """,
+            ["""
+             %221%2C%22,%222%22
+             """],
+            true,
+            """
+            ["\"1,\"","\"2\""]
+            """,
+            false
+        },
+        {
+            """
+            {
+                "name": "DoubleQuotedCommas",
+                "in": "header",
+                "schema": { "type": "array", "items": { "type": "string" } }
+            }
+            """,
+            ["""
+             %221%5C%22%2C%22
+             """],
+            true,
+            """"
+            ["\"1\\\",\""]
+            """",
             false
         }
     };
